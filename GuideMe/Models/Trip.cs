@@ -29,6 +29,10 @@ namespace GuideMe.Models
         [Required]
         public string Image { get; set; } = string.Empty;
         [Required]
+        public DateTime CreatedOn { get; set; }
+        [Required]
+        public DateTime LastUpdatedon { get; set; }
+
         public int VisitorId { get; set; }
 
         public Visitor Visitor { get; set; }

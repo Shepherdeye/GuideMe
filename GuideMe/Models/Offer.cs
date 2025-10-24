@@ -41,7 +41,5 @@ namespace GuideMe.Models
         [Required]
         public DateTime OfferEndDate { get; set; }
 
-        
-
     }
 }
