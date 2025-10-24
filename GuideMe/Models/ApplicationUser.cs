@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace GuideMe.Models
 {
@@ -14,7 +15,7 @@ namespace GuideMe.Models
         Female
     }
 
-    public class ApplicationUser
+    public class ApplicationUser:IdentityUser
     {
         [Required]
         public string FirstName { get; set; } = string.Empty;

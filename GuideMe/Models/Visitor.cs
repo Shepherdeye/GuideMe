@@ -25,6 +25,9 @@ namespace GuideMe.Models
         public ApplicationUser ApplicationUser { get; set; }
 
         public ICollection<Trip> Trips { get; set; } = new List<Trip>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        
 
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GuideMe.Models
 {
@@ -23,8 +22,8 @@ namespace GuideMe.Models
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public decimal Price { get; set; }
         public int Members { get; set; }
-        [Required]
-       
+
+        [Required]       
         public int NumberOfDays { get; set; }
         [Required]
         public string Image { get; set; } = string.Empty;
@@ -38,6 +37,10 @@ namespace GuideMe.Models
         public Visitor Visitor { get; set; }
 
         public ICollection<Offer> Offers { get; set; } = new List<Offer>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+     
 
     }
 }

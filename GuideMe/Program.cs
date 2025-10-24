@@ -1,3 +1,8 @@
+using GuideMe.DataAccess;
+using GuideMe.Utility.DBInitializer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 namespace GuideMe
 {
     public class Program
@@ -9,7 +14,35 @@ namespace GuideMe
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+
+            // add dbcontext  service
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+
+            //for Identity
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+
+            //for dbinitializer 
+            builder.Services.AddScoped<IDBInitializer, DBIntializer>();
+
+
             var app = builder.Build();
+
+            // service for => dbInitailizer 
+            var scope = app.Services.CreateScope();
+            var service = scope.ServiceProvider.GetService<IDBInitializer>();
+            service.Initialize();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

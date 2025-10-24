@@ -40,5 +40,9 @@ namespace GuideMe.Models
         [Required]
         public int VisitorId { get; set; }
         public Visitor Visitor { get; set; }
+
+        public Payment Payment { get; set; }
+
+        public ContactAccess ContactAccess { get; set; }
     }
 }
