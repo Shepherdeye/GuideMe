@@ -44,7 +44,8 @@ namespace GuideMe.Utility.DBInitializer
                         LastName="One",
                         Email = "SuperAdmin@EraaSoft.com",
                         EmailConfirmed = true,
-                        UserName = "SuperAdmin"
+                        UserName = "SuperAdmin",
+                        PhoneNumber="01012939912",
 
                     }, "Admin123@").GetAwaiter().GetResult();
 
