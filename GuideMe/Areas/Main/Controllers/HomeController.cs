@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using GuideMe.Utility;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuideMe.Areas.Main.Controllers
@@ -15,11 +13,11 @@ namespace GuideMe.Areas.Main.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+       public IActionResult NotFoundPage()
         {
+
             return View();
         }
-
      
     }
 }
