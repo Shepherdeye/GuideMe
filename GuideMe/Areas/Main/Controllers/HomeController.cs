@@ -6,18 +6,25 @@ namespace GuideMe.Areas.Main.Controllers
     public class HomeController : Controller
     {
 
-    
+
 
         public IActionResult Index()
         {
             return View();
         }
 
-       public IActionResult NotFoundPage()
+        public IActionResult NotFoundPage()
         {
 
             return View();
         }
+        public IActionResult About()
+        {
+
+            return View();
+        }
+
      
+
     }
 }

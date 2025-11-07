@@ -30,6 +30,8 @@
     <!-- Template Stylesheet -->
     <link href="~/main/css/style.css" rel="stylesheet">
 
+    <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
 </head>
 <body>
 
@@ -49,7 +51,7 @@
     <!-- Navbar & Hero Start -->
     <div class="container-fluid position-relative p-0">
         <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
-
+            /
             <a asp-controller="Home" asp-action="Index" class="navbar-brand p-0">
                 <h3 class="text-primary m-0"><i class="fa fa-map-marker-alt me-3"></i>GuideMe</h3>
                 <!-- <img src="img/logo.png" alt="Logo"> -->
@@ -75,7 +77,21 @@
                     </div>
                     <a href="contact.html" class="nav-item nav-link">Contact</a>
                 </div>
-                <a href="" class="btn btn-primary rounded-pill py-2 px-4">Register</a>
+                @* <a href="/identity/Account/VisitorRegister" class="btn btn-primary rounded-pill py-2 px-4 mx-2">Register</a>
+                <a href="/identity/Account/Login" class="btn btn-secondary rounded-pill py-2 px-4">Login</a> *@
+              
+                @if (User is not null && User.Identity.IsAuthenticated)
+                {
+                    <a class="nav-item nav-link fw-bolder" href="/Identity/Profile/Index">@User.Identity.Name</a>
+                    <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Login</a>
+                }
+                else
+                {
+                    <a href="/identity/Account/VisitorRegister" class="btn btn-primary rounded-pill py-2 px-4 mx-2">Register</a>
+                <a href="/identity/Account/Login" class="btn btn-secondary rounded-pill py-2 px-4">Login</a>
+
+                }
+
             </div>
         </nav>
 
@@ -133,29 +149,7 @@
                         <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
-                @* <div class="col-lg-3 col-md-6">
-                    <h4 class="text-white mb-3">Gallery</h4>
-                    <div class="row g-2 pt-2">
-                        <div class="col-4">
-                            <img class="img-fluid bg-light p-1" src="~/main/img/package-1.jpg" alt="">
-                        </div>
-                        <div class="col-4">
-                            <img class="img-fluid bg-light p-1" src="~/main/img/package-2.jpg" alt="">
-                        </div>
-                        <div class="col-4">
-                            <img class="img-fluid bg-light p-1" src="~/main/img/package-3.jpg" alt="">
-                        </div>
-                        <div class="col-4">
-                            <img class="img-fluid bg-light p-1" src="~/main/img/package-2.jpg" alt="">
-                        </div>
-                        <div class="col-4">
-                            <img class="img-fluid bg-light p-1" src="~/main/img/package-3.jpg" alt="">
-                        </div>
-                        <div class="col-4">
-                            <img class="img-fluid bg-light p-1" src="~/main/img/package-1.jpg" alt="">
-                        </div>
-                    </div>
-                </div> *@
+               
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Newsletter</h4>
                     <p>Dolor amet sit justo amet elitr clita ipsum elitr est.</p>
@@ -183,10 +177,9 @@
     <script src="~/main/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="~/main/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="~/main/js/main.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    @* <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script> *@
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

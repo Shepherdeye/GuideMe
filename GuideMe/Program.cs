@@ -1,6 +1,7 @@
-using GuideMe.DataAccess;
+using GuideMe.Repositories;
 using GuideMe.Utility.DBInitializer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace GuideMe
@@ -29,13 +30,31 @@ namespace GuideMe
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;
+               
             }).AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+            // for=> authorize
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Main/Home/NotFound";
+
+            });
+
+
+            //for email sender
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 
             //for dbinitializer 
             builder.Services.AddScoped<IDBInitializer, DBIntializer>();
+            builder.Services.AddScoped<IRepository<Visitor>, Repository<Visitor>>();
+            builder.Services.AddScoped<IRepository<Guide>, Repository<Guide>>();
+            builder.Services.AddScoped<IRepository<UserOTP>, Repository<UserOTP>>();
 
+      
 
             var app = builder.Build();
 

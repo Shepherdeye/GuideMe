@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
+using GuideMe.ViewModels;
+using GuideMe.Models;
 
 namespace GuideMe.DataAccess
 {
@@ -19,6 +21,7 @@ namespace GuideMe.DataAccess
         public DbSet<Booking> Booking { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<ContactAccess> ContactAccess { get; set; }
+        public DbSet<UserOTP> UserOTPs { get; set; }
 
 
 
@@ -56,20 +59,25 @@ namespace GuideMe.DataAccess
                 .HasForeignKey(b => b.GuideId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ✅ Review ↔ Visitor
+            //  Review ↔ Visitor
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Visitor)
                 .WithMany(v => v.Reviews)
                 .HasForeignKey(r => r.VisitorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ✅ Review ↔ Trip
+            //  Review ↔ Trip
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Trip)
                 .WithMany(t => t.Reviews)
                 .HasForeignKey(r => r.TripId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+        public DbSet<GuideMe.Models.ForgetPasswordVM> ForgetPasswordVM { get; set; } = default!;
+        public DbSet<GuideMe.ViewModels.ResetPasswordVM> ResetPasswordVM { get; set; } = default!;
+        public DbSet<GuideMe.Models.ChangePasswordVM> ChangePasswordVM { get; set; } = default!;
+
+ 
 
 
 
