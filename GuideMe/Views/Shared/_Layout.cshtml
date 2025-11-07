@@ -51,7 +51,7 @@
     <!-- Navbar & Hero Start -->
     <div class="container-fluid position-relative p-0">
         <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
-            /
+           
             <a asp-controller="Home" asp-action="Index" class="navbar-brand p-0">
                 <h3 class="text-primary m-0"><i class="fa fa-map-marker-alt me-3"></i>GuideMe</h3>
                 <!-- <img src="img/logo.png" alt="Logo"> -->
@@ -82,8 +82,8 @@
               
                 @if (User is not null && User.Identity.IsAuthenticated)
                 {
-                    <a class="nav-item nav-link fw-bolder" href="/Identity/Profile/Index">@User.Identity.Name</a>
-                    <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Login</a>
+                    <a class="nav-item nav-link fw-bolder" href="/Identity/Profile/Index">@User.Identity.Name <i class="bi-person-fill me-1 text-lg"></i></a>
+                    <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Logout</a>
                 }
                 else
                 {
