@@ -1,67 +1,98 @@
-﻿@model ProfileVm
+﻿@model AllProfileData
 
 <div class="profile-container container py-5">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center ">
         <div class="col-xl-10 col-lg-11 col-md-12">
 
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
                 <div class="row g-0">
 
-                    <!-- Left: Profile Image -->
-                    <div class="col-lg-3 bg-light text-center p-4 d-flex flex-column align-items-center justify-content-start">
-                        <img src="~/identity/profile/1.jpg"
-                             alt="Profile Picture"
-                             class="rounded-circle img-fluid mb-3"
-                             style="width: 120px; height: 120px; object-fit: cover;">
-                        <h5 class="fw-bold">@Model.FirstName @Model.LastName</h5>
-                        <p class="text-muted small mb-1">@Model.Email</p>
+                                <!-- Left: Profile Image -->    
+                               <!-- Profile Image Section -->
+                               <!-- Profile Image Section -->
+                            <div class="col-lg-3 bg-light text-center p-4 d-flex flex-column align-items-center justify-content-start rounded-start-4">
 
-                      
-                            <div class="role-badge mb-3 px-3 py-1 rounded-pill bg-success text-white">
-                                @Model.Role
+                                <!-- Profile Image -->
+                                <div class="position-relative mb-3">
+                                    <img id="profileImagePreview"
+                                         src="~/identity/profile/@Model.ProfileVm.ProfileImage"
+                                         alt="Profile Picture"
+                                         class="rounded-circle shadow-sm border border-3 border-white img-fluid"
+                                         style="width: 130px; height: 130px; object-fit: cover;">
+
+                                    <!-- Camera icon overlay -->
+                                    <label for="ProfileImageFile"
+                                           class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow-sm"
+                                           style="cursor:pointer;">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </label>
+                                </div>
+
+                                <!-- Name + Email -->
+                                <h5 class="fw-bold mb-1">@Model.ProfileVm.FirstName @Model.ProfileVm.LastName</h5>
+                                <p class="text-muted small mb-1">@Model.ProfileVm.Email</p>
+
+                                <!-- Role badge -->
+                                <div class="role-badge mb-3 px-3 py-1 rounded-pill bg-success text-white shadow-sm">
+                                    @Model.ProfileVm.Role
+                                </div>
+
+                                <!-- Upload Form -->
+                                <form asp-action="ChangePhoto"
+                                      asp-controller="Profile"
+                                      asp-area="Profile"
+                                      method="post"
+                                      enctype="multipart/form-data"
+                                      class="w-100 d-flex flex-column align-items-center gap-2">
+
+                                    <input type="hidden" name="userId" value="@Model.ProfileVm.Id" />
+                                    <input type="file" id="ProfileImageFile" name="ProfileImageFile"
+                                           accept="image/*" class="d-none" onchange="previewProfileImage(event)" />
+
+                                    <button type="submit" id="savePhotoBtn"
+                                            class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm d-none">
+                                        Save New Photo
+                                    </button>
+                                </form>
                             </div>
-                        
-
-                        <button type="button" class="btn btn-outline-primary btn-sm w-75">Change Photo</button>
-                    </div>
 
 
                     <!-- Middle: Profile Form -->
                     <div class="col-lg-5 p-4 border-end">
                         <form asp-action="UpdateProfile" asp-controller="Profile" asp-area="Profile" method="post" class="profile-form">
-                            <input type="hidden" name="Id" value="@Model.Id" />
+                            <input type="hidden" asp-for="ProfileVm.Id"/>
 
                             <h4 class="mb-4 fw-bold text-primary">Profile Settings</h4>
 
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
-                                    <label asp-for="FirstName" class="form-label text-secondary">First Name</label>
-                                    <input asp-for="FirstName" class="form-control" placeholder="First name">
+                                    <label asp-for="ProfileVm.FirstName" class="form-label text-secondary">First Name</label>
+                                    <input asp-for="ProfileVm.FirstName" class="form-control" placeholder="First name">
                                 </div>
                                 <div class="col-md-6">
-                                    <label asp-for="LastName" class="form-label text-secondary">Last Name</label>
-                                    <input asp-for="LastName" class="form-control" placeholder="Last name">
+                                    <label asp-for="ProfileVm.LastName" class="form-label text-secondary">Last Name</label>
+                                    <input asp-for="ProfileVm.LastName" class="form-control" placeholder="Last name">
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="PhoneNumber" class="form-label text-secondary">Phone Number</label>
-                                <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number">
+                                <label asp-for="ProfileVm.PhoneNumber" class="form-label text-secondary">Phone Number</label>
+                                <input asp-for="ProfileVm.PhoneNumber" class="form-control" placeholder="Enter phone number">
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="Email" class="form-label text-secondary">Email</label>
-                                <input asp-for="Email" class="form-control" placeholder="Email">
+                                <label asp-for="ProfileVm.Email" class="form-label text-secondary">Email</label>
+                                <input asp-for="ProfileVm.Email" class="form-control" placeholder="Email">
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="UserName" class="form-label text-secondary">User Name</label>
-                                <input asp-for="UserName" class="form-control" placeholder="User Name">
+                                <label asp-for="ProfileVm.UserName" class="form-label text-secondary">User Name</label>
+                                <input asp-for="ProfileVm.UserName" class="form-control" placeholder="User Name">
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="Country" class="form-label text-secondary">Country</label>
-                                <input asp-for="Country" class="form-control" placeholder="Country">
+                                <label asp-for="ProfileVm.Country" class="form-label text-secondary">Country</label>
+                                <input asp-for="ProfileVm.Country" class="form-control" placeholder="Country">
                             </div>
 
                             <div class="text-center mt-4">
@@ -75,22 +106,75 @@
                         <div class="accordion" id="profileAccordion">
 
                             <!-- More Details -->
-                            <div class="accordion-item mb-3">
+                            @if (Model.ProfileVm.Role == UserRole.Visitor)
+                            {
+                                  <div class="accordion-item mb-3">
                                 <h2 class="accordion-header" id="headingDetails">
                                     <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
-                                        More Details
+                                        Edit Visitor Details
                                     </button>
                                 </h2>
                                 <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails" data-bs-parent="#profileAccordion">
                                     <div class="accordion-body">
-                                        <form asp-action="UpdateDetails" method="post">
+                                        <form asp-action="UpdateVisitorDetails" asp-controller="Profile" asp-area="Profile" method="post">
+
+                                           <input type="hidden" name="Id" value="@Model.Visitor.Id" />
                                             <div class="mb-3">
-                                                <label class="form-label">Experience in Designing</label>
-                                                <input name="Experience" class="form-control" placeholder="Enter experience">
+                                                <label class="form-label">Visitor Status</label>
+                                               <select class="form-select" name="visitorStatus">
+                                                  
+                                                        @if (Model.Visitor.visitorStatus == VisitorStatus.Available)
+                                                        {
+                                                         <option selected value="@VisitorStatus.Available">Available</option>
+                                                            
+                                                        <option value="@VisitorStatus.NotAvailable">NotAvailable</option>
+                                                                                                }
+                                                        else
+                                                        {
+                                                          <option  value="@VisitorStatus.Available">Available</option>
+                                                            
+                                                        <option selected value="@VisitorStatus.NotAvailable">NotAvailable</option>
+                                                        }
+
+                                                    
+                                                </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Additional Details</label>
-                                                <textarea name="AdditionalDetails" class="form-control" rows="3" placeholder="Additional details"></textarea>
+                                                <label class="form-label">Passport</label>
+                                                <input name="Passport" class="form-control" value="@Model.Visitor.Passport" />
+                                            </div>
+                                            <div class="text-center mt-3">
+                                                <button type="submit" class="btn btn-outline-primary rounded-pill px-4 w-100">Update Details</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                </div>
+                            }
+                            else if(Model.ProfileVm.Role== UserRole.Guide)
+                            {
+                                  <div class="accordion-item mb-3">
+                                <h2 class="accordion-header" id="headingDetails">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+                                       Edit Guide Details
+                                    </button>
+                                </h2>
+                                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails" data-bs-parent="#profileAccordion">
+                                    <div class="accordion-body">
+                                        <form asp-action="UpdateGuideDetails" asp-controller="Profile" asp-area="Profile" method="post">
+                                            <input type="hidden" name="Id" value="@Model.Guide.Id" />
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label">National Id</label>
+                                                <input name="NationalId" class="form-control" value="@Model.Guide.NationalId" >
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">LicenseNumber</label>
+                                                <input name="LicenseNumber" class="form-control" value="@Model.Guide.LicenseNumber" >
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Years Of Experience</label>
+                                                <input type="number" name="YearsOfExperience" class="form-control" value="@Model.Guide.YearsOfExperience" >
                                             </div>
                                             <div class="text-center mt-3">
                                                 <button type="submit" class="btn btn-outline-primary rounded-pill px-4 w-100">Update Details</button>
@@ -99,6 +183,10 @@
                                     </div>
                                 </div>
                             </div>
+
+
+
+                            }
 
                             <!-- Change Password -->
                             <div class="accordion-item">
@@ -110,7 +198,7 @@
                                 <div id="collapsePassword" class="accordion-collapse collapse" aria-labelledby="headingPassword" data-bs-parent="#profileAccordion">
                                     <div class="accordion-body">
                                         <form asp-action="ChangePassword" asp-controller="Profile" method="post">
-                                            <input type="hidden" name="ApplicationUserId" value="@Model.Id" />
+                                            <input type="hidden" name="ApplicationUserId" value="@Model.ProfileVm.Id" />
                                             <div class="mb-3">
                                                 <label class="form-label">Current Password</label>
                                                 <input name="CurrentPassword" type="password" class="form-control">
@@ -130,6 +218,98 @@
                                     </div>
                                 </div>
                             </div>
+                            @if (Model.ProfileVm.Role == UserRole.Visitor)
+                            {
+                                <!-- Additional Data (Read Only) -->
+                           <!-- Visitor Info -->
+                            <div class="accordion-item mt-3 border-0 shadow-sm rounded-3 overflow-hidden">
+                                <h2 class="accordion-header" id="headingAdditionalData">
+                                    <button class="accordion-button collapsed fw-bold text-primary bg-light" 
+                                            type="button" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#collapseAdditionalData" 
+                                            aria-expanded="false" 
+                                            aria-controls="collapseAdditionalData">
+                                        <i class="bi bi-person-vcard me-2"></i> Visitor Info
+                                    </button>
+                                </h2>
+
+                                <div id="collapseAdditionalData" 
+                                     class="accordion-collapse collapse" 
+                                     aria-labelledby="headingAdditionalData" 
+                                     data-bs-parent="#profileAccordion">
+
+                                    <div class="accordion-body bg-white">
+                                        <div class="row gy-3">
+
+                             @* <!-- Visitor Status --> *@
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3 border d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <label class="fw-bold text-secondary mb-1 d-block">Visitor Status</label>
+                                            @if (Model.Visitor.visitorStatus == VisitorStatus.Available)
+                                            {
+                                                <span class="badge bg-success px-3 py-2">@Model.Visitor.visitorStatus</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger px-3 py-2">@Model.Visitor.visitorStatus</span>
+                                            }
+                                        </div>
+                                        <i class="bi bi-activity fs-4 text-muted"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Passport -->
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3 border d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <label class="fw-bold text-secondary mb-1 d-block">Passport</label>
+                                            <span class="fw-semibold text-dark">@Model.Visitor.Passport</span>
+                                        </div>
+                                        <i class="bi bi-passport fs-4 text-muted"></i>
+                                    </div>
+                                </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                                
+                            }else if (Model.ProfileVm.Role == UserRole.Guide)
+                            {
+                                        <!-- Additional Data (Read Only) -->
+                                        <div class="accordion-item mt-3">
+                                            <h2 class="accordion-header" id="headingAdditionalData">
+                                                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdditionalData" aria-expanded="false" aria-controls="collapseAdditionalData">
+                                                    Guide Info
+                                                </button>
+                                            </h2>
+                                            <div id="collapseAdditionalData" class="accordion-collapse collapse" aria-labelledby="headingAdditionalData" data-bs-parent="#profileAccordion">
+                                                <div class="accordion-body">
+
+                                                    <div class="mb-3">
+                                                        <label class="fw-bold text-secondary d-block">License Number:</label>
+                                                        <span>@Model.Guide.LicenseNumber</span>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="fw-bold text-secondary d-block">National Id:</label>
+                                                        <span>@Model.Guide.NationalId</span>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="fw-bold text-secondary d-block">Years Of Experience:</label>
+                                                        <span>@Model.Guide.YearsOfExperience</span>
+                                                    </div>
+                                            
+                                                </div>
+                                            </div>
+                                        </div>
+
+                            }
 
                         </div>
                     </div>
@@ -145,4 +325,24 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <partial name="_NotifactionPartial" />
+
+
+    <script>
+        function previewProfileImage(event) {
+            const input = event.target;
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                const preview = document.getElementById('profileImagePreview');
+                preview.src = reader.result;
+
+                // Show the save button
+                document.getElementById('savePhotoBtn').classList.remove('d-none');
+            };
+
+            if (input.files && input.files[0]) {
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }
