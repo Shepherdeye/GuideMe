@@ -28,7 +28,7 @@
 
                     <!-- Middle: Profile Form -->
                     <div class="col-lg-5 p-4 border-end">
-                        <form asp-action="UpdateProfile" asp-controller="Profile" method="post" class="profile-form">
+                        <form asp-action="UpdateProfile" asp-controller="Profile" asp-area="Profile" method="post" class="profile-form">
                             <input type="hidden" name="Id" value="@Model.Id" />
 
                             <h4 class="mb-4 fw-bold text-primary">Profile Settings</h4>
