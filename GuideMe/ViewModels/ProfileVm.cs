@@ -25,5 +25,8 @@ namespace GuideMe.ViewModels
         [Required, MinLength(11), MaxLength(14)]
         public string PhoneNumber { get; set; } = string.Empty;
 
+        public UserRole? Role { get; set; }
+
+
     }
 }

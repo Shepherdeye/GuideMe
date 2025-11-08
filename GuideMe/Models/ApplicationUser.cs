@@ -6,7 +6,8 @@ namespace GuideMe.Models
    public enum UserRole
     {
         Visitor,
-        Guide
+        Guide,
+        Admin
     }
 
     public enum GenderType

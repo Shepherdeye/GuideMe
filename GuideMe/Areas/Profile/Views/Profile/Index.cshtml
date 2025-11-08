@@ -14,9 +14,17 @@
                              class="rounded-circle img-fluid mb-3"
                              style="width: 120px; height: 120px; object-fit: cover;">
                         <h5 class="fw-bold">@Model.FirstName @Model.LastName</h5>
-                        <p class="text-muted small mb-3">@Model.Email</p>
+                        <p class="text-muted small mb-1">@Model.Email</p>
+
+                      
+                            <div class="role-badge mb-3 px-3 py-1 rounded-pill bg-success text-white">
+                                @Model.Role
+                            </div>
+                        
+
                         <button type="button" class="btn btn-outline-primary btn-sm w-75">Change Photo</button>
                     </div>
+
 
                     <!-- Middle: Profile Form -->
                     <div class="col-lg-5 p-4 border-end">
@@ -27,32 +35,32 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
-                                    <label asp-for="FirstName" class="form-label">First Name</label>
+                                    <label asp-for="FirstName" class="form-label text-secondary">First Name</label>
                                     <input asp-for="FirstName" class="form-control" placeholder="First name">
                                 </div>
                                 <div class="col-md-6">
-                                    <label asp-for="LastName" class="form-label">Last Name</label>
+                                    <label asp-for="LastName" class="form-label text-secondary">Last Name</label>
                                     <input asp-for="LastName" class="form-control" placeholder="Last name">
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                <label asp-for="PhoneNumber" class="form-label text-secondary">Phone Number</label>
                                 <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number">
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="Email" class="form-label">Email</label>
+                                <label asp-for="Email" class="form-label text-secondary">Email</label>
                                 <input asp-for="Email" class="form-control" placeholder="Email">
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="UserName" class="form-label">User Name</label>
+                                <label asp-for="UserName" class="form-label text-secondary">User Name</label>
                                 <input asp-for="UserName" class="form-control" placeholder="User Name">
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="Country" class="form-label">Country</label>
+                                <label asp-for="Country" class="form-label text-secondary">Country</label>
                                 <input asp-for="Country" class="form-control" placeholder="Country">
                             </div>
 

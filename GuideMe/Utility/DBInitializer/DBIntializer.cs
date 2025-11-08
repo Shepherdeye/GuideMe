@@ -46,6 +46,7 @@ namespace GuideMe.Utility.DBInitializer
                         EmailConfirmed = true,
                         UserName = "SuperAdmin",
                         PhoneNumber="01012939912",
+                        Role=UserRole.Admin
 
                     }, "Admin123@").GetAwaiter().GetResult();
 
