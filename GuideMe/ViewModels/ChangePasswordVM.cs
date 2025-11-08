@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GuideMe.Models
+namespace GuideMe.ViewModels
 {
     public class ChangePasswordVM
     {

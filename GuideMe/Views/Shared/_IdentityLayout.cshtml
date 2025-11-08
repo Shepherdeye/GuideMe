@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GuideMe</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/identity/css/style.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+</head>
+<body class="identity-layout">
+
+    <div class="identity-container">
+        <!-- Left side: Image / Branding -->
+        <div class="identity-left d-none d-md-flex flex-column justify-content-center align-items-center text-center">
+            <div class="identity-overlay text-center">
+                <h2 class="fw-bold text-white mb-3">Welcome to GuideMe</h2>
+                <p class="text-white-50">Explore the world with confidence</p>
+            </div>
+        </div>
+
+
+        <!-- Right side: Auth content -->
+        <div class="identity-right d-flex align-items-center justify-content-center">
+            <div class="identity-card shadow-lg rounded-4 p-4 w-100" style="max-width: 480px;">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

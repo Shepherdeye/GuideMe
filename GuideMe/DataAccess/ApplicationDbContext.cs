@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
-using GuideMe.ViewModels;
-using GuideMe.Models;
 
 namespace GuideMe.DataAccess
 {
@@ -73,9 +70,7 @@ namespace GuideMe.DataAccess
                 .HasForeignKey(r => r.TripId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        public DbSet<GuideMe.Models.ForgetPasswordVM> ForgetPasswordVM { get; set; } = default!;
-        public DbSet<GuideMe.ViewModels.ResetPasswordVM> ResetPasswordVM { get; set; } = default!;
-        public DbSet<GuideMe.Models.ChangePasswordVM> ChangePasswordVM { get; set; } = default!;
+
 
  
 

@@ -1,0 +1,79 @@
+.profile-layout {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f6f8;
+}
+
+.profile-content {
+    flex: 1;
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+    min-height: 100vh;
+}
+
+.profile-left {
+    flex: 1 0 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.profile-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.profile-btn {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+}
+
+.profile-middle {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+
+.vrp-input {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    border-radius: 0.35rem;
+    border: 1px solid #ccc;
+}
+
+    .vrp-input:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 4px rgba(76,175,80,0.3);
+    }
+
+.vrp-submit-btn {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 0.4rem;
+    font-weight: 600;
+    background-color: #4caf50;
+    color: #fff;
+}
+
+    .vrp-submit-btn:hover {
+        background-color: #43a047;
+    }
+
+.profile-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.profile-accordion .accordion-button {
+    font-size: 0.9rem;
+    font-weight: 600;
+}

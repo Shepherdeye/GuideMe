@@ -3,9 +3,6 @@ using GuideMe.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace GuideMe.Areas.Identity.Controllers
 {
@@ -43,6 +40,12 @@ namespace GuideMe.Areas.Identity.Controllers
         [HttpGet]
         public IActionResult VisitorRegister()
         {
+
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home", new { area="Main"});
+            }
+
             return View();
         }
 
@@ -129,7 +132,10 @@ namespace GuideMe.Areas.Identity.Controllers
 
         public IActionResult GuideRegister()
         {
-
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home", new { area = "Main" });
+            }
             return View();
         }
 
@@ -252,6 +258,10 @@ namespace GuideMe.Areas.Identity.Controllers
 
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home", new { area = "Main" });
+            }
 
             return View();
         }
@@ -304,6 +314,10 @@ namespace GuideMe.Areas.Identity.Controllers
         [HttpGet]
         public IActionResult ResendEmailConfirmation()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home", new { area = "Main" });
+            }
 
             return View();
         }
@@ -362,6 +376,10 @@ namespace GuideMe.Areas.Identity.Controllers
         [HttpGet]
         public IActionResult ForgetPassword()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home", new { area = "Main" });
+            }
             return View();
         }
 

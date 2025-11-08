@@ -1,37 +1,26 @@
 ﻿@model GuideMe.ViewModels.ResendEmailConfirmationVm
-
 @{
     ViewData["Title"] = "ResendEmailConfirmation";
+    Layout = "~/Views/Shared/_IdentityLayout.cshtml";
 }
 
-<div class="container">
-    <h1>Resend EmailConfirmation</h1>
+<h2 class="vrp-title text-center mb-4">Resend Email Confirmation</h2>
 
+<form asp-action="ResendEmailConfirmation" class="d-flex flex-column align-items-center w-100" style="max-width: 450px; margin: auto;">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 w-100"></div>
 
-    <hr />
-    <div class="row">
-        <div class="col-md-12">
-            <form asp-action="ResendEmailConfirmation">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="UserNameOrEmail" class="control-label"></label>
-                    <input asp-for="UserNameOrEmail" class="form-control" />
-                    <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
-                </div>
-                <div class="form-group py-2">
-                    <input type="submit" value="Send" class="btn btn-primary" />
-                </div>
-            </form>
-        </div>
+    <input asp-for="UserNameOrEmail" class="form-control vrp-input mb-3" placeholder="Username or Email" />
+
+    <button type="submit" class="btn vrp-submit-btn w-100 mb-3">Send</button>
+
+    <div class="d-flex justify-content-center w-100">
+        <a asp-action="Login" class="vrp-alt-link">Back to Login</a>
     </div>
+</form>
 
-    <div>
-        <a asp-action="Login">Back to Login</a>
-    </div>
-
-
-</div>
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <partial name="_NotifactionPartial" />
 }

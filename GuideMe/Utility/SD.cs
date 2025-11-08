@@ -6,6 +6,7 @@
         public const string MainArea = "Main";
         public const string AdminArea = "Admin";
         public const string IdentityArea = "Identity";
+        public const string ProfileArea = "Profile";
         //role
         public const string SuperAdminRole = "SuperAdmin";
         public const string AdminRole = "Admin";

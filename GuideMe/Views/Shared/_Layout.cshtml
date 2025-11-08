@@ -82,13 +82,13 @@
               
                 @if (User is not null && User.Identity.IsAuthenticated)
                 {
-                    <a class="nav-item nav-link fw-bolder" href="/Identity/Profile/Index">@User.Identity.Name <i class="bi-person-fill me-1 text-lg"></i></a>
+                    <a class="nav-item nav-link fw-bolder" href="/Profile/Profile/Index">@User.Identity.Name <i class="bi-person-fill me-1 text-lg"></i></a>
                     <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Logout</a>
                 }
                 else
                 {
                     <a href="/identity/Account/VisitorRegister" class="btn btn-primary rounded-pill py-2 px-4 mx-2">Register</a>
-                <a href="/identity/Account/Login" class="btn btn-secondary rounded-pill py-2 px-4">Login</a>
+                    <a href="/identity/Account/Login" class="btn btn-secondary rounded-pill py-2 px-4">Login</a>
 
                 }
 

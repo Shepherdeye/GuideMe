@@ -1,0 +1,330 @@
+﻿/*
+ * Modified CSS for Identity Layout
+ * Includes responsiveness for all screen sizes
+ */
+
+/* General Layout and Background */
+.identity-layout {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #5cb270, #2e7d32);
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden; /* Added to prevent horizontal scroll on smaller screens */
+}
+
+.identity-container {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row; /* Default for larger screens */
+}
+
+/* Left Section - Image/Overlay */
+.identity-left {
+    flex: 1;
+    position: relative;
+    background-image: url('../img/identity.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.identity-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2rem 3rem;
+    border-radius: 1rem;
+    animation: fadeIn 1s ease-in-out both;
+    text-align: center; /* Ensures text inside is centered */
+}
+
+/* Right Section - Form Container */
+.identity-right {
+    flex: 1;
+    background: #f9f9f9;
+    /* Ensure the content aligns well when it's the only column */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem; /* Added padding for smaller screens */
+}
+
+.identity-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Removed redundant height: 100%; as parent's flex handles it */
+    width: 100%; /* Ensure it uses full width within padding */
+    max-width: 450px; /* Constrain the form width for better design */
+}
+
+/* Form Card Styles */
+.identity-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
+    width: 100%;
+    animation: fadeInUp 0.7s ease both;
+}
+
+    .identity-card h2 {
+        font-weight: 700;
+        color: #2e7d32;
+        margin-bottom: 1.5rem;
+        text-align: center; /* Center the title */
+    }
+
+    .identity-card .form-control {
+        border-radius: 0.75rem;
+        padding: 0.8rem 1rem;
+        border: 1px solid #ccc;
+        transition: 0.3s;
+        width: 100%; /* Ensures inputs take full width */
+    }
+
+        .identity-card .form-control:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
+        }
+
+    .identity-card .btn-primary {
+        background: #4caf50;
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.8rem;
+        font-weight: 600;
+        transition: 0.3s;
+        width: 100%; /* Ensures button takes full width */
+    }
+
+        .identity-card .btn-primary:hover {
+            background: #43a047;
+        }
+
+    .identity-card a {
+        color: #4caf50;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .identity-card a:hover {
+            text-decoration: underline;
+        }
+
+/* Media Query for Mobile/Tablet Devices */
+@media (max-width: 768px) {
+    .identity-container {
+        flex-direction: column; /* Stacks the sections vertically */
+    }
+
+    .identity-left {
+        min-height: 30vh; /* Give the image a minimum height on small screens */
+        flex: none; /* Remove flex sizing */
+    }
+
+    .identity-overlay {
+        padding: 1.5rem 2rem; /* Reduced padding on small screens */
+    }
+
+    .identity-right {
+        min-height: 70vh; /* Ensure the form section still has ample space */
+        flex: none;
+        padding: 1rem;
+    }
+
+    .identity-content {
+        /* Allow content to flow better on small screens */
+        padding: 0;
+    }
+
+    .identity-card {
+        margin: auto; /* Center the card horizontally */
+    }
+}
+
+
+/* Animations (No changes needed, but included for completeness) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* --- Small Component Styles (VRP) --- */
+/* Kept the VRP/GR styles as is since the layout changes primarily affect the .identity classes. */
+
+/* Title */
+.vrp-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+/* Small Inputs */
+.vrp-input {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    border-radius: 0.35rem;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+}
+
+    .vrp-input:focus, .vrp-input:active {
+        border-color: #4caf50;
+        box-shadow: 0 0 4px rgba(76, 175, 80, 0.3);
+    }
+
+/* Submit button */
+.vrp-submit-btn {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 0.4rem;
+    font-weight: 600;
+    background-color: #4caf50;
+}
+
+    .vrp-submit-btn:hover {
+        background-color: #43a047;
+    }
+
+/* External login buttons */
+.vrp-google-btn, .vrp-facebook-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    border-radius: 0.35rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.vrp-google-btn {
+    background-color: #db4437;
+}
+
+    .vrp-google-btn:hover {
+        background-color: #c1351d;
+    }
+
+.vrp-facebook-btn {
+    background-color: #3b5998;
+}
+
+    .vrp-facebook-btn:hover {
+        background-color: #2d4373;
+    }
+
+/* Alternative link */
+.vrp-alt-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4caf50;
+    text-decoration: none;
+}
+
+    .vrp-alt-link:hover {
+        text-decoration: underline;
+    }
+
+
+/* --- Guide style (GR) --- */
+
+/* Wrapper */
+.gr-form {
+    max-width: 600px;
+    margin: auto;
+}
+
+/* Title */
+.gr-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+/* Small Inputs */
+.gr-input {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    border-radius: 0.35rem;
+    border: 1px solid #ccc;
+    transition: 0.2s;
+}
+
+    .gr-input:focus, .gr-input:active {
+        border-color: #4caf50;
+        box-shadow: 0 0 4px rgba(76, 175, 80, 0.3);
+    }
+
+/* Submit button */
+.gr-submit-btn {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 0.4rem;
+    font-weight: 600;
+    background-color: #4caf50;
+}
+
+    .gr-submit-btn:hover {
+        background-color: #43a047;
+    }
+
+/* External login buttons */
+.gr-google-btn, .gr-facebook-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    border-radius: 0.35rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.gr-google-btn {
+    background-color: #db4437;
+}
+
+    .gr-google-btn:hover {
+        background-color: #c1351d;
+    }
+
+.gr-facebook-btn {
+    background-color: #3b5998;
+}
+
+    .gr-facebook-btn:hover {
+        background-color: #2d4373;
+    }
+
+/* Alternative link */
+.gr-alt-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4caf50;
+    text-decoration: none;
+}
+
+    .gr-alt-link:hover {
+        text-decoration: underline;
+    }
+
+
+/*profile  page  style*/
+
