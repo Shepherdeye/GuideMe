@@ -27,25 +27,23 @@ namespace GuideMe.Areas.Profile.Controllers
         }
         public async Task<IActionResult> Index()
         {
-
             var user = await _userManager.GetUserAsync(User);
 
-            ProfileVm userProfile = user.Adapt<ProfileVm>();
+            if (user == null) return NotFound();
 
-            if (userProfile is null) return NotFound();
+            ProfileVm userProfile = user.Adapt<ProfileVm>();
 
             var guideData = await _guideRepository.GetOneAsync(e => e.ApplicationUserId == user.Id);
             var visitorData = await _visitorRepository.GetOneAsync(e => e.ApplicationUserId == user.Id);
 
             AllProfileData data = new AllProfileData()
             {
-
                 ProfileVm = userProfile,
-                Guide = guideData,
-                Visitor = visitorData
 
+                // we  make a  new  class  here to  aviod null reference
+                Guide = guideData ?? new Guide(), 
+                Visitor = visitorData ?? new Visitor() 
             };
-
 
             return View(data);
         }
@@ -221,7 +219,7 @@ namespace GuideMe.Areas.Profile.Controllers
                     System.IO.File.Delete(oldPath);
                 }
 
-                TempData["success-notification"] = "Guide Details changed successfully";
+                TempData["success-notification"] = "profile image changed successfully";
 
 
                 return RedirectToAction(nameof(Index));

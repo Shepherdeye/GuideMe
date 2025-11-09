@@ -3,6 +3,8 @@ using GuideMe.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace GuideMe.Areas.Identity.Controllers
 {
@@ -536,6 +538,117 @@ namespace GuideMe.Areas.Identity.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login", "Account", new { area = "Identity" });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string returnUrl = "/", string role = null)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl, role });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return Challenge(properties, provider);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/", string remoteError = null, string role = null)
+        {
+            if (remoteError != null)
+            {
+                TempData["ErrorMessage"] = $"Error from external provider: {remoteError}";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null) return RedirectToAction(nameof(Login));
+
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (signInResult.Succeeded) return LocalRedirect(returnUrl);
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["ErrorMessage"] = "Google account has no email.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+
+                var createUserResult = await _userManager.CreateAsync(user);
+                if (!createUserResult.Succeeded)
+                {
+                    TempData["ErrorMessage"] = "Failed to create user.";
+                    return RedirectToAction(nameof(Login));
+                }
+
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (!addLoginResult.Succeeded)
+                {
+                    TempData["ErrorMessage"] = "Failed to link Google account.";
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+            else
+            {
+                // Link external login if not already linked
+                var logins = await _userManager.GetLoginsAsync(user);
+                if (!logins.Any(l => l.LoginProvider == info.LoginProvider))
+                    await _userManager.AddLoginAsync(user, info);
+            }
+
+            // --------- CREATE ROLE-SPECIFIC ENTITY IF MISSING ---------
+            if (!string.IsNullOrEmpty(role))
+            {
+                if (role == "Visitor")
+                {
+                    var existingVisitor = await _visitorRepository.GetOneAsync(v => v.ApplicationUserId == user.Id);
+                    if (existingVisitor == null)
+                    {
+                        var visitor = new Visitor
+                        {
+                            ApplicationUserId = user.Id,
+                            Passport = "DEFAULT-PASSPORT",
+                            visitorStatus = VisitorStatus.Available
+                        };
+                        await _visitorRepository.CreateAsync(visitor);
+                        await _visitorRepository.CommitAsync();
+                    }
+                }
+                else if (role == "Guide")
+                {
+                    var existingGuide = await _guideRepository.GetOneAsync(g => g.ApplicationUserId == user.Id);
+                    if (existingGuide == null)
+                    {
+                        var guide = new Guide
+                        {
+                            ApplicationUserId = user.Id,
+                            LicenseNumber = "DEFAULT-LICENSE",
+                            YearsOfExperience = 0,
+                            NationalId = "DEFAULT-NATIONALID"
+                        };
+                        await _guideRepository.CreateAsync(guide);
+                        await _guideRepository.CommitAsync();
+                    }
+                }
+            }
+
+            // --------- SIGN IN THE USER ---------
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // --------- ENSURE RETURN URL IS LOCAL ---------
+            if (!Url.IsLocalUrl(returnUrl)) returnUrl = "/";
+
+            return LocalRedirect(returnUrl);
+        }
+
+
 
     }
 }

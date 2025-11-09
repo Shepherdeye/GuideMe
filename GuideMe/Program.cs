@@ -30,7 +30,7 @@ namespace GuideMe
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;
-               
+
             }).AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
@@ -54,7 +54,20 @@ namespace GuideMe
             builder.Services.AddScoped<IRepository<Guide>, Repository<Guide>>();
             builder.Services.AddScoped<IRepository<UserOTP>, Repository<UserOTP>>();
 
-      
+
+
+            //External login by google
+            builder.Services
+               .AddAuthentication()
+               .AddGoogle(opt =>
+               {
+                   var googleAuth = builder.Configuration.GetSection("Authentication:Google");
+                   opt.ClientId = googleAuth["ClientId"];
+                   opt.ClientSecret = googleAuth["ClientSecret"];
+                   // this tells ASP.NET to use the external login scheme for temporary sign-in
+                   opt.SignInScheme = IdentityConstants.ExternalScheme;
+               });
+
 
             var app = builder.Build();
 
@@ -73,7 +86,7 @@ namespace GuideMe
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();

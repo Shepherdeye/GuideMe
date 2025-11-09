@@ -4,43 +4,74 @@
     Layout = "~/Views/Shared/_IdentityLayout.cshtml";
 }
 
-<h2 class="vrp-title text-center mb-4">Login</h2>
+<div class="card shadow-lg p-4 p-md-5 border-0 rounded-4" style="max-width: 450px; margin: auto;">
 
-<form asp-action="Login" class="d-flex flex-column align-items-center w-100" style="max-width: 450px; margin: auto;">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 w-100"></div>
+    <h3 class="card-title text-center text-primary fw-bold mb-4">Welcome Back! </h3>
+    <p class="text-center text-muted mb-4">Sign in to continue to your account.</p>
 
-    <input asp-for="UserNameOrEmail" class="form-control vrp-input mb-3" placeholder="Username or Email" />
+    <form asp-action="Login" class="d-flex flex-column w-100">
 
-    <input asp-for="Password" type="password" class="form-control vrp-input mb-3" placeholder="Password" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 mb-3 w-100"></div>
 
-    <div class="form-check mb-3 w-100">
-        <input class="form-check-input" asp-for="RememberMe" id="rememberMe" />
-        <label class="form-check-label" for="rememberMe">
-            @Html.DisplayNameFor(model => model.RememberMe)
-        </label>
+        <div class="form-floating mb-3">
+            <input asp-for="UserNameOrEmail" class="form-control" placeholder="Username or Email" />
+            <label asp-for="UserNameOrEmail">Username or Email</label>
+            <span asp-validation-for="UserNameOrEmail" class="text-danger small"></span>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+            <label asp-for="Password">Password</label>
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+                <input class="form-check-input" asp-for="RememberMe" id="rememberMe" />
+                <label class="form-check-label text-muted small" for="rememberMe">
+                    @Html.DisplayNameFor(model => model.RememberMe)
+                </label>
+            </div>
+
+            <a asp-action="ForgetPassword" class="text-decoration-none small text-secondary">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100 mb-4 rounded-3 fw-bold">Login</button>
+
+    </form>
+
+    <div class="d-flex align-items-center mb-4">
+        <hr class="flex-grow-1">
+        <span class="small text-muted mx-3">OR</span>
+        <hr class="flex-grow-1">
     </div>
 
-    <button type="submit" class="btn vrp-submit-btn w-100 mb-3">Login</button>
+    <div class="d-grid gap-2 mb-4">
+        <form asp-action="ExternalLogin" asp-controller="Account" method="post">
+            <input type="hidden" name="provider" value="Google" />
+            <input type="hidden" name="role" value="Visitor" />
+            <input type="hidden" name="returnUrl" value="/Main/Home/Index" />
+            <button type="submit" class="btn btn-outline-secondary w-100 rounded-3 d-flex align-items-center justify-content-center py-2 gap-2">
+                <i class="bi bi-google"></i> Continue with Google
+            </button>
+        </form>
 
-    <div class="d-flex justify-content-between w-100 mb-3">
-        <a asp-action="VisitorRegister" class="vrp-alt-link">Create Account</a>
-        <a asp-action="ForgetPassword" class="vrp-alt-link">Forget Password?</a>
+        @* <form asp-action="ExternalLogin" asp-controller="Account" method="post">
+            <input type="hidden" name="provider" value="Google" />
+            <input type="hidden" name="role" value="Guide" />
+            <input type="hidden" name="returnUrl" value="/Main/Home/Index" />
+            <button type="submit" class="btn btn-outline-secondary w-100 rounded-3 d-flex align-items-center justify-content-center py-2 gap-2">
+                <i class="bi bi-google"></i> Continue with Google as Guide
+            </button>
+        </form> *@
     </div>
 
-    <hr class="w-100 mb-3" />
-
-    <span class="small text-muted mb-2">Or login with</span>
-    <div class="d-flex gap-2 w-100 mb-3">
-        <button type="button" class="btn vrp-google-btn flex-fill">
-            <i class="bi bi-google"></i> Google
-        </button>
-        <button type="button" class="btn vrp-facebook-btn flex-fill">
-            <i class="bi bi-facebook"></i> Facebook
-        </button>
+    <div class="text-center small mt-2 pt-3 border-top">
+        <p class="mb-2">Don't have an account? <a asp-action="VisitorRegister" class="text-decoration-none fw-bold">Create Account</a></p>
+        <a asp-action="ResendEmailConfirmation" class="text-decoration-none text-secondary">Resend Email Confirmation</a>
     </div>
 
-    <a asp-action="ResendEmailConfirmation" class="vrp-alt-link small mt-2">Resend Email Confirmation</a>
-</form>
+</div>
 
 @section Scripts {
     @{

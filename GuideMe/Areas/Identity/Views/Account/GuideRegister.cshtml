@@ -5,115 +5,215 @@
     ViewData["Title"] = "Guide Register";
 }
 
-<div class="identity-content">
-    <form asp-action="GuideRegister" class="gr-form">
-        <h2 class="gr-title mb-3 text-center">Create Guide Account</h2>
+<style>
+    /* 🎨 Custom Styles */
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    /* Main Background (Optional, but good for identity pages) */
+    .register-bg {
+        /* A very light, subtle background color */
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+    }
 
-        <!-- First + Last Name -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="FirstName" class="form-control gr-input" placeholder="First Name" />
-                <span asp-validation-for="FirstName" class="text-danger small"></span>
-            </div>
-            <div class="col">
-                <input asp-for="LastName" class="form-control gr-input" placeholder="Last Name" />
-                <span asp-validation-for="LastName" class="text-danger small"></span>
-            </div>
-        </div>
+    /* Card Styling */
+    .guide-card {
+        max-width: 550px; /* Slightly wider card for more guide fields */
+        margin: auto;
+        /* Softer, more elegant shadow */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        border: none;
+        border-radius: 1.25rem !important;
+        padding: 2.5rem !important;
+    }
 
-        <!-- UserName + PhoneNumber -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="UserName" class="form-control gr-input" placeholder="Username" />
-                <span asp-validation-for="UserName" class="text-danger small"></span>
-            </div>
-            <div class="col">
-                <input asp-for="PhoneNumber" class="form-control gr-input" placeholder="Phone" />
-                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-            </div>
-        </div>
+    /* Header Styling */
+    .header-gradient-text {
+        background-image: linear-gradient(45deg, #6a11cb, #2575fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 1.75rem !important;
+    }
 
-        <!-- Email -->
-        <div class="mb-2">
-            <input asp-for="Email" class="form-control gr-input" placeholder="Email" />
-            <span asp-validation-for="Email" class="text-danger small"></span>
-        </div>
+    /* Custom gradient button style for primary action */
+    .btn-brand-gradient {
+        background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+    }
 
-        <!-- Password + Confirm -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="Password" class="form-control gr-input" placeholder="Password" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-            <div class="col">
-                <input asp-for="ConfirmPassword" class="form-control gr-input" placeholder="Confirm Password" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-            </div>
-        </div>
+        .btn-brand-gradient:hover {
+            background-image: linear-gradient(to right, #5c0cad 0%, #1a5ac9 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
 
-        <!-- Country + Gender -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="Country" class="form-control gr-input" placeholder="Country" />
-                <span asp-validation-for="Country" class="text-danger small"></span>
-            </div>
-            <div class="col">
-                <select asp-for="Gender" class="form-select gr-input">
-                    <option value="0">Male</option>
-                    <option value="1">Female</option>
-                </select>
-                <span asp-validation-for="Gender" class="text-danger small"></span>
-            </div>
-        </div>
+    /* Override for form-floating controls for a cleaner look */
+    .form-floating > .form-control {
+        border-radius: 0.5rem;
+        padding: 1rem 0.75rem 0.5rem 0.75rem; /* Adjust padding for label visibility */
+    }
 
-        <!-- License + YearsOfExperience -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="LicenseNumber" class="form-control gr-input" placeholder="License Number" />
-                <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
-            </div>
-            <div class="col">
-                <input asp-for="YearsOfExperience" class="form-control gr-input" placeholder="Years of Experience" />
-                <span asp-validation-for="YearsOfExperience" class="text-danger small"></span>
-            </div>
-        </div>
+    .form-floating > label {
+        padding: 1rem 0.75rem;
+    }
 
-        <!-- NationalId + ApplicationUserId -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="NationalId" class="form-control gr-input" placeholder="National ID" />
+    .btn-google-outline {
+        border-color: #ced4da;
+        color: #495057;
+        transition: all 0.3s;
+    }
+
+        .btn-google-outline:hover {
+            background-color: #f0f0f0;
+            border-color: #adb5bd;
+        }
+</style>
+
+<div class="register-bg">
+    <div class="card guide-card">
+
+        <h4 class="card-title text-center fw-bold mb-2 header-gradient-text">Create Guide Account</h4>
+        <p class="text-center text-muted mb-4 small">Join our community and start guiding.</p>
+
+        <form asp-action="GuideRegister"  method="post" class="w-100">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 mb-3 small"></div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="FirstName" class="form-control" placeholder="First Name" />
+                        <label asp-for="FirstName" class="small">First Name</label>
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="LastName" class="form-control" placeholder="Last Name" />
+                        <label asp-for="LastName" class="small">Last Name</label>
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="UserName" class="form-control" placeholder="Username" />
+                        <label asp-for="UserName" class="small">Username</label>
+                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" />
+                        <label asp-for="PhoneNumber" class="small">Phone Number</label>
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Email" class="form-control" placeholder="Email Address" />
+                <label asp-for="Email" class="small">Email Address</label>
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Country" class="form-control" placeholder="Country" />
+                        <label asp-for="Country" class="small">Country</label>
+                        <span asp-validation-for="Country" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="Gender" class="form-select" id="genderSelect">
+                            <option value="">Select Gender</option>
+                            <option value="0">Male</option>
+                            <option value="1">Female</option>
+                        </select>
+                        <label for="genderSelect" class="small">Gender</label>
+                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="LicenseNumber" class="form-control" placeholder="License Number" />
+                        <label asp-for="LicenseNumber" class="small">License Number</label>
+                        <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="YearsOfExperience" type="number" class="form-control" placeholder="Years of Experience" />
+                        <label asp-for="YearsOfExperience" class="small">Years of Experience</label>
+                        <span asp-validation-for="YearsOfExperience" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="NationalId" class="form-control" placeholder="National ID" />
+                <label asp-for="NationalId" class="small">National ID</label>
                 <span asp-validation-for="NationalId" class="text-danger small"></span>
             </div>
-            <div class="col">
-                <input asp-for="ApplicationUserId" class="form-control gr-input" placeholder="Application User ID" />
-                <span asp-validation-for="ApplicationUserId" class="text-danger small"></span>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+                        <label asp-for="Password" class="small">Password</label>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm Password" />
+                        <label asp-for="ConfirmPassword" class="small">Confirm Password</label>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
             </div>
+
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-brand-gradient rounded-3 fw-bold">
+                    Register Guide Account
+                </button>
+            </div>
+        </form>
+
+        @* <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1" />
+            <span class="px-3 text-muted small fw-bold">OR</span>
+            <hr class="flex-grow-1" />
+        </div> *@
+        @* <form asp-action="ExternalLogin" asp-controller="Account" method="post">
+            <input type="hidden" name="provider" value="Google" />
+            <input type="hidden" name="role" value="Guide" />
+            <input type="hidden" name="returnUrl" value="/Main/Home/Index" />
+            <button type="submit" class="btn btn-google-outline w-100 rounded-3 d-flex align-items-center justify-content-center py-2 gap-2">
+                <i class="bi bi-google"></i> Continue with Google
+            </button>
+        </form> *@
+
+
+
+
+        <div class="text-center small mt-4 pt-3 border-top">
+            <p class="mb-2">Not a guide? <a asp-action="VisitorRegister" class="text-decoration-none fw-bold" style="color: #2575fc;">Create a Visitor Account</a></p>
+            <a asp-action="Login" class="text-muted text-decoration-none fw-medium">Already have an account? <span style="color: #6a11cb;">Login here.</span></a>
         </div>
-
-        <div class="d-grid mb-2">
-            <button type="submit" class="btn btn-primary gr-submit-btn">Create Account</button>
-        </div>
-
-        <hr class="my-2">
-
-        <div class="d-grid gap-1 mb-2">
-            <a href="@Url.Action("ExternalLogin", "Account", new { provider = "Google", returnUrl = "/" })" class="btn btn-outline-danger btn-sm gr-google-btn">
-                <i class="fab fa-google me-1"></i> Google
-            </a>
-            <a href="@Url.Action("ExternalLogin", "Account", new { provider = "Facebook", returnUrl = "/" })" class="btn btn-outline-primary btn-sm gr-facebook-btn">
-                <i class="fab fa-facebook-f me-1"></i> Facebook
-            </a>
-        </div>
-
-        <div class="text-center mt-2">
-            <a asp-action="VisitorRegister" class="gr-alt-link">Create Visitor Account</a>
-            <br />
-            <a asp-action="Login" class="gr-alt-link">Login Now</a>
-
-        </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

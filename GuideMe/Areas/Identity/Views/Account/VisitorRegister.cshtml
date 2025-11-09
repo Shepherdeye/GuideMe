@@ -5,96 +5,146 @@
     ViewData["Title"] = "Visitor Register";
 }
 
-<div class="identity-content">
-    <form asp-action="VisitorRegister" class="vrp-form">
-        <h2 class="vrp-title mb-3 text-center">Create Visitor Account</h2>
+<style>
+    /* Gradient for the main background (optional, but adds depth) */
+    .register-bg {
+        background: linear-gradient(135deg, #f0f2f5 0%, #e0e5eb 100%);
+    }
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    /* Styling for the card container */
+    .register-card {
+        max-width: 700px;
+        width: 100%;
+        /* A softer, more modern shadow */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        border: 1px solid #dee2e6; /* subtle border */
+        border-radius: 1.5rem !important; /* more rounded corners */
+    }
 
-        <!-- FirstName + LastName -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="FirstName" class="form-control vrp-input" placeholder="First Name" />
-                <span asp-validation-for="FirstName" class="text-danger small"></span>
+    /* Custom gradient button style for primary action */
+    .btn-brand-gradient {
+        background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+        .btn-brand-gradient:hover {
+            background-image: linear-gradient(to right, #5c0cad 0%, #1a5ac9 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+    /* Custom style for header text (subtle gradient) */
+    .header-gradient-text {
+        background-image: linear-gradient(45deg, #6a11cb, #2575fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2rem !important;
+    }
+
+    /* Style for form controls (soft-pill look) */
+    .form-control-soft-pill, .form-select-soft-pill {
+        border-radius: 0.75rem; /* softer rounding */
+        padding: 0.5rem 1rem; /* slightly larger padding */
+        font-size: 0.95rem;
+        border-color: #ced4da;
+    }
+</style>
+
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 ">
+    <div class="bg-white register-card p-4 p-sm-5">
+        <h2 class="text-center fw-bold mb-4 header-gradient-text">Create Visitor Account</h2>
+
+        <form asp-action="VisitorRegister" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <input asp-for="FirstName" class="form-control form-control-soft-pill" placeholder="First Name" />
+                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <input asp-for="LastName" class="form-control form-control-soft-pill" placeholder="Last Name" />
+                    <span asp-validation-for="LastName" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="col">
-                <input asp-for="LastName" class="form-control vrp-input" placeholder="Last Name" />
-                <span asp-validation-for="LastName" class="text-danger small"></span>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <input asp-for="UserName" class="form-control form-control-soft-pill" placeholder="Username" />
+                    <span asp-validation-for="UserName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <input asp-for="PhoneNumber" class="form-control form-control-soft-pill" placeholder="Phone Number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
             </div>
-        </div>
 
-        <!-- UserName + PhoneNumber -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="UserName" class="form-control vrp-input" placeholder="Username" />
-                <span asp-validation-for="UserName" class="text-danger small"></span>
+            <div class="mb-3">
+                <input asp-for="Email" class="form-control form-control-soft-pill" placeholder="Email Address" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
-            <div class="col">
-                <input asp-for="PhoneNumber" class="form-control vrp-input" placeholder="Phone" />
-                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <input asp-for="Password" type="password" class="form-control form-control-soft-pill" placeholder="Password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <input asp-for="ConfirmPassword" type="password" class="form-control form-control-soft-pill" placeholder="Confirm Password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
             </div>
-        </div>
 
-        <!-- Email -->
-        <div class="mb-2">
-            <input asp-for="Email" class="form-control vrp-input" placeholder="Email" />
-            <span asp-validation-for="Email" class="text-danger small"></span>
-        </div>
-
-        <!-- Password + ConfirmPassword -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="Password" class="form-control vrp-input" placeholder="Password" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <input asp-for="Country" class="form-control form-control-soft-pill" placeholder="Country" />
+                    <span asp-validation-for="Country" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <select asp-for="Gender" class="form-select form-select-soft-pill">
+                        <option value="">Select Gender</option>
+                        <option value="0">Male</option>
+                        <option value="1">Female</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="col">
-                <input asp-for="ConfirmPassword" class="form-control vrp-input" placeholder="Confirm Password" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+
+            <div class="mb-4">
+                <input asp-for="Passport" class="form-control form-control-soft-pill" placeholder="Passport Number" />
+                <span asp-validation-for="Passport" class="text-danger small"></span>
             </div>
-        </div>
 
-        <!-- Country + Gender -->
-        <div class="row g-2 mb-2">
-            <div class="col">
-                <input asp-for="Country" class="form-control vrp-input" placeholder="Country" />
-                <span asp-validation-for="Country" class="text-danger small"></span>
+            <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-brand-gradient rounded-3 fw-bold py-2">
+                    Create Account
+                </button>
             </div>
-            <div class="col">
-                <select asp-for="Gender" class="form-select vrp-input">
-                    <option value="0">Male</option>
-                    <option value="1">Female</option>
-                </select>
-                <span asp-validation-for="Gender" class="text-danger small"></span>
-            </div>
+        </form>
+
+        <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1" />
+            <span class="px-3 text-muted small fw-bold">OR</span>
+            <hr class="flex-grow-1" />
         </div>
 
-        <!-- Passport -->
-        <div class="mb-2">
-            <input asp-for="Passport" class="form-control vrp-input" placeholder="Passport" />
-            <span asp-validation-for="Passport" class="text-danger small"></span>
-        </div>
+        <form asp-action="ExternalLogin" asp-controller="Account" method="post">
+            <input type="hidden" name="provider" value="Google" />
+            <input type="hidden" name="role" value="Visitor" />
+            <input type="hidden" name="returnUrl" value="/Main/Home/Index" />
+            <button type="submit" class="btn btn-outline-secondary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 py-2">
+                <i class="bi bi-google"></i> Continue with Google
+            </button>
+        </form>
 
-        <div class="d-grid mb-2">
-            <button type="submit" class="btn btn-primary vrp-submit-btn">Create Account</button>
+        <div class="text-center mt-4">
+            <a asp-action="GuideRegister" class="d-block mb-2 fw-bold" style="color: #2575fc;">Create Guide Account</a>
+            <a asp-action="Login" class="text-muted" style="font-weight: 500;">Already have an account? <span class="fw-bold" style="color: #6a11cb;">Login</span></a>
         </div>
-
-        <hr class="my-2">
-
-        <div class="d-grid gap-1 mb-2">
-            <a href="@Url.Action("ExternalLogin", "Account", new { provider = "Google", returnUrl = "/" })" class="btn btn-outline-danger btn-sm vrp-google-btn">
-                <i class="fab fa-google me-1"></i> Google
-            </a>
-            <a href="@Url.Action("ExternalLogin", "Account", new { provider = "Facebook", returnUrl = "/" })" class="btn btn-outline-primary btn-sm vrp-facebook-btn">
-                <i class="fab fa-facebook-f me-1"></i> Facebook
-            </a>
-        </div>
-
-        <div class="text-center mt-2">
-            <a asp-action="GuideRegister" class="vrp-alt-link">Create Guide Account</a>
-            <br />
-            <a asp-action="Login" class="vrp-alt-link">Login Now</a>
-        </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

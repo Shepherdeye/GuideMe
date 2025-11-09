@@ -5,7 +5,6 @@ namespace GuideMe.ViewModels
     public class GuideRegisterVm
     {
 
-        public int id { get; set; }
 
         [Required]
         public string FirstName { get; set; } = string.Empty;
@@ -41,8 +40,7 @@ namespace GuideMe.ViewModels
         public int YearsOfExperience { get; set; }
         [Required]
         public string NationalId { get; set; } = string.Empty;
-        [Required]
-        public string ApplicationUserId { get; set; } = string.Empty;
+      
 
         public GenderType Gender { get; set; }
 
