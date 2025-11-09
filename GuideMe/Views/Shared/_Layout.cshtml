@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -77,13 +85,49 @@
                     </div>
                     <a href="contact.html" class="nav-item nav-link">Contact</a>
                 </div>
-                @* <a href="/identity/Account/VisitorRegister" class="btn btn-primary rounded-pill py-2 px-4 mx-2">Register</a>
-                <a href="/identity/Account/Login" class="btn btn-secondary rounded-pill py-2 px-4">Login</a> *@
+        
               
                 @if (User is not null && User.Identity.IsAuthenticated)
                 {
-                    <a class="nav-item nav-link fw-bolder" href="/Profile/Profile/Index">@User.Identity.Name <i class="bi-person-fill me-1 text-lg"></i></a>
-                    <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Logout</a>
+                   
+                    @* <a class="nav-item nav-link fw-bolder" href="/Profile/Profile/Index">@User.Identity.Name <i class="bi-person-fill me-1 text-lg"></i></a>
+                    <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Logout</a> *@
+                        <div class="nav-item dropdown ms-3 position-relative" id="userDropdown">
+                            <a href="#" class="nav-link dropdown-toggle d-flex align-items-center px-2" aria-expanded="false">
+                                <img src="~/identity/Profile/@user.ProfileImage" alt="User"
+                                    class="rounded-circle me-2 border border-1 border-white shadow-sm"
+                                    style="width: 35px; height: 35px; object-fit: cover;">
+                                <span class="fw-bolder">@User.Identity.Name</span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 py-2 user-dropdown-menu" style="min-width: max-content;">
+                                <div class="px-3 py-2 border-bottom d-flex align-items-center">
+                                    <img src="~/identity/Profile/@user.ProfileImage" alt="User"
+                                        class="rounded-circle me-2" style="width: 36px; height: 36px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">@User.Identity.Name</h6>
+                                        <small class="text-muted">@user.Role</small>
+                                    </div>
+                                </div>
+                                <a href="/Profile/Profile/Index" class="dropdown-item d-flex align-items-center py-2">
+                                    <i class="bi bi-person-circle me-2 text-primary"></i> My Profile
+                                </a>
+                                <a href="/admin" class="dropdown-item d-flex align-items-center py-2">
+                                    <i class="bi bi-speedometer2 me-2 text-secondary"></i> Dashboard
+                                </a>
+                                <a href="/Identity/Account/Manage" class="dropdown-item d-flex align-items-center py-2">
+                                    <i class="bi bi-gear-fill me-2 text-info"></i> Settings
+                                </a>
+                                <hr class="dropdown-divider">
+                                <a href="/Identity/Account/Logout" class="dropdown-item d-flex align-items-center text-danger py-2">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+
+
+
+                  
                 }
                 else
                 {

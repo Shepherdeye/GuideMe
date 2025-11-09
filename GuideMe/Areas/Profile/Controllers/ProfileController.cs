@@ -40,9 +40,9 @@ namespace GuideMe.Areas.Profile.Controllers
             {
                 ProfileVm = userProfile,
 
-                // we  make a  new  class  here to  aviod null reference
-                Guide = guideData ?? new Guide(), 
-                Visitor = visitorData ?? new Visitor() 
+                // we  make a  new  class  here to  aviod null reference in external login  by google
+                Guide = guideData ?? new Guide(),
+                Visitor = visitorData ?? new Visitor()
             };
 
             return View(data);
@@ -72,7 +72,16 @@ namespace GuideMe.Areas.Profile.Controllers
             user.Country = profileVm.Country;
             user.PhoneNumber = profileVm.PhoneNumber;
 
-            await _userManager.UpdateAsync(user);
+            var result = await _userManager.UpdateAsync(user);
+
+            if(!result.Succeeded)
+            {
+                TempData["error-notification"] = "Can't Update values";
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["success-notification"] = "values updated successfully";
+
 
             return RedirectToAction(nameof(Index));
 
