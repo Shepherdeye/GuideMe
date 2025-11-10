@@ -4,9 +4,9 @@ namespace GuideMe.Models
 {
     public enum OfferStatus
     {
-        Active,
-        Taken,
-        Expired
+        Pending,
+        Accepted,
+        Rejected
     }
 
 
@@ -28,7 +28,7 @@ namespace GuideMe.Models
         public string Message { get; set; }
 
         [Required]
-        public OfferStatus Availability { get; set; }
+        public OfferStatus Status { get; set; }
 
         [Required]
         [Range(10,double.MaxValue)]

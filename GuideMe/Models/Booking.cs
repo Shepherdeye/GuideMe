@@ -26,6 +26,7 @@ namespace GuideMe.Models
         [Range(0.01,double.MaxValue)]
         public decimal BookingPrice { get; set; }
 
+        public string? StripeSessionId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 

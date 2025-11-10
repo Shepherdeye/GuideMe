@@ -2,6 +2,13 @@
 
 namespace GuideMe.Models
 {
+
+    public enum TripStatus
+    {
+        Open,
+        Close
+    }
+
     public class Trip
     {
         [Key]
@@ -32,6 +39,7 @@ namespace GuideMe.Models
         [Required]
         public DateTime LastUpdatedon { get; set; }
 
+        public TripStatus Status { get; set; }
         public int VisitorId { get; set; }
 
         public Visitor Visitor { get; set; }

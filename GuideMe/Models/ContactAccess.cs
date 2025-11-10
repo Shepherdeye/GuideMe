@@ -10,5 +10,7 @@ namespace GuideMe.Models
         [Required]
         public int BookingId { get; set; }
         public Booking  Booking { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }
