@@ -1,6 +1,7 @@
 ﻿@model List<VisitorResponseVM>
 
 <div class="container-fluid py-4">
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold mb-0">Visitors</h4>
         <a asp-action="Create" class="btn btn-sm btn-primary">
@@ -10,23 +11,23 @@
 
     @if (Model.Any())
     {
-        <div class="table-responsive shadow-sm rounded bg-white">
+        <div class="table-responsive shadow-sm rounded bg-white p-2">
             <table class="table table-sm table-striped table-hover align-middle mb-0 small">
-                <thead class="table-dark text-center">
+                <thead class="table-dark text-center align-middle">
                     <tr>
                         <th>#</th>
                         <th>First</th>
                         <th>Last</th>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Gender</th>
-                        <th>Country</th>
-                        <th>Role</th>
-                        <th>Profile</th>
-                        <th>Passport</th>
-                        <th>Status</th>
-                        <th style="width:90px;">Actions</th>
+                        <th style="width: 90px;">User</th>
+                        <th style="width: 110px;">Email</th>
+                        <th style="width: 85px;">Phone</th>
+                        <th style="width: 70px;">Gender</th>
+                        <th style="width: 85px;">Country</th>
+                        <th style="width: 70px;">Role</th>
+                        <th style="width: 60px;">Profile</th>
+                        <th style="width: 80px;">Passport</th>
+                        <th style="width: 80px;">Status</th>
+                        <th style="width: 90px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="text-center">
@@ -37,9 +38,9 @@
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
 
-                            <!-- Username with ellipsis and click-to-view -->
+                            <!-- Truncated Username -->
                             <td>
-                                <span class="truncate-text"
+                                <span class="truncate-text-sm"
                                       data-bs-toggle="tooltip"
                                       title="@item.UserName"
                                       onclick="showFullText('@item.UserName', 'Username')">
@@ -47,9 +48,9 @@
                                 </span>
                             </td>
 
-                            <!-- Email with ellipsis and click-to-view -->
+                            <!-- Truncated Email -->
                             <td>
-                                <span class="truncate-text"
+                                <span class="truncate-text-sm"
                                       data-bs-toggle="tooltip"
                                       title="@item.Email"
                                       onclick="showFullText('@item.Email', 'Email')">
@@ -59,15 +60,26 @@
 
                             <td>@item.PhoneNumber</td>
                             <td>@item.Gender</td>
-                            <td>@item.Country</td>
+                            <td>
+                                <span class="truncate-text-sm"
+                                      data-bs-toggle="tooltip"
+                                      title="@item.Country">
+                                      @item.Country
+                                </span>
+                            </td>
                             <td><span class="badge bg-secondary">@item.Role</span></td>
                             <td>
                                 <img src="/identity/Profile/@item.ProfileImage"
                                      class="rounded-circle border"
-                                     width="28" height="28"
+                                     width="25" height="25"
                                      alt="Profile">
                             </td>
-                            <td>@item.Passport</td>
+                            <td>  <span class="truncate-text-sm"
+                                      data-bs-toggle="tooltip"
+                                      title="@item.Passport"
+                                      onclick="showFullText('@item.Passport', 'Passport')">
+                                    @item.Passport
+                                </span></td>
                             <td>
                                 <span class="badge @(item.visitorStatus == VisitorStatus.Available ? "bg-success" : "bg-warning text-dark")">
                                     @item.visitorStatus
@@ -75,11 +87,11 @@
                             </td>
                             <td>
                                 <div class="d-flex justify-content-center gap-1">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary p-0 px-2" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure?');">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger p-0 px-2" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
@@ -110,47 +122,46 @@
     }
 </div>
 
-<!-- Modal to show full text -->
+<!-- Modal for full text -->
 <div class="modal fade" id="textModal" tabindex="-1" aria-labelledby="textModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-header py-2">
                 <h6 class="modal-title" id="textModalLabel"></h6>
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body small" id="textModalContent"></div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script>
-    // Activate Bootstrap tooltips
+    // Tooltip
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
 
-    // Show full text in modal
+    // Modal full text viewer
     function showFullText(text, label) {
         document.getElementById('textModalLabel').textContent = label;
         document.getElementById('textModalContent').textContent = text;
-        const modal = new bootstrap.Modal(document.getElementById('textModal'));
-        modal.show();
+        new bootstrap.Modal(document.getElementById('textModal')).show();
     }
 </script>
 
 <style>
     table.table-sm td, table.table-sm th {
-        padding: 0.25rem 0.3rem !important;
+        padding: 0.15rem 0.25rem !important;
         vertical-align: middle !important;
     }
 
     table {
-        font-size: 0.78rem !important;
+        font-size: 0.72rem !important;
+        table-layout: fixed;
     }
 
-    .truncate-text {
+    .truncate-text-sm {
         display: inline-block;
-        max-width: 120px;
+        max-width: 70px; /* smaller than before */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -158,7 +169,11 @@
         color: #0d6efd;
     }
 
-    .truncate-text:hover {
+    .truncate-text-sm:hover {
         text-decoration: underline;
+    }
+
+    th {
+        white-space: nowrap;
     }
 </style>
