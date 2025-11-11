@@ -303,3 +303,52 @@
     color: #fff;
     border-radius: 4px;
 }
+/* Make table responsive with horizontal scroll */
+.table-container {
+    overflow-x: auto;
+}
+
+table th, table td {
+    white-space: nowrap; /* Prevent text from wrapping */
+    vertical-align: middle;
+}
+
+/* Profile image style */
+img.profile-img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Professional look */
+table th {
+    background-color: #343a40;
+    color: #fff;
+    text-align: center;
+}
+
+table td {
+    text-align: center;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Optional: make important columns wider */
+.col-name {
+    min-width: 120px;
+}
+
+.col-email {
+    min-width: 180px;
+}
+
+.col-phone {
+    min-width: 130px;
+}
+
+.col-passport {
+    min-width: 130px;
+}

@@ -1,0 +1,164 @@
+﻿@model List<VisitorResponseVM>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Visitors</h4>
+        <a asp-action="Create" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Create New Visitor
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive shadow-sm rounded bg-white">
+            <table class="table table-sm table-striped table-hover align-middle mb-0 small">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>First</th>
+                        <th>Last</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Country</th>
+                        <th>Role</th>
+                        <th>Profile</th>
+                        <th>Passport</th>
+                        <th>Status</th>
+                        <th style="width:90px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+
+                            <!-- Username with ellipsis and click-to-view -->
+                            <td>
+                                <span class="truncate-text"
+                                      data-bs-toggle="tooltip"
+                                      title="@item.UserName"
+                                      onclick="showFullText('@item.UserName', 'Username')">
+                                    @item.UserName
+                                </span>
+                            </td>
+
+                            <!-- Email with ellipsis and click-to-view -->
+                            <td>
+                                <span class="truncate-text"
+                                      data-bs-toggle="tooltip"
+                                      title="@item.Email"
+                                      onclick="showFullText('@item.Email', 'Email')">
+                                    @item.Email
+                                </span>
+                            </td>
+
+                            <td>@item.PhoneNumber</td>
+                            <td>@item.Gender</td>
+                            <td>@item.Country</td>
+                            <td><span class="badge bg-secondary">@item.Role</span></td>
+                            <td>
+                                <img src="/identity/Profile/@item.ProfileImage"
+                                     class="rounded-circle border"
+                                     width="28" height="28"
+                                     alt="Profile">
+                            </td>
+                            <td>@item.Passport</td>
+                            <td>
+                                <span class="badge @(item.visitorStatus == VisitorStatus.Available ? "bg-success" : "bg-warning text-dark")">
+                                    @item.visitorStatus
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-3" aria-label="pagination">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item active"><a class="page-link bg-primary text-white" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a></li>
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <h5 class="text-muted">No Records Found</h5>
+        </div>
+    }
+</div>
+
+<!-- Modal to show full text -->
+<div class="modal fade" id="textModal" tabindex="-1" aria-labelledby="textModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title" id="textModalLabel"></h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body small" id="textModalContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script>
+    // Activate Bootstrap tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+
+    // Show full text in modal
+    function showFullText(text, label) {
+        document.getElementById('textModalLabel').textContent = label;
+        document.getElementById('textModalContent').textContent = text;
+        const modal = new bootstrap.Modal(document.getElementById('textModal'));
+        modal.show();
+    }
+</script>
+
+<style>
+    table.table-sm td, table.table-sm th {
+        padding: 0.25rem 0.3rem !important;
+        vertical-align: middle !important;
+    }
+
+    table {
+        font-size: 0.78rem !important;
+    }
+
+    .truncate-text {
+        display: inline-block;
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        color: #0d6efd;
+    }
+
+    .truncate-text:hover {
+        text-decoration: underline;
+    }
+</style>

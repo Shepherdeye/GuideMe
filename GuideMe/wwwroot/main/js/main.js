@@ -31,27 +31,50 @@
     const $dropdownToggle = $(".dropdown-toggle");
     const $dropdownMenu = $(".dropdown-menu");
     const showClass = "show";
-    
-    $(window).on("load resize", function() {
-        if (this.matchMedia("(min-width: 992px)").matches) {
-            $dropdown.hover(
-            function() {
-                const $this = $(this);
+  
+    $(document).ready(function () {
+        const showClass = "show"; // define your show class
+        const $dropdown = $(".dropdown"); // adjust selector if needed
+        const $dropdownToggle = ".dropdown-toggle";
+        const $dropdownMenu = ".dropdown-menu";
+
+        // Function to close all dropdowns
+        function closeAllDropdowns() {
+            $dropdown.removeClass(showClass);
+            $dropdown.find($dropdownToggle).attr("aria-expanded", "false");
+            $dropdown.find($dropdownMenu).removeClass(showClass);
+        }
+
+        // Click to toggle dropdown
+        $dropdown.on("click", function (e) {
+            e.stopPropagation(); // prevent click from bubbling to document
+            const $this = $(this);
+            const isOpen = $this.hasClass(showClass);
+
+            closeAllDropdowns(); // close other dropdowns
+
+            if (!isOpen) {
                 $this.addClass(showClass);
                 $this.find($dropdownToggle).attr("aria-expanded", "true");
                 $this.find($dropdownMenu).addClass(showClass);
-            },
-            function() {
-                const $this = $(this);
-                $this.removeClass(showClass);
-                $this.find($dropdownToggle).attr("aria-expanded", "false");
-                $this.find($dropdownMenu).removeClass(showClass);
             }
-            );
-        } else {
-            $dropdown.off("mouseenter mouseleave");
-        }
+        });
+
+        // Click outside closes dropdown
+        $(document).on("click", function () {
+            closeAllDropdowns();
+        });
+
+        // Optional: handle window resize if you have responsive behavior
+        $(window).on("resize", function () {
+            if ($(window).width() < 992) {
+                closeAllDropdowns(); // close dropdowns on small screens
+            }
+        });
     });
+
+
+
     
     
     // Back to top button
