@@ -2,7 +2,7 @@
 {
     using System.ComponentModel.DataAnnotations;
 
-    public class VisitorResponseVM
+    public class VisitorEditVM
     {
         public int Id { get; set; }
 
@@ -26,32 +26,21 @@
       
         public string Email { get; set; }
         [Required,DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [Required, DataType(DataType.Password),Compare(nameof(Password))]
-        public string ConfirmPassword { get; set; }
-
+       
 
         [Display(Name = "Email Confirmed")]
         public bool EmailConfirmed { get; set; }
 
         [Phone(ErrorMessage = "Please enter a valid phone number.")]
-       
         public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Gender is required.")]
-       
         public GenderType Gender { get; set; }
 
         [Required(ErrorMessage = "Country is required.")]
         [StringLength(50, ErrorMessage = "Country name cannot exceed 50 characters.")]
-        
         public string Country { get; set; }
 
-       
-        public UserRole? Role { get; set; }
-
-       
         public string? ProfileImage { get; set; }
 
         [Required(ErrorMessage = "Passport number is required.")]
@@ -62,9 +51,6 @@
         [Required(ErrorMessage = "Visitor status is required.")]
        
         public VisitorStatus visitorStatus { get; set; }
-
-
-       
     }
 
 }

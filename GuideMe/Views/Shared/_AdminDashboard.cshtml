@@ -15,7 +15,7 @@
     <meta content="" name="keywords">
     <meta content="" name="description">
 
-    <link href="img/favicon.ico" rel="icon">
+    <link href="~/icon.png" rel="icon">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +29,7 @@
 
     <link href="~/Admin/css/bootstrap.min.css" rel="stylesheet">
     <link href="~/Admin/css/style.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -95,9 +96,9 @@
                 <a href="#" class="sidebar-toggler flex-shrink-0">
                     <i class="fa fa-bars"></i>
                 </a>
-                <form class="d-none d-md-flex ms-4">
+                @* <form class="d-none d-md-flex ms-4">
                     <input class="form-control border-0" type="search" placeholder="Search">
-                </form>
+                </form> *@
                 <div class="navbar-nav align-items-center ms-auto">
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -200,8 +201,13 @@
     <script src="~/Admin/lib/tempusdominus/js/moment.min.js"></script>
     <script src="~/Admin/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="~/Admin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="~/Admin/js/main.js"></script>
+
+    <partial name="_NotifactionPartial" />
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>
