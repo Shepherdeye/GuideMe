@@ -1,0 +1,139 @@
+﻿@model GuideEditVM
+@{
+    ViewData["Title"] = "Edit Guide";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm rounded-3">
+        <div class="card-header bg-primary text-white py-2">
+            <h5 class="mb-0">Edit Guide</h5>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Edit" asp-controller="Guide" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row g-3">
+                    <!-- First Name -->
+                    <div class="col-md-6">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="col-md-6">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="col-md-6">
+                        <label asp-for="UserName" class="form-label"></label>
+                        <input asp-for="UserName" class="form-control" />
+                        <span asp-validation-for="UserName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="col-md-6">
+                        <label asp-for="Gender" class="form-label"></label>
+                        <select asp-for="Gender" class="form-select" asp-items="Html.GetEnumSelectList<GenderType>()">
+                            <option value="">-- Select Gender --</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="col-md-6">
+                        <label asp-for="Country" class="form-label"></label>
+                        <input asp-for="Country" class="form-control" />
+                        <span asp-validation-for="Country" class="text-danger small"></span>
+                    </div>
+
+                    <!-- License Number -->
+                    <div class="col-md-6">
+                        <label asp-for="LicenseNumber" class="form-label"></label>
+                        <input asp-for="LicenseNumber" class="form-control" />
+                        <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                    </div>
+
+                    <!-- National ID -->
+                    <div class="col-md-6">
+                        <label asp-for="NationalId" class="form-label"></label>
+                        <input asp-for="NationalId" class="form-control" />
+                        <span asp-validation-for="NationalId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Years Of Experience -->
+                    <div class="col-md-6">
+                        <label asp-for="YearsOfExperience" class="form-label"></label>
+                        <input asp-for="YearsOfExperience" type="number" class="form-control" min="0" />
+                        <span asp-validation-for="YearsOfExperience" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Email Confirmed -->
+                    <div class="col-md-6 d-flex align-items-center mt-4">
+                        <div class="form-check">
+                            <input asp-for="EmailConfirmed" class="form-check-input" type="checkbox" />
+                            <label asp-for="EmailConfirmed" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <!-- Profile Image Upload -->
+                    <div class="col-md-6">
+                        <label class="form-label">Profile Image</label>
+                        <input type="file" asp-for="ProfileImage" accept="image/*" />
+                        <div class="mt-2">
+                            <img id="imagePreview"
+                                 src="@(string.IsNullOrEmpty(Model.ProfileImage) ? "/identity/Profile/unkown.png" : "/identity/Profile/" + Model.ProfileImage)"
+                                 class="border rounded"
+                                 width="90" height="90"
+                                 alt="Profile Preview" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Live image preview
+        document.getElementById("imageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById("imagePreview");
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

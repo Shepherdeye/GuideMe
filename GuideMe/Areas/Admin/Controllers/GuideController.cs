@@ -5,35 +5,35 @@ using Microsoft.AspNetCore.Mvc;
 namespace GuideMe.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
-    public class VisitorController : Controller
+    public class GuideController : Controller
     {
-        private readonly IRepository<Visitor> _visitorRepo;
+        private readonly IRepository<Guide> _guideRepo;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public VisitorController(IRepository<Visitor> visitorRepo, UserManager<ApplicationUser> userManager)
+        public GuideController(IRepository<Guide> guideRepo, UserManager<ApplicationUser> userManager)
         {
-            _visitorRepo = visitorRepo;
+            _guideRepo = guideRepo;
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index([FromQuery]int page = 1)
+        public async Task<IActionResult> Index([FromQuery] int page = 1)
         {
-            var response = new List<VisitorResponseVM>();
+            var response = new List<GuideResponseVM>();
 
             var users = _userManager.Users.ToList();
 
             foreach (var user in users)
             {
 
-                var visitor = await _visitorRepo.GetOneAsync(e => e.ApplicationUserId == user.Id);
+                var guide = await _guideRepo.GetOneAsync(e => e.ApplicationUserId == user.Id);
 
-                if (visitor == null)
+                if (guide == null)
                     continue;
 
 
-                var userVM = new VisitorResponseVM
+                var userVM = new GuideResponseVM
                 {
-                    Id = visitor.Id,
+                    Id = guide.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Email = user.Email,
@@ -44,8 +44,9 @@ namespace GuideMe.Areas.Admin.Controllers
                     EmailConfirmed = user.EmailConfirmed,
                     Role = user.Role,
                     ProfileImage = user.ProfileImage,
-                    Passport = visitor.Passport,
-                    visitorStatus = visitor.visitorStatus
+                    LicenseNumber = guide.LicenseNumber,
+                    NationalId = guide.NationalId,
+                    YearsOfExperience = guide.YearsOfExperience
 
                 };
 
@@ -56,12 +57,12 @@ namespace GuideMe.Areas.Admin.Controllers
             double pages = Math.Ceiling(totalcount / 8.00);
             var pageination = response.Skip((page - 1) * 8).Take(8).ToList();
 
-            AllVisitorResponse returnedData = new AllVisitorResponse
+            AllGuideResponse returnedData = new AllGuideResponse
             {
-                Visitors = pageination,
+                Guides = pageination,
                 PagesNumber = pages,
                 TotalCount = totalcount,
-                CurrentPage=page
+                CurrentPage = page
 
             };
 
@@ -78,7 +79,7 @@ namespace GuideMe.Areas.Admin.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> Create(VisitorResponseVM visitorResponseVM, IFormFile? ProfileImage)
+        public async Task<IActionResult> Create(GuideResponseVM guideResponseVM, IFormFile? ProfileImage)
         {
             if (!ModelState.IsValid)
             {
@@ -108,41 +109,42 @@ namespace GuideMe.Areas.Admin.Controllers
             var user = new ApplicationUser
             {
 
-                FirstName = visitorResponseVM.FirstName,
-                LastName = visitorResponseVM.LastName,
-                UserName = visitorResponseVM.UserName,
-                Email = visitorResponseVM.Email,
-                PhoneNumber = visitorResponseVM.PhoneNumber,
-                Country = visitorResponseVM.Country,
-                Gender = visitorResponseVM.Gender,
-                EmailConfirmed = visitorResponseVM.EmailConfirmed,
+                FirstName = guideResponseVM.FirstName,
+                LastName = guideResponseVM.LastName,
+                UserName = guideResponseVM.UserName,
+                Email = guideResponseVM.Email,
+                PhoneNumber = guideResponseVM.PhoneNumber,
+                Country = guideResponseVM.Country,
+                Gender = guideResponseVM.Gender,
+                EmailConfirmed = guideResponseVM.EmailConfirmed,
                 ProfileImage = imgesrc,
-                Role = UserRole.Visitor
+                Role = UserRole.Guide
             };
 
-            var result = await _userManager.CreateAsync(user, visitorResponseVM.Password);
+            var result = await _userManager.CreateAsync(user, guideResponseVM.Password);
 
 
             if (!result.Succeeded)
             {
                 TempData["error-notification"] = "Faild To Create User,";
-                return View(visitorResponseVM);
+                return View(guideResponseVM);
             }
 
-            //add role visitor
-            await _userManager.AddToRoleAsync(user, SD.VisitorRole);
+            //add role guide
+            await _userManager.AddToRoleAsync(user, SD.GuideRole);
 
-            var visitor = new Visitor
+            var guide = new Guide
             {
 
                 ApplicationUserId = user.Id,
-                Passport = visitorResponseVM.Passport,
-                visitorStatus = visitorResponseVM.visitorStatus
+                LicenseNumber = guideResponseVM.LicenseNumber,
+                NationalId = guideResponseVM.NationalId,
+                YearsOfExperience = guideResponseVM.YearsOfExperience
 
             };
 
-            await _visitorRepo.CreateAsync(visitor);
-            await _visitorRepo.CommitAsync();
+            await _guideRepo.CreateAsync(guide);
+            await _guideRepo.CommitAsync();
 
 
 
@@ -156,17 +158,17 @@ namespace GuideMe.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int id)
         {
 
-            var visitor = await _visitorRepo.GetOneAsync(e => e.Id == id);
+            var guide = await _guideRepo.GetOneAsync(e => e.Id == id);
 
-            if (visitor == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Admin" });
+            if (guide == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Admin" });
 
-            var user = await _userManager.FindByIdAsync(visitor.ApplicationUserId);
+            var user = await _userManager.FindByIdAsync(guide.ApplicationUserId);
 
             if (user == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Admin" });
 
-            var userVM = new VisitorEditVM
+            var userVM = new GuideEditVM
             {
-                Id = visitor.Id,
+                Id = guide.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
@@ -176,8 +178,9 @@ namespace GuideMe.Areas.Admin.Controllers
                 Country = user.Country,
                 EmailConfirmed = user.EmailConfirmed,
                 ProfileImage = user.ProfileImage,
-                Passport = visitor.Passport,
-                visitorStatus = visitor.visitorStatus
+                LicenseNumber = guide.LicenseNumber,
+                NationalId = guide.NationalId,
+                YearsOfExperience = guide.YearsOfExperience
 
             };
 
@@ -186,20 +189,20 @@ namespace GuideMe.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(VisitorEditVM visitorEditVM, IFormFile? ProfileImage)
+        public async Task<IActionResult> Edit(GuideEditVM guideEditVM, IFormFile? ProfileImage)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(e => e.Errors);
                 TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
-                return View(visitorEditVM);
+                return View(guideEditVM);
             }
 
-            var visitor = await _visitorRepo.GetOneAsync(e => e.Id == visitorEditVM.Id);
+            var guide = await _guideRepo.GetOneAsync(e => e.Id == guideEditVM.Id);
 
-            if (visitor == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Admin" });
+            if (guide == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Admin" });
 
-            var user = await _userManager.FindByIdAsync(visitor.ApplicationUserId);
+            var user = await _userManager.FindByIdAsync(guide.ApplicationUserId);
 
             if (user == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Admin" });
 
@@ -216,7 +219,7 @@ namespace GuideMe.Areas.Admin.Controllers
 
                 user.ProfileImage = filename;
 
-                if (oldImagesrc is not null && oldImagesrc != "")
+                if(oldImagesrc is not null &&  oldImagesrc != "")
                 {
                     var oldpath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\identity\\profile", oldImagesrc);
 
@@ -225,20 +228,22 @@ namespace GuideMe.Areas.Admin.Controllers
                         System.IO.File.Delete(oldpath);
                     }
                 }
+
+
             }
             else
             {
                 user.ProfileImage = oldImagesrc;
             }
 
-            user.FirstName = visitorEditVM.FirstName;
-            user.LastName = visitorEditVM.LastName;
-            user.UserName = visitorEditVM.UserName;
-            user.Email = visitorEditVM.Email;
-            user.EmailConfirmed = visitorEditVM.EmailConfirmed;
-            user.PhoneNumber = visitorEditVM.PhoneNumber;
-            user.Country = visitorEditVM.Country;
-            user.Gender = visitorEditVM.Gender;
+            user.FirstName = guideEditVM.FirstName;
+            user.LastName = guideEditVM.LastName;
+            user.UserName = guideEditVM.UserName;
+            user.Email = guideEditVM.Email;
+            user.EmailConfirmed = guideEditVM.EmailConfirmed;
+            user.PhoneNumber = guideEditVM.PhoneNumber;
+            user.Country = guideEditVM.Country;
+            user.Gender = guideEditVM.Gender;
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -249,16 +254,17 @@ namespace GuideMe.Areas.Admin.Controllers
                     ModelState.AddModelError(string.Empty, item.Description);
                 }
 
-                return View(visitorEditVM);
+                return View(guideEditVM);
             }
 
-            visitor.Passport = visitorEditVM.Passport;
-            visitor.visitorStatus = visitorEditVM.visitorStatus;
+            guide.LicenseNumber = guideEditVM.LicenseNumber;
+            guide.NationalId = guideEditVM.NationalId;
+            guide.YearsOfExperience = guideEditVM.YearsOfExperience;
 
-            _visitorRepo.Update(visitor);
-            await _visitorRepo.CommitAsync();
+            _guideRepo.Update(guide);
+            await _guideRepo.CommitAsync();
 
-            TempData["success-notification"] = "Update Visitor SuccessFully";
+            TempData["success-notification"] = "Update Guide SuccessFully";
 
             return RedirectToAction(nameof(Index));
 
@@ -270,14 +276,14 @@ namespace GuideMe.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var visitor = await _visitorRepo.GetOneAsync(e => e.Id == id);
-            if (visitor == null)
+            var guide = await _guideRepo.GetOneAsync(e => e.Id == id);
+            if (guide == null)
             {
 
                 return NotFound();
             }
 
-            var user = await _userManager.FindByIdAsync(visitor.ApplicationUserId);
+            var user = await _userManager.FindByIdAsync(guide.ApplicationUserId);
 
             if (user == null)
             {
@@ -289,6 +295,5 @@ namespace GuideMe.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
 
         }
-
     }
 }
