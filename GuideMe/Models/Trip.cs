@@ -32,8 +32,8 @@ namespace GuideMe.Models
 
         [Required]       
         public int NumberOfDays { get; set; }
-        [Required]
-        public string Image { get; set; } = string.Empty;
+
+        public string? Image { get; set; } = string.Empty;
         [Required]
         public DateTime CreatedOn { get; set; }
         [Required]
@@ -42,7 +42,7 @@ namespace GuideMe.Models
         public TripStatus Status { get; set; }
         public int VisitorId { get; set; }
 
-        public Visitor Visitor { get; set; }
+        public Visitor? Visitor { get; set; }
 
         public ICollection<Offer> Offers { get; set; } = new List<Offer>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();

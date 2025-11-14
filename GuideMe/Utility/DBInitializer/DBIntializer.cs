@@ -30,31 +30,61 @@ namespace GuideMe.Utility.DBInitializer
                     _context.Database.Migrate();
                 }
 
-                if (_roleManager.Roles.IsNullOrEmpty())
+                // ------------------ CREATE ROLES -------------------------
+                if (!_roleManager.Roles.Any())
                 {
-                    _roleManager.CreateAsync(new(SD.SuperAdminRole)).GetAwaiter().GetResult();
-                    _roleManager.CreateAsync(new(SD.AdminRole)).GetAwaiter().GetResult();
-                    _roleManager.CreateAsync(new(SD.VisitorRole)).GetAwaiter().GetResult();
-                    _roleManager.CreateAsync(new(SD.GuideRole)).GetAwaiter().GetResult();
+                    _roleManager.CreateAsync(new IdentityRole(SD.SuperAdminRole)).GetAwaiter().GetResult();
+                    _roleManager.CreateAsync(new IdentityRole(SD.AdminRole)).GetAwaiter().GetResult();
+                    _roleManager.CreateAsync(new IdentityRole(SD.VisitorRole)).GetAwaiter().GetResult();
+                    _roleManager.CreateAsync(new IdentityRole(SD.GuideRole)).GetAwaiter().GetResult();
+                }
 
-                    //create => Super Admin
-                    _userManager.CreateAsync(new()
+                // ------------------ CREATE SUPERADMIN USER -------------------------
+                if (_userManager.FindByEmailAsync("SuperAdmin@EraaSoft.com").GetAwaiter().GetResult() == null)
+                {
+                    var superAdmin = new ApplicationUser
                     {
                         FirstName = "SuperAdmin",
-                        LastName="One",
+                        LastName = "One",
                         Email = "SuperAdmin@EraaSoft.com",
-                        EmailConfirmed = true,
                         UserName = "SuperAdmin",
-                        PhoneNumber="01012939912",
-                        Role=UserRole.Admin
+                        PhoneNumber = "01012939912",
+                        EmailConfirmed = true,
+                        Role = UserRole.Admin
+                    };
 
-                    }, "Admin123@").GetAwaiter().GetResult();
+                    var result = _userManager.CreateAsync(superAdmin, "Admin123@").GetAwaiter().GetResult();
 
-                    var user = _userManager.FindByEmailAsync("SuperAdmin@EraaSoft.com").GetAwaiter().GetResult();
+                    if (result.Succeeded)
+                    {
+                        // Assign role
+                        _userManager.AddToRoleAsync(superAdmin, SD.SuperAdminRole).GetAwaiter().GetResult();
 
-                    _userManager.AddToRoleAsync(user, SD.SuperAdminRole).GetAwaiter().GetResult();
+                        // ------------------ INSERT Visitor Linked to User -------------------------
+                        var visitor = new Visitor
+                        {
+                            Passport = "P123456789",
+                            visitorStatus = VisitorStatus.Available,
+                            ApplicationUserId = superAdmin.Id
+                        };
 
-                }
+                        _context.Visitors.Add(visitor);
+
+                        // ------------------ INSERT Guide Linked to User -------------------------
+                        var guide = new Guide
+                        {
+                            LicenseNumber = "LIC-987654987654",
+                            YearsOfExperience = 5,
+                            NationalId = "29811223344556",
+                            ApplicationUserId = superAdmin.Id
+                        };
+
+                        _context.Guides.Add(guide);
+
+                        _context.SaveChanges();
+                    }
+                
+            }
             }
             catch (Exception ex )
             {

@@ -15,14 +15,14 @@ namespace GuideMe.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        public int GuideId { get; set; }
-        public Guide Guide { get; set; }
 
-        [Required]
-        public int TripId { get; set; }
+        public int? GuideId { get; set; }
+      
+        public Guide? Guide { get; set; }
 
-        public Trip Trip { get; set; }
+        public int? TripId { get; set; }
+
+        public Trip? Trip { get; set; }
 
         [Required]
         public string Message { get; set; }

@@ -181,6 +181,48 @@
         });
     });
 </script>
+<script>
+        // Enable all Bootstrap tooltips
+        document.addEventListener('DOMContentLoaded', function () {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+
+        // Function to show full text in a Bootstrap modal or alert
+        function showFullText(text, label) {
+            // Create a modal dynamically if not exists
+            let modal = document.getElementById("textModal");
+            if (!modal) {
+                const modalHtml = `
+                    <div class="modal fade" id="textModal" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="textModalLabel"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body" id="textModalBody"></div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>`;
+                document.body.insertAdjacentHTML("beforeend", modalHtml);
+            }
+
+            // Set content
+            document.getElementById("textModalLabel").textContent = label || "Details";
+            document.getElementById("textModalBody").textContent = text;
+
+            // Show modal
+            const modalInstance = new bootstrap.Modal(document.getElementById("textModal"));
+            modalInstance.show();
+        }
+    </script>
+
 
 <style>
     table.table-sm td, table.table-sm th {

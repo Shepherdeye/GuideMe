@@ -1,0 +1,68 @@
+﻿@model Offer
+
+<div class="container py-4">
+    <h4 class="fw-bold mb-4">Edit Offer</h4>
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="GuideId" />
+
+        <!-- Trip Selection -->
+        <div class="mb-3">
+            <label asp-for="TripId" class="form-label fw-semibold">Select Trip</label>
+            <select asp-for="TripId" class="form-select" asp-items="ViewBag.Trips">
+                <option value="">-- Select Trip --</option>
+            </select>
+            <span asp-validation-for="TripId" class="text-danger"></span>
+        </div>
+
+        <!-- Message -->
+        <div class="mb-3">
+            <label asp-for="Message" class="form-label fw-semibold"></label>
+            <textarea asp-for="Message" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Message" class="text-danger"></span>
+        </div>
+
+        <!-- Offered Price -->
+        <div class="mb-3">
+            <label asp-for="OfferedPrice" class="form-label fw-semibold"></label>
+            <input asp-for="OfferedPrice" class="form-control" type="number" step="0.01" min="10" />
+            <span asp-validation-for="OfferedPrice" class="text-danger"></span>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+            <label asp-for="Status" class="form-label fw-semibold"></label>
+            <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<OfferStatus>()"></select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <!-- Start Date -->
+        <div class="mb-3">
+            <label asp-for="OfferStartDate" class="form-label fw-semibold"></label>
+            <input asp-for="OfferStartDate" class="form-control" type="date" />
+            <span asp-validation-for="OfferStartDate" class="text-danger"></span>
+        </div>
+
+        <!-- End Date -->
+        <div class="mb-3">
+            <label asp-for="OfferEndDate" class="form-label fw-semibold"></label>
+            <input asp-for="OfferEndDate" class="form-control" type="date" />
+            <span asp-validation-for="OfferEndDate" class="text-danger"></span>
+        </div>
+
+        <!-- Submit -->
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary px-4">Update Offer</button>
+            <a asp-action="Index" class="btn btn-secondary px-4">Back</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

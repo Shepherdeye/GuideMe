@@ -39,35 +39,12 @@
                             <td>@item.FirstName</td>
                             <td>@item.LastName</td>
 
-                            <!-- Username -->
-                            <td>
-                                <span class="truncate-text"
-                                      data-bs-toggle="tooltip"
-                                      title="@item.UserName"
-                                      onclick="showFullText('@item.UserName', 'Username')">
-                                    @item.UserName
-                                </span>
-                            </td>
-
-                            <!-- Email -->
-                            <td>
-                                <span class="truncate-text"
-                                      data-bs-toggle="tooltip"
-                                      title="@item.Email"
-                                      onclick="showFullText('@item.Email', 'Email')">
-                                    @item.Email
-                                </span>
-                            </td>
-
+                            <!-- Truncated fields -->
+                            <td><span class="truncate-text" data-text="@item.UserName" data-label="Username">@item.UserName</span></td>
+                            <td><span class="truncate-text" data-text="@item.Email" data-label="Email">@item.Email</span></td>
                             <td>@item.PhoneNumber</td>
                             <td>@item.Gender</td>
-                            <td>
-                                <span class="truncate-text"
-                                      data-bs-toggle="tooltip"
-                                      title="@item.Country">
-                                    @item.Country
-                                </span>
-                            </td>
+                            <td><span class="truncate-text" data-text="@item.Country" data-label="Country">@item.Country</span></td>
                             <td><span class="badge bg-secondary">@item.Role</span></td>
 
                             <td>
@@ -77,14 +54,7 @@
                                      alt="Profile" />
                             </td>
 
-                            <td>
-                                <span class="truncate-text"
-                                      data-bs-toggle="tooltip"
-                                      title="@item.Passport"
-                                      onclick="showFullText('@item.Passport', 'Passport')">
-                                    @item.Passport
-                                </span>
-                            </td>
+                            <td><span class="truncate-text" data-text="@item.Passport" data-label="Passport">@item.Passport</span></td>
 
                             <td>
                                 <span class="badge @(item.visitorStatus == VisitorStatus.Available ? "bg-success" : "bg-warning text-dark")">
@@ -162,21 +132,27 @@
                 <h6 class="modal-title" id="textModalLabel"></h6>
                 <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body small" id="textModalContent"></div>
+            <div class="modal-body small" id="textModalBody"></div>
         </div>
     </div>
 </div>
 
+<!-- Scripts -->
 <script>
-    // Tooltip init
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
 
-    // Modal full text
-    function showFullText(text, label) {
-        document.getElementById('textModalLabel').textContent = label;
-        document.getElementById('textModalContent').textContent = text;
-        new bootstrap.Modal(document.getElementById('textModal')).show();
-    }
+    // Automatically make all truncated fields open modal on click
+    document.querySelectorAll('.truncate-text').forEach(el => {
+        el.addEventListener('click', function() {
+            const text = this.dataset.text;
+            const label = this.dataset.label || 'Details';
+            document.getElementById('textModalLabel').textContent = label;
+            document.getElementById('textModalBody').textContent = text;
+            new bootstrap.Modal(document.getElementById('textModal')).show();
+        });
+    });
 
     // SweetAlert delete confirmation
     document.querySelectorAll('.delete-btn').forEach(btn => {
@@ -192,41 +168,27 @@
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
-                if (result.isConfirmed) form.submit();
+                if (result.isConfirmed) {
+                    form.submit();
+                }
             });
         });
     });
 </script>
 
 <style>
-    table {
-        font-size: 0.8rem !important;
-        table-layout: fixed;
-        border-collapse: collapse;
-    }
-
-    table th, table td {
-        padding: 0.35rem !important;
-        vertical-align: middle !important;
-        white-space: nowrap;
-    }
-
     .truncate-text {
         display: inline-block;
-        max-width: 90px;
+        max-width: 100px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         cursor: pointer;
         color: #0d6efd;
     }
+    .truncate-text:hover { text-decoration: underline; }
 
-    .truncate-text:hover {
-        text-decoration: underline;
-    }
-
-    .table-responsive {
-        max-height: 70vh;
-        overflow-y: auto;
+    table.table-striped td, table.table-striped th {
+        vertical-align: middle !important;
     }
 </style>

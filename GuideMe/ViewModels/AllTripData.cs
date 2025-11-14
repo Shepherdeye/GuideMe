@@ -1,11 +1,13 @@
 ﻿namespace GuideMe.ViewModels
 {
-    public class AllGuideResponse
+    public class AllTripData
     {
-        public List<GuideResponseVM> Guides { get; set; }
+        public List<Trip> Trips { get; set; }
 
         public double PagesNumber { get; set; }
 
         public int CurrentPage { get; set; }
+
+
     }
 }

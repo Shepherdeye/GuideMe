@@ -106,7 +106,7 @@
                         <div class="accordion" id="profileAccordion">
 
                             <!-- More Details -->
-                            @if (Model.ProfileVm.Role == UserRole.Visitor)
+                            @if (Model.ProfileVm.Role != UserRole.Guide)
                             {
                                   <div class="accordion-item mb-3">
                                 <h2 class="accordion-header" id="headingDetails">
@@ -151,7 +151,7 @@
                                 </div>
                                 </div>
                             }
-                            else if(Model.ProfileVm.Role== UserRole.Guide)
+                            @if(Model.ProfileVm.Role!= UserRole.Visitor)
                             {
                                   <div class="accordion-item mb-3">
                                 <h2 class="accordion-header" id="headingDetails">
@@ -218,7 +218,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if (Model.ProfileVm.Role == UserRole.Visitor)
+                            @if (Model.ProfileVm.Role != UserRole.Guide)
                             {
                                 <!-- Additional Data (Read Only) -->
                            <!-- Visitor Info -->
@@ -278,7 +278,8 @@
 
 
                                 
-                            }else if (Model.ProfileVm.Role == UserRole.Guide)
+                            }
+                            @if (Model.ProfileVm.Role != UserRole.Visitor)
                             {
                                         <!-- Additional Data (Read Only) -->
                                         <div class="accordion-item mt-3">

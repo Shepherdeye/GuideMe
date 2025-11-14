@@ -1,0 +1,113 @@
+﻿@model Trip
+
+<div class="container py-4">
+    <h4 class="fw-bold mb-4">Edit Trip</h4>
+
+    <form asp-action="Edit" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="VisitorId" />
+
+        <div class="row g-3">
+
+            <!-- Title -->
+            <div class="col-md-6">
+                <label asp-for="Title" class="form-label fw-semibold"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <!-- Destination -->
+            <div class="col-md-6">
+                <label asp-for="Destination" class="form-label fw-semibold"></label>
+                <input asp-for="Destination" class="form-control" />
+                <span asp-validation-for="Destination" class="text-danger"></span>
+            </div>
+
+            <!-- Region -->
+            <div class="col-md-6">
+                <label asp-for="Region" class="form-label fw-semibold"></label>
+                <input asp-for="Region" class="form-control" />
+                <span asp-validation-for="Region" class="text-danger"></span>
+            </div>
+
+            <!-- Price -->
+            <div class="col-md-6">
+                <label asp-for="Price" class="form-label fw-semibold"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <!-- Members -->
+            <div class="col-md-6">
+                <label asp-for="Members" class="form-label fw-semibold"></label>
+                <input asp-for="Members" type="number" min="1" class="form-control" />
+                <span asp-validation-for="Members" class="text-danger"></span>
+            </div>
+
+            <!-- Number of Days -->
+            <div class="col-md-6">
+                <label asp-for="NumberOfDays" class="form-label fw-semibold"></label>
+                <input asp-for="NumberOfDays" type="number" min="1" class="form-control" />
+                <span asp-validation-for="NumberOfDays" class="text-danger"></span>
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-6">
+                <label asp-for="Status" class="form-label fw-semibold"></label>
+                <select asp-for="Status" class="form-select"
+                        asp-items="Html.GetEnumSelectList<TripStatus>()"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <!-- Description -->
+            <div class="col-md-12">
+                <label asp-for="Description" class="form-label fw-semibold"></label>
+                <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Upload Image</label>
+                <input type="file" required="@false" class="form-control" name="Image" id="imageInput" accept="image/*" />
+            </div>
+
+            <!-- Preview -->
+            <div class="col-md-6 text-center">
+                <img id="previewImage"
+                     src="@(!string.IsNullOrEmpty(Model.Image) ? $"/main/img/{Model.Image}" : "/identity/profile/unknown.png")"
+                     class="border rounded mt-2"
+                     width="150" height="150"
+                     alt="Preview" />
+            </div>
+
+            <!-- Hidden Dates -->
+            <input type="hidden" asp-for="CreatedOn" />
+            <input type="hidden" asp-for="LastUpdatedon" value="@DateTime.Now" />
+
+            <!-- Submit -->
+            <div class="col-12 mt-3">
+                <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                <a asp-action="Index" class="btn btn-secondary px-4">Back</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Preview selected image
+        document.getElementById("imageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    document.getElementById("previewImage").src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

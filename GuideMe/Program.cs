@@ -39,7 +39,7 @@ namespace GuideMe
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/Identity/Account/Login";
-                options.AccessDeniedPath = "/Main/Home/NotFound";
+                options.AccessDeniedPath = "/Main/Home/NotFoundPage";
 
             });
 
@@ -53,6 +53,12 @@ namespace GuideMe
             builder.Services.AddScoped<IRepository<Visitor>, Repository<Visitor>>();
             builder.Services.AddScoped<IRepository<Guide>, Repository<Guide>>();
             builder.Services.AddScoped<IRepository<UserOTP>, Repository<UserOTP>>();
+            builder.Services.AddScoped<IRepository<Trip>, Repository<Trip>>();
+            builder.Services.AddScoped<IRepository<Review>, Repository<Review>>();
+            builder.Services.AddScoped<IRepository<Booking>, Repository<Booking>>();
+            builder.Services.AddScoped<IRepository<Payment>, Repository<Payment>>();
+            builder.Services.AddScoped<IRepository<Offer>, Repository<Offer>>();
+            builder.Services.AddScoped<IRepository<ContactAccess>, Repository<ContactAccess>>();
 
 
 

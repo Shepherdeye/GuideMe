@@ -53,14 +53,13 @@ namespace GuideMe.Areas.Admin.Controllers
             }
 
             var totalcount = response.Count();
-            double pages = Math.Ceiling(totalcount / 8.00);
-            var pageination = response.Skip((page - 1) * 8).Take(8).ToList();
+            double pages = Math.Ceiling(totalcount / 10.00);
+            var pageination = response.Skip((page - 1) * 10).Take(10).ToList();
 
             AllVisitorResponse returnedData = new AllVisitorResponse
             {
                 Visitors = pageination,
                 PagesNumber = pages,
-                TotalCount = totalcount,
                 CurrentPage=page
 
             };
