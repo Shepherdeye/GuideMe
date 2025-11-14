@@ -32,19 +32,11 @@ namespace GuideMe.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
 
-
-            Expression<Func<Offer, object>>[] includes =
-            {
-                o => o.Guide,
-                o => o.Guide.ApplicationUser,
-                o => o.Trip
-            };
-
-            var offers = await _offerRepository.GetAsync(includes: includes);
+            var offers = await _offerRepository.GetAsync(includes: [e => e.Guide, e => e.Guide.ApplicationUser, e => e.Trip]);
 
             var totaCount = offers.Count();
             var pages = Math.Ceiling(totaCount / 10.00);
-            offers = offers.Skip((page - 1)).Take(10).ToList();
+            offers = offers.OrderByDescending(e => e.Id).Skip((page - 1)).Take(10).ToList();
 
 
             AllOffersResponse data = new AllOffersResponse()
@@ -100,10 +92,10 @@ namespace GuideMe.Areas.Admin.Controllers
                 TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
 
                 var trips = await _tripRepo.GetAsync();
-                
+
                 ViewBag.Trips = new SelectList(trips, "Id", "Title");
 
-                
+
                 return View(offer);
             }
 
@@ -121,12 +113,12 @@ namespace GuideMe.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int id)
         {
 
-            var offer = await _offerRepository.GetOneAsync(e=>e.Id==id);
+            var offer = await _offerRepository.GetOneAsync(e => e.Id == id);
             if (offer is null)
             {
 
                 TempData["error-notification"] = "Offer Not Found";
-                return RedirectToAction("NotFoudPage", "Home", new { area="Admin"});
+                return RedirectToAction("NotFoudPage", "Home", new { area = "Admin" });
 
             }
             // Get trips for dropdown
@@ -152,7 +144,8 @@ namespace GuideMe.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Delete(int id) {
+        public async Task<IActionResult> Delete(int id)
+        {
 
             var offer = await _offerRepository.GetOneAsync(e => e.Id == id);
             if (offer is null)
