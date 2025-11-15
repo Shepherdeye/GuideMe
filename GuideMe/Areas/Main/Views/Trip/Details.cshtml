@@ -1,0 +1,325 @@
+﻿@{
+    ViewData["Title"] = "Trip Details";
+}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+<div class="container py-4">
+
+    <!-- BANNER + TITLE -->
+    <div class="card shadow-lg mb-4 border-0 overflow-hidden">
+
+        <img src="/main/img/65c1edf7-26b3-48ab-afb0-ffd0edc2fe28.jpg" class="w-100" style="height:330px; object-fit:cover;" />
+
+        <div class="p-4">
+
+            <h1 class="fw-bold">Amazing Trip to Paris</h1>
+
+            <div class="d-flex flex-wrap gap-3 mt-2">
+
+                <span><i class="fa-solid fa-location-dot text-danger"></i> Paris, France</span>
+                <span><i class="fa-solid fa-map text-primary"></i> Europe</span>
+                <span><i class="fa-solid fa-clock text-warning"></i> 7 Days</span>
+                <span><i class="fa-solid fa-users text-success"></i> 15 Members</span>
+
+            </div>
+
+            <h3 class="mt-3 text-primary fw-bold">$1,250</h3>
+
+            <p class="mt-3 text-muted">
+                Experience the beauty of Paris with a 7-day guided tour including famous attractions,
+                fine dining, museums, river cruises, and cultural experiences.
+            </p>
+
+            <button class="btn btn-primary px-4 me-2" data-bs-toggle="modal" data-bs-target="#offerModal">
+                <i class="fa-solid fa-handshake"></i> Make Offer
+            </button>
+
+            <button class="btn btn-outline-primary px-4" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <i class="fa-solid fa-star"></i> Write Review
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- OFFER LIST -->
+    <div class="card shadow-sm mb-5 border-0">
+        <div class="card-header bg-secondary text-white py-3">
+            <h4 class="m-0"><i class="fa-solid fa-handshake-simple"></i> Offers</h4>
+        </div>
+
+        <div class="card-body">
+            <!-- OFFER ITEM 1 -->
+            <div class="d-flex gap-3 mb-4 border-bottom pb-3">
+                <img src="/identity/Profile/02846d12-f69e-4d65-aecd-f61f33be1002.jpg"
+                     class="rounded-circle shadow-sm" width="55" height="55" />
+
+                <div class="flex-grow-1">
+                    <h5 class="fw-bold m-0">John Smith (Guide)</h5>
+                    <p class="m-1 text-muted">"Special discount for early booking!"</p>
+
+                    <span class="fw-bold text-primary">$900</span>
+                    <span class="text-muted">— 2024-01-05 → 2024-01-20</span>
+
+                    <div>
+                        <span class="badge bg-success mt-2">Approved</span>
+                    </div>
+
+                    <!-- BOOK NOW BUTTON -->
+                    <button class="btn btn-outline-primary btn-sm mt-3 px-3"
+                            data-bs-toggle="modal" data-bs-target="#bookingModal1">
+                        <i class="bi bi-calendar-check me-1"></i> Book Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- BOOKING POPUP MODAL -->
+            <div class="modal fade" id="bookingModal1" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content rounded-4 shadow-lg">
+
+                        <div class="modal-header border-0 p-4">
+                            <h4 class="modal-title fw-bold">
+                                <i class="bi bi-calendar2-check me-2"></i>Complete Your Booking
+                            </h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body px-4 pb-4">
+
+                            <!-- Form -->
+                            <form>
+                                <div class="row g-3">
+
+                                    <!-- Booking Price -->
+                                    <div class="col-md-6">
+                                        <label class="fw-bold mb-1">Booking Price</label>
+                                        <input type="text" class="form-control" value="$900" disabled />
+                                    </div>
+
+                                    <!-- Booking Status -->
+                                    <div class="col-md-6">
+                                        <label class="fw-bold mb-1">Booking Status</label>
+                                        <select class="form-select">
+                                            <option>Pending</option>
+                                            <option>Accepted</option>
+                                            <option>Rejected</option>
+                                            <option>Canceled</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Start Date -->
+                                    <div class="col-md-6">
+                                        <label class="fw-bold mb-1">Start Date</label>
+                                        <input type="date" class="form-control" value="2024-01-05" />
+                                    </div>
+
+                                    <!-- End Date -->
+                                    <div class="col-md-6">
+                                        <label class="fw-bold mb-1">End Date</label>
+                                        <input type="date" class="form-control" value="2024-01-20" />
+                                    </div>
+
+                                    <!-- Visitor (Dummy) -->
+                                    <div class="col-md-6">
+                                        <label class="fw-bold mb-1">Visitor</label>
+                                        <input class="form-control" value="Dummy Visitor (ID: 1)" disabled />
+                                    </div>
+
+                                    <!-- Guide (Dummy) -->
+                                    <div class="col-md-6">
+                                        <label class="fw-bold mb-1">Guide</label>
+                                        <input class="form-control" value="John Smith (ID: 3)" disabled />
+                                    </div>
+
+                                    <!-- Trip (Dummy) -->
+                                    <div class="col-12">
+                                        <label class="fw-bold mb-1">Trip</label>
+                                        <input class="form-control" value="Title (Trip ID: Id)" disabled />
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button class="btn btn-primary w-100 mt-4 py-2 fw-bold rounded-3">
+                                    Confirm Booking
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- OFFER ITEM 2 -->
+            <div class="d-flex gap-3 mb-4 border-bottom pb-3">
+                <img src="/identity/Profile/229d70be-5106-48be-b18b-5c1b86f9855a.jpg" class="rounded-circle" width="55" height="55" />
+                <div>
+                    <h5 class="fw-bold m-0">Emma Johnson (Guide)</h5>
+                    <p class="m-1 text-muted">"Includes river cruise & Louvre museum tour."</p>
+
+                    <span class="fw-bold">$1,050</span>
+                    <span class="text-muted">— 2024-01-10 → 2024-01-25</span>
+                    <div>
+                        <span class="badge bg-warning text-dark mt-2">Pending</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- REVIEWS -->
+    <div class="card shadow-sm mb-5 border-0">
+        <div class="card-header bg-primary text-white py-3">
+            <h4 class="m-0"><i class="fa-solid fa-comments"></i> Reviews</h4>
+        </div>
+
+        <div class="card-body">
+
+            <!-- REVIEW 1 -->
+            <div class="d-flex gap-3 mb-4 border-bottom pb-3">
+                <img src="~/identity/Profile/7cd669ce-5980-423a-8fd3-94f989b14a79.jpg" class="rounded-circle" width="50" height="50" />
+                <div>
+                    <h6 class="fw-bold m-0">Michael Brown</h6>
+
+                    <div class="text-warning mb-1">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                    </div>
+
+                    <p class="m-0">
+                        Amazing experience! Great guide, fantastic food, and beautiful attractions.
+                    </p>
+
+                    <small class="text-muted">Reviewed on: Feb 1, 2024</small>
+                </div>
+            </div>
+
+            <!-- REVIEW 2 -->
+            <div class="d-flex gap-3 mb-4 border-bottom pb-3">
+                <img src="~/identity/Profile/02846d12-f69e-4d65-aecd-f61f33be1002.jpg" class="rounded-circle" width="50" height="50" />
+                <div>
+                    <h6 class="fw-bold m-0">Sarah Green</h6>
+
+                    <div class="text-warning mb-1">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-regular fa-star"></i>
+                    </div>
+
+                    <p class="m-0">
+                        Great trip overall, but the hotel could be better.
+                    </p>
+
+                    <small class="text-muted">Reviewed on: Feb 10, 2024</small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!-- OFFER MODAL -->
+    <div class="modal fade" id="offerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Create Offer</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Message</label>
+                            <textarea class="form-control" rows="3" placeholder="Enter offer message..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Offered Price</label>
+                            <input type="number" class="form-control" placeholder="900" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Start Date</label>
+                                <input type="date" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">End Date</label>
+                                <input type="date" class="form-control" />
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success px-4">Submit Offer</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- REVIEW MODAL -->
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Write a Review</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Comment</label>
+                            <textarea class="form-control" rows="3" placeholder="Share your experience..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rating</label>
+                            <select class="form-select">
+                                <option>Excellent</option>
+                                <option>Good</option>
+                                <option>Average</option>
+                                <option>Poor</option>
+                            </select>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary px-4">Submit Review</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

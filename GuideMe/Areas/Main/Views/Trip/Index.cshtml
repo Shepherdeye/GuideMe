@@ -1,0 +1,161 @@
+﻿@model TripsWithFilterVm
+
+
+
+
+
+<div class="container mt-5">
+
+    <!--  FILTER FORM -->
+    <div class="accordion mb-5 shadow-sm" id="filterAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="filterHeading">
+                <button class="accordion-button collapsed bg-primary text-white fw-bold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false"
+                    aria-controls="filterCollapse">
+                     Filter Trips
+                </button>
+            </h2>
+
+            <div id="filterCollapse" class="accordion-collapse collapse" aria-labelledby="filterHeading"
+                data-bs-parent="#filterAccordion">
+
+                <div class="accordion-body">
+
+                    <form method="get" asp-action="Index">
+                        <div class="row g-4">
+
+                            <!-- Title -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Title</label>
+                                <input type="text" class="form-control shadow-sm" name="Filter.Title"
+                                    value="@Model.Filter?.Title" placeholder="Search by title">
+                            </div>
+
+                            <!-- Destination -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Destination</label>
+                                <input type="text" class="form-control shadow-sm" name="Filter.Distination"
+                                    value="@Model.Filter?.Distination" placeholder="Search destination">
+                            </div>
+
+                            <!-- Min Price -->
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Min Price</label>
+                                <input type="number" class="form-control shadow-sm" name="Filter.MinPrice"
+                                    value="@Model.Filter?.MinPrice">
+                            </div>
+
+                            <!-- Max Price -->
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Max Price</label>
+                                <input type="number" class="form-control shadow-sm" name="Filter.MaxPrice"
+                                    value="@Model.Filter?.MaxPrice">
+                            </div>
+
+                            <!-- Active -->
+                            <div class="col-md-3 mt-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" class="form-check-input" name="Filter.Active"
+                                        @(Model.Filter?.Active==true ? "checked" : "" )>
+                                    <label class="form-check-label">Active Trips Only</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4 text-end">
+                            <button class="btn btn-primary px-4 me-2 shadow-sm">
+                                Apply Filters
+                            </button>
+
+                            <a href="/Trips/Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                                Reset
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- TRIPS SECTION  -->
+    @if (Model.Trips.Any())
+    {
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="section-title bg-white text-center text-primary px-3">Packages</h6>
+                <h1 class="mb-5">Awesome Packages</h1>
+            </div>
+            <div class="row g-4 justify-content-center">
+                @foreach (var trip in Model.Trips) { <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="package-item">
+                        <div class="overflow-hidden">
+                            <img class="img-fluid" src="~/main/img/@trip.Image" style="min-height:250px" alt="">
+                        </div>
+                        <div class="d-flex border-bottom">
+                            <small class="flex-fill text-center border-end py-2">
+                                <i class="fa fa-map-marker-alt text-primary me-2">
+
+                                </i>@trip.Destination</small> <small class="flex-fill text-center border-end py-2">
+                                <i class="fa fa-calendar-alt text-primary me-2"></i>@trip.NumberOfDays days</small>
+                            <small class="flex-fill text-center py-2"><i
+                                    class="fa fa-user text-primary me-2"></i>@trip.Members
+                                Person</small>
+                        </div>
+                        <div class="text-center p-4">
+                            <h3 class="mb-0">@trip.Price.ToString("c")</h3>
+                            <div class="mb-3"> <small class="fa fa-star text-primary"></small> <small
+                                    class="fa fa-star text-primary"></small> <small
+                                    class="fa fa-star text-primary"></small>
+                                <small class="fa fa-star text-primary"></small> <small
+                                    class="fa fa-star text-primary"></small>
+                            </div>
+                            <p>@trip.Description</p>
+                            <div class="d-flex justify-content-center mb-2"> <a href="#"
+                                    class="btn btn-sm btn-primary px-3 border-end"
+                                    style="border-radius: 30px 0 0 30px;">Read More</a>
+                                    <button href=""
+                                    class="btn btn-sm @(trip.Status==TripStatus.Open?"btn-primary":"btn-danger") px-3" style="border-radius: 0 30px 30px 0;">@trip.Status</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> } </div>
+        </div>
+    </div>
+
+    <!--  PAGINATION  -->
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+
+            <!-- Previous -->
+            <li class="page-item @(Model.CurrentPage == 1 ? " disabled" : "" )">
+                <a class="page-link" href="?page=@(Model.CurrentPage - 1)&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice">&lt;</a>
+            </li>
+
+            <!-- Page Numbers -->
+            @for (int i = 1; i <= Model.PagesNumber; i++) { <li class="page-item @(Model.CurrentPage == i ? " active"
+                : "" )">
+                <a class="page-link" href="?page=@i&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice">@i</a>
+                </li>
+                }
+
+                <!-- Next -->
+                <li class="page-item @(Model.CurrentPage == Model.PagesNumber ? " disabled" : "" )">
+                    <a class="page-link" href="?page=@(Model.CurrentPage + 1)&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice">&gt</a>
+                </li>
+        </ul>
+    </nav>
+    }
+    else
+    {
+    <h1 class="text-center text-muted mt-5">No Available Trips Right Now</h1>
+    }
+
+</div>
