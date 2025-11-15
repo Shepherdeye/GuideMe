@@ -16,7 +16,7 @@ namespace GuideMe.Areas.Main.Controllers
         }
         public async Task<IActionResult> Index(TripFilterVM filter, int page = 1)
         {
-            var trips = await _tripRepo.GetAsync(includes: [e => e.Visitor]);
+            var trips = await _tripRepo.GetAsync();
 
             if (!string.IsNullOrEmpty(filter.Title))
             {
