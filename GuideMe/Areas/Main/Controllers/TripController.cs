@@ -20,27 +20,27 @@ namespace GuideMe.Areas.Main.Controllers
 
             if (!string.IsNullOrEmpty(filter.Title))
             {
-                //var title = filter.Title;
+               
                 trips = trips.Where(e => e.Title.Contains(filter.Title)).ToList();
             }
+
             if (!string.IsNullOrEmpty(filter.Distination))
             {
-                //var distination = filter.Distination;
                 trips = trips.Where(e => e.Destination.Contains(filter.Distination)).ToList();
             }
+
             if (filter.MinPrice is not null && filter.MinPrice != 0)
             {
-                //var price = filter.MinPrice;
                 trips = trips.Where(e => e.Price >= filter.MinPrice).ToList();
             }
+
             if (filter.MaxPrice is not null && filter.MaxPrice != 0)
             {
-                //var price = filter.MaxPrice;
                 trips = trips.Where(e => e.Price <= filter.MaxPrice).ToList();
             }
+
             if (filter.Active == true)
             {
-                //var title = filter.Title;
                 trips = trips.Where(e => e.Status == TripStatus.Open).ToList();
             }
 

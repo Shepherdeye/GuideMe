@@ -6,7 +6,7 @@
         public string? Distination { get; set; }
         public decimal? MaxPrice { get; set; }
         public decimal? MinPrice { get; set; }
-        public bool? Active { get; set; } = false;
+        public bool? Active { get; set; } 
 
     }
 

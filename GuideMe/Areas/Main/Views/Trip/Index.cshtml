@@ -55,13 +55,16 @@
 
                             <!-- Active -->
                             <div class="col-md-3 mt-3">
-                                <label class="form-label fw-bold">Status</label>
-                                <div class="form-check mt-2">
-                                    <input type="checkbox" class="form-check-input" name="Filter.Active"
-                                        @(Model.Filter?.Active==true ? "checked" : "" )>
+                                    <label class="form-label fw-bold">Status</label>
+                                    <div class="form-check mt-2">
+                                    <input type="checkbox" class="form-check-input" 
+                                    name="Filter.Active"
+                                    value="true"
+                                    @(Model.Filter?.Active == true ? "checked" : "") />
                                     <label class="form-check-label">Active Trips Only</label>
-                                </div>
+                                    </div>
                             </div>
+
 
                         </div>
 
@@ -70,7 +73,7 @@
                                 Apply Filters
                             </button>
 
-                            <a href="/Trips/Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                            <a href="/Main/Trip/Index" class="btn btn-outline-secondary px-4 shadow-sm">
                                 Reset
                             </a>
                         </div>
@@ -136,19 +139,19 @@
 
             <!-- Previous -->
             <li class="page-item @(Model.CurrentPage == 1 ? " disabled" : "" )">
-                <a class="page-link" href="?page=@(Model.CurrentPage - 1)&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice">&lt;</a>
+                <a class="page-link" href="?page=@(Model.CurrentPage - 1)&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice&Filter.Active=@Model.Filter.Active">&lt;</a>
             </li>
 
             <!-- Page Numbers -->
             @for (int i = 1; i <= Model.PagesNumber; i++) { <li class="page-item @(Model.CurrentPage == i ? " active"
                 : "" )">
-                <a class="page-link" href="?page=@i&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice">@i</a>
+                <a class="page-link" href="?page=@i&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice&Filter.Active=@Model.Filter.Active">@i</a>
                 </li>
                 }
 
                 <!-- Next -->
                 <li class="page-item @(Model.CurrentPage == Model.PagesNumber ? " disabled" : "" )">
-                    <a class="page-link" href="?page=@(Model.CurrentPage + 1)&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice">&gt</a>
+                    <a class="page-link" href="?page=@(Model.CurrentPage + 1)&Filter.Title=@Model.Filter.Title&Filter.Distination=@Model.Filter.Distination&Filter.MinPrice=@Model.Filter.MinPrice&Filter.MaxPrice=@Model.Filter.MaxPrice&Filter.Active=@Model.Filter.Active">&gt</a>
                 </li>
         </ul>
     </nav>
