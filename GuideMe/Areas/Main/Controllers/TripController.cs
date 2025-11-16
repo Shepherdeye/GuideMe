@@ -1,7 +1,5 @@
 ﻿using GuideMe.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Threading.Tasks;
 
 namespace GuideMe.Areas.Main.Controllers
 {
@@ -9,10 +7,18 @@ namespace GuideMe.Areas.Main.Controllers
     public class TripController : Controller
     {
         private readonly IRepository<Trip> _tripRepo;
+        private readonly IRepository<Offer> _offerRepo;
+        private readonly IRepository<Review> _reviewRepo;
 
-        public TripController(IRepository<Trip> tripRepo)
+        public TripController(
+              IRepository<Trip> tripRepo
+            , IRepository<Offer> offerRepo
+            , IRepository<Review> ReviewRepo
+            )
         {
             _tripRepo = tripRepo;
+            _offerRepo = offerRepo;
+            _reviewRepo = ReviewRepo;
         }
         public async Task<IActionResult> Index(TripFilterVM filter, int page = 1)
         {
@@ -20,7 +26,7 @@ namespace GuideMe.Areas.Main.Controllers
 
             if (!string.IsNullOrEmpty(filter.Title))
             {
-               
+
                 trips = trips.Where(e => e.Title.Contains(filter.Title)).ToList();
             }
 
@@ -60,9 +66,25 @@ namespace GuideMe.Areas.Main.Controllers
             return View(Data);
         }
 
-        public  IActionResult Details()
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var trip = await _tripRepo.GetOneAsync(e => e.Id == id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+            if (trip == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Main" });
+            var offers = await _offerRepo.GetAsync(e => e.TripId == trip.Id, includes: [e => e.Guide, e => e.Guide.ApplicationUser]);
+            var reviews = await _reviewRepo.GetAsync(e => e.TripId == trip.Id, includes: [e=>e.Visitor,e=>e.Visitor.ApplicationUser]);
+
+
+
+
+            TripDetailsResponseVM data= new TripDetailsResponseVM()
+            {
+                Trip=trip,
+                Offers=offers,
+                Reviews=reviews
+            };
+
+
+            return View(data);
         }
     }
 }
