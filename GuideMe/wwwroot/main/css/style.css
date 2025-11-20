@@ -688,3 +688,10 @@ animation: fadeIn 0.2s ease;
 .card-body hr:first-child {
     display: none;
 }
+
+.trip-image-card {
+    min-height: 250px;
+    max-height: 250px;
+    width: 100%;
+    object-fit:cover;
+}
