@@ -15,7 +15,7 @@ namespace GuideMe.Models
 
 
 
-public class Review
+    public class Review
     {
         [Key]
         public int Id { get; set; }

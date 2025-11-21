@@ -1,10 +1,7 @@
-﻿using GuideMe.Models;
-using GuideMe.Repositories;
+﻿using GuideMe.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace GuideMe.Areas.Admin.Controllers
 {

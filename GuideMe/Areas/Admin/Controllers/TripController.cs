@@ -1,8 +1,6 @@
 ﻿using GuideMe.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Threading.Tasks;
 
 namespace GuideMe.Areas.Admin.Controllers
 {
