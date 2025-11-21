@@ -38,9 +38,12 @@
                 <h3 class="text-primary fw-bolder display-5 m-0">@Model.Trip.Price.ToString("c")</h3>
                 <div class="d-flex gap-2 gap-md-3">
                     @* Adjusted gap for better mobile fit *@
-                    <button class="btn btn-primary btn-sm btn-lg px-3 px-md-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#offerModal">
-                        <i class="fa-solid fa-handshake me-1 me-md-2"></i> Offer
-                    </button>
+                    @if (Model.CurrentUser.Role != UserRole.Visitor)
+                    {
+                        <button class="btn btn-primary btn-sm btn-lg px-3 px-md-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#offerModal">
+                            <i class="fa-solid fa-handshake me-1 me-md-2"></i> Offer
+                        </button>
+                    }
 
                     <button class="btn btn-outline-dark btn-sm btn-lg px-3 px-md-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#reviewModal">
                         <i class="fa-solid fa-star me-1 me-md-2"></i> Review
@@ -53,8 +56,13 @@
                 <p class="lead text-dark mb-4">
                     @Model.Trip.Description
                 </p>
+                <div class="border-top pt-3 mt-4 text-end text-secondary" style="font-size:12px">
+                    <span class="fw-semibold text-dark">Created by:</span>
+                    @Model.Trip.Visitor.ApplicationUser.FirstName
+                    @Model.Trip.Visitor.ApplicationUser.LastName
+                </div>
 
-              
+
             </div>
 
             <h3 class="text-uppercase fw-bold text-secondary mb-4">
@@ -99,10 +107,14 @@
                                         <span class="badge @badgeClass fs-7 rounded-pill px-3 py-1 mt-1">@item.Status</span>
                                     </div>
 
-                                    <button class="btn btn-outline-success px-4 rounded-pill flex-shrink-0 d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#bookingModal1">
-                                        <i class="bi bi-calendar-check me-1"></i> Book
-                                    </button>
+                                    @if (Model.CurrentUser.Role != UserRole.Guide && Model.CurrentUser.Visitor != null && Model.Trip.VisitorId == Model.CurrentUser.Visitor.Id)
+                                    {
+                                        <button class="btn btn-outline-success px-4 rounded-pill flex-shrink-0 d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#bookingModal1">
+                                            <i class="bi bi-calendar-check me-1"></i> Book
+                                        </button>
+                                    }
                                 </div>
+
                                 <button class="btn btn-outline-success w-100 mt-3 d-md-none" data-bs-toggle="modal" data-bs-target="#bookingModal1">
                                     <i class="bi bi-calendar-check me-1"></i> Book Offer
                                 </button>
@@ -234,11 +246,11 @@
                         <div class="mb-4">
                             <label class="form-label fw-bold">Rating</label>
                             <select class="form-select form-select-lg">
-                                <option value="5" selected>🌟 Excellent (5 Stars)</option>
-                                <option value="4">✨ Very Good (4 Stars)</option>
-                                <option value="3">👍 Good (3 Stars)</option>
-                                <option value="2">😕 Bad (2 Stars)</option>
-                                <option value="1">Worst 😡 (1 Star)</option>
+                                <option value="@RatingReview.Excellent" selected>@RatingReview.Excellent</option>
+                                <option value="@RatingReview.VeryGood">@RatingReview.VeryGood</option>
+                                <option value="@RatingReview.Good">@RatingReview.Good</option>
+                                <option value="@RatingReview.Bad">@RatingReview.Bad</option>
+                                <option value="@RatingReview.VeryBad">@RatingReview.VeryBad</option>
                             </select>
                         </div>
                         <div class="mb-4">

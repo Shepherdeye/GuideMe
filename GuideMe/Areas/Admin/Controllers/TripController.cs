@@ -26,7 +26,7 @@ namespace GuideMe.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
 
-            var trips = await _tripRepo.GetAsync(includes: [e => e.Visitor]);
+            var trips = await _tripRepo.GetAsync(includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
 
             var totalCount = trips.Count();
             double pagesNumber = Math.Ceiling(totalCount / 10.00);
@@ -147,7 +147,7 @@ namespace GuideMe.Areas.Admin.Controllers
 
         }
 
-       
+
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
 

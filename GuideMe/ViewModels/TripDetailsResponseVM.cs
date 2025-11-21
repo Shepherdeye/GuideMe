@@ -6,6 +6,6 @@
         public List<Offer> Offers { get; set; } = new List<Offer>();
         public List<Review> Reviews { get; set; } = new List<Review>();
 
-        public ApplicationUser? User { get; set; }=new ApplicationUser();
+        public ApplicationUser? CurrentUser { get; set; } 
     }
 }

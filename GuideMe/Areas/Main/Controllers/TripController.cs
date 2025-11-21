@@ -1,4 +1,5 @@
 ﻿using GuideMe.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GuideMe.Areas.Main.Controllers
@@ -9,16 +10,19 @@ namespace GuideMe.Areas.Main.Controllers
         private readonly IRepository<Trip> _tripRepo;
         private readonly IRepository<Offer> _offerRepo;
         private readonly IRepository<Review> _reviewRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public TripController(
               IRepository<Trip> tripRepo
             , IRepository<Offer> offerRepo
             , IRepository<Review> ReviewRepo
+            , UserManager<ApplicationUser> userManager
             )
         {
             _tripRepo = tripRepo;
             _offerRepo = offerRepo;
             _reviewRepo = ReviewRepo;
+            _userManager = userManager;
         }
         public async Task<IActionResult> Index(TripFilterVM filter, int page = 1)
         {
@@ -71,16 +75,18 @@ namespace GuideMe.Areas.Main.Controllers
             var trip = await _tripRepo.GetOneAsync(e => e.Id == id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
             if (trip == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Main" });
             var offers = await _offerRepo.GetAsync(e => e.TripId == trip.Id, includes: [e => e.Guide, e => e.Guide.ApplicationUser]);
-            var reviews = await _reviewRepo.GetAsync(e => e.TripId == trip.Id, includes: [e=>e.Visitor,e=>e.Visitor.ApplicationUser]);
+            var reviews = await _reviewRepo.GetAsync(e => e.TripId == trip.Id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
 
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null) return NotFound();
 
-
-
-            TripDetailsResponseVM data= new TripDetailsResponseVM()
+            TripDetailsResponseVM data = new TripDetailsResponseVM()
             {
-                Trip=trip,
-                Offers=offers,
-                Reviews=reviews
+                Trip = trip,
+                Offers = offers,
+                Reviews = reviews,
+                CurrentUser = user
+
             };
 
 
