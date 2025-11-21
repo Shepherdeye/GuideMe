@@ -110,7 +110,8 @@
                                         <span class="badge @badgeClass fs-7 rounded-pill px-3 py-1 mt-1">@item.Status</span>
                                     </div>
 
-                                    @if (Model.CurrentUser.Role != UserRole.Guide && Model.CurrentUser.Visitor != null && Model.Trip.VisitorId == Model.CurrentUser.Visitor.Id)
+                                    @if (Model.CurrentUser.Visitor?.Id == Model.Trip.VisitorId)
+
                                     {
                                         <button class="btn btn-outline-success px-4 rounded-pill flex-shrink-0 d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#bookingModal1">
                                             <i class="bi bi-calendar-check me-1"></i> Book
@@ -174,7 +175,10 @@
 
                                 <p class="text-muted small mb-1">"@item.Comment"</p>
 
-                                <small class="text-muted fst-italic">@item.ReviewDate.ToShortDateString()</small>
+                                <small class="text-secondary">
+                                    <i class="fa-solid fa-calendar-alt me-1"></i>
+                                    @item.ReviewDate.ToShortDateString()
+                                </small>
                             </div>
                         }
                     </div>
@@ -246,14 +250,15 @@
                 <div class="modal-body p-4">
                     <form method="post" asp-action="CreateReview" asp-controller="Trip" asp-area="Main">
                         <div class="modal-body p-4">
-                            <p class="text-primary mb-1">
-                                Dear @Model.CurrentUser.Visitor.ApplicationUser.FirstName @Model.CurrentUser.Visitor.ApplicationUser.LastName,
-                               
-                            </p>
+                         
                             <p class="text-muted mb-4">Your honest feedback helps others !</p>
 
                             <input type="hidden" name="TripId" value="@Model.Trip.Id" />
-                             <input type="hidden" name="VisitorId" value="@Model.CurrentUser.Visitor.Id" /> 
+                            @if (Model.CurrentUser.Visitor != null)
+                            {
+                                <input type="hidden" name="VisitorId" value="@Model.CurrentUser.Visitor.Id" />
+                            }
+
 
                             <div class="mb-4">
                                

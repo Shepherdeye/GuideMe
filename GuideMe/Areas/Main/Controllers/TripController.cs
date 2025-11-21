@@ -94,6 +94,7 @@ namespace GuideMe.Areas.Main.Controllers
             if (currentUser == null)
                 return NotFound();
 
+           
 
             TripDetailsResponseVM data = new TripDetailsResponseVM()
             {
