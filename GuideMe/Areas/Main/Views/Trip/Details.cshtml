@@ -186,16 +186,14 @@
                                         </a>
 
                                         
-                                        <form method="post" asp-action="DeleteReview" asp-controller="Trip" asp-area="Main" class="d-inline">
-                                            <input type="hidden" name="ReviewId" value="@item.Id" />
-                                            <input type="hidden" name="TripId" value="@Model.Trip.Id" />
-                                            <button type="submit" class="btn btn-outline-danger p-1" 
-                                                    onclick="return confirm('Are you sure you want to delete this review?');"
-                                                    title="Delete Review">
-                                               
-                                                <i class="fa-solid fa-trash-can"></i>
-                                            </button>
-                                        </form>
+                                <form method="post" asp-action="DeleteReview" asp-controller="Trip" asp-area="Main" class="d-inline delete-review-form">
+                                <input type="hidden" name="ReviewId" value="@item.Id" />
+                                <input type="hidden" name="TripId" value="@Model.Trip.Id" />
+                                <button type="submit" class="btn btn-outline-danger p-1" title="Delete Review">
+                                <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                </form>
+
                                         }
                                     </div>
                                 </div>
@@ -434,6 +432,33 @@
     <partial name="_NotifactionPartial" />
 
 
+        <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // اختر كل الفورمات اللي عندها class delete-review-form
+    const deleteForms = document.querySelectorAll(".delete-review-form");
+
+    deleteForms.forEach(form => {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault(); // منع الفورم من الإرسال الفوري
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // الآن يتم إرسال الفورم إذا ضغط على Yes
+                }
+            });
+        });
+    });
+});
+</script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const activeId = @Model.ActiveReview?.Id ?? 0;
@@ -444,4 +469,7 @@
             }
         });
     </script>
+
+
+
 }
