@@ -432,34 +432,34 @@
     <partial name="_NotifactionPartial" />
 
 
-        <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // اختر كل الفورمات اللي عندها class delete-review-form
-    const deleteForms = document.querySelectorAll(".delete-review-form");
+ <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // اختر كل الفورمات اللي عندها class delete-review-form
+            const deleteForms = document.querySelectorAll(".delete-review-form");
 
-    deleteForms.forEach(form => {
-        form.addEventListener("submit", function (e) {
-            e.preventDefault(); // منع الفورم من الإرسال الفوري
+            deleteForms.forEach(form => {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault(); // منع الفورم من الإرسال الفوري
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit(); // الآن يتم إرسال الفورم إذا ضغط على Yes
-                }
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // الآن يتم إرسال الفورم إذا ضغط على Yes
+                        }
+                    });
+                });
             });
         });
-    });
-});
 </script>
 
-    <script>
+<script>
         document.addEventListener("DOMContentLoaded", function () {
             const activeId = @Model.ActiveReview?.Id ?? 0;
 
@@ -468,7 +468,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 modal.show();
             }
         });
-    </script>
+</script>
 
 
 
