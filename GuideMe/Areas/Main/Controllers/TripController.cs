@@ -1,5 +1,6 @@
 ﻿using GuideMe.Repositories;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +76,7 @@ namespace GuideMe.Areas.Main.Controllers
             return View(Data);
         }
 
+        [Authorize]
         public async Task<IActionResult> Details(int id)
         {
             var trip = await _tripRepo.GetOneAsync(e => e.Id == id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
