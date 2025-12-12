@@ -6,7 +6,8 @@ namespace GuideMe.Models
     {
         Pending,
         Accepted,
-        Rejected
+        Rejected,
+        Canceled
     }
 
 

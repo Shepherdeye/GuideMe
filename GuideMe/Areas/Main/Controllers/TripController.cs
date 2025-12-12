@@ -1,9 +1,11 @@
 ﻿using GuideMe.Repositories;
+using GuideMe.ViewModels;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace GuideMe.Areas.Main.Controllers
 {
@@ -77,7 +79,7 @@ namespace GuideMe.Areas.Main.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Details(int id, [FromQuery] int activeReviewId = 0)
+        public async Task<IActionResult> Details(int id, [FromQuery] int activeReviewId = 0, int activeOfferId = 0)
         {
             var trip = await _tripRepo.GetOneAsync(e => e.Id == id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
             if (trip == null) return RedirectToAction("NotFoundPage", "Home", new { area = "Main" });
@@ -106,14 +108,21 @@ namespace GuideMe.Areas.Main.Controllers
                 return RedirectToAction("Details", new { id = trip.Id });
             }
 
+            var activeOffer = await _offerRepo.GetOneAsync(e => e.Id == activeOfferId);
+
+            if (activeOfferId > 0 && currentUser?.Guide?.Id != activeOffer?.GuideId)
+            {
+                return RedirectToAction("Details", new { id = trip.Id });
+            }
+
             TripDetailsResponseVM data = new TripDetailsResponseVM()
             {
                 Trip = trip,
                 Offers = offers,
                 Reviews = reviews,
                 CurrentUser = currentUser,
-                ActiveReview = activeReview
-
+                ActiveReview = activeReview,
+                ActiveOffer=activeOffer
 
             };
 
@@ -211,7 +220,7 @@ namespace GuideMe.Areas.Main.Controllers
 
         //start the offer crud
 
-        [HttpPost]        
+        [HttpPost]
         public async Task<IActionResult> CreateOffer(OfferCreateVM offerCreateVM)
         {
             if (!ModelState.IsValid)
@@ -228,9 +237,58 @@ namespace GuideMe.Areas.Main.Controllers
             await _offerRepo.CommitAsync();
 
             TempData["success-notification"] = "Your Offer has been Added successfully!";
-            return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId });
+            return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId});
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> EditOffer(EditOfferVm editOfferVm)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(e => e.Errors);
+                TempData["error-notification"] = string.Join(",", errors.Select(e => e.ErrorMessage));
+                return RedirectToAction(nameof(Details), new { id = editOfferVm.TripId });
+            }
+
+            var offer = await _offerRepo.GetOneAsync(e => e.Id == editOfferVm.Id);
+
+            if (offer is null )
+            {
+                TempData["error-notification"] = "Offer Not Founded";
+
+                return RedirectToAction(nameof(Details), new { id = editOfferVm.TripId });
+            }
+            offer.Id=editOfferVm.Id;
+            offer.Message = editOfferVm.Message;
+            offer.OfferedPrice = editOfferVm.OfferedPrice;
+            offer.OfferStartDate = editOfferVm.OfferStartDate;
+            offer.OfferEndDate = editOfferVm.OfferEndDate;
+
+            _offerRepo.Update(offer);
+            await _offerRepo.CommitAsync();
+
+            TempData["success-notification"] = "Your Offer has been Updated successfully!";
+            return RedirectToAction(nameof(Details), new { id = editOfferVm.TripId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteOffer(int offerId)
+        {
+            var offer = await _offerRepo.GetOneAsync(e => e.Id == offerId);
+            if(offer is null)
+            {
+                TempData["error-notification"] = "Offer Not Founded";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            _offerRepo.Delete(offer);
+            await _offerRepo.CommitAsync();
+
+            TempData["success-notification"] = "Your Offer has been Deleted successfully!";
+            return RedirectToAction(nameof(Details), new { id = offer.TripId });
+        }
 
         //End the offer crud
 

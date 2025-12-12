@@ -110,7 +110,7 @@
                                         <span class="badge @badgeClass fs-7 rounded-pill px-3 py-1 mt-1">@item.Status</span>
                                     </div>
 
-                                    @if (Model.CurrentUser.Visitor?.Id == Model.Trip.VisitorId)
+                                    @if (Model.CurrentUser?.Visitor?.Id == Model.Trip.VisitorId)
 
                                     {
                                         <button class="btn btn-outline-success px-4 rounded-pill flex-shrink-0 d-none d-md-inline-block" data-bs-toggle="modal" data-bs-target="#bookingModal1">
@@ -122,7 +122,32 @@
                                 <button class="btn btn-outline-success w-100 mt-3 d-md-none" data-bs-toggle="modal" data-bs-target="#bookingModal1">
                                     <i class="bi bi-calendar-check me-1"></i> Book Offer
                                 </button>
+
+                           @if(Model.CurrentUser.Guide?.Id==item.GuideId){
+                                    <div class="text-end flex-shrink-0">
+
+                                       <a href="/Main/Trip/Details/@item.TripId?activeOfferId=@item.Id" 
+                                           class="btn btn-outline-warning p-1">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+
+
+                                    <form method="post" asp-action="DeleteOffer" asp-controller="Trip" asp-area="Main" class="d-inline delete-offer-form">
+                                        <input type="hidden" name="offerId" value="@item.Id" />
+
+                                        <button type="submit" class="btn btn-outline-danger btn-sm p-1" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+
+
+
+                                </div>
+                           }
+
+
                             </div>
+
                         }
 
                     </div>
@@ -211,8 +236,8 @@
         </div>
     </div>
 
-    @* Offers *@
-    @* start Creating Offer *@
+@* Offers *@
+@* start Creating Offer *@
 
     <div class="modal fade" id="offerModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -259,7 +284,85 @@
         </div>
     </div>
 
-    @* End Creating Offer *@
+@* End Creating Offer *@
+
+
+@* start Edit  Offer *@
+
+    <div class="modal fade" id="editOfferModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white border-0 p-4 rounded-top-4">
+                <h5 class="modal-title fw-bold fs-4">
+                    <i class="fa-solid fa-pen-to-square me-2"></i> Edit Your Offer
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4">
+                <form method="post" asp-action="EditOffer" asp-controller="Trip" asp-area="Main">
+
+
+
+                    <!-- For backend later -->
+                    <input type="hidden" name="Id" asp-for="@Model.ActiveOffer.Id" />
+                    <input type="hidden" name="TripId" value="@Model.Trip.Id" />
+
+                    <p class="text-muted mb-4">Update your proposed price and date range.</p>
+
+                    <!-- Message -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Offer Message</label>
+                        <textarea asp-for="@Model.ActiveOffer.Message" name="Message" class="form-control" rows="3"
+                                  placeholder="Update your offer message..."></textarea>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Offered Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                            </span>
+                            <input asp-for="@Model.ActiveOffer.OfferedPrice" type="number" name="OfferedPrice"
+                                   class="form-control form-control-lg"
+                                   placeholder="e.g., 900" />
+                        </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Start Date</label>
+                            <input asp-for="@Model.ActiveOffer.OfferStartDate" name="OfferStartDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">End Date</label>
+                            <input asp-for="@Model.ActiveOffer.OfferEndDate" name="OfferEndDate" type="date" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer border-0 p-4 d-flex justify-content-between">
+                        <button class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button class="btn btn-primary px-5 rounded-pill fw-bold">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@* End Edit Offer *@
 
 
 
@@ -474,6 +577,7 @@
         });
 </script>
 
+@* to show the review edit popup *@
 <script>
         document.addEventListener("DOMContentLoaded", function () {
             const activeId = @Model.ActiveReview?.Id ?? 0;
@@ -483,6 +587,60 @@
                 modal.show();
             }
         });
+</script>
+
+@* to show the Offer edit popup *@
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const activeOfferId = @(Model?.ActiveOffer?.Id ?? 0);
+
+        if (activeOfferId > 0) {
+
+            // ضع الـ id داخل الحقل المخفي داخل المودال
+            const input = document.getElementById("edit-offer-id");
+            if (input) input.value = activeOfferId;
+
+            // افتح مودال التعديل
+            const modalEl = document.getElementById("editOfferModal");
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll(".delete-offer-form").forEach(form => {
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); // منع الإرسال مؤقتاً
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This offer will be permanently deleted.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+                        form.submit(); // إرسال الفورم بعد الموافقة
+                    }
+
+                });
+
+            });
+
+        });
+
+    });
 </script>
 
 

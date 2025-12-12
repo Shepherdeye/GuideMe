@@ -7,5 +7,6 @@
         public List<Review> Reviews { get; set; } = new List<Review>();
         public ApplicationUser? CurrentUser { get; set; }
         public Review? ActiveReview { get; set; }
+        public Offer? ActiveOffer { get; set; }
     }
 }
