@@ -60,6 +60,7 @@ namespace GuideMe.Areas.Admin.Controllers
 
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Create(Trip trip, IFormFile Image)
         {
@@ -160,5 +161,13 @@ namespace GuideMe.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
 
         }
+
+
+
+
+
+
+
+
     }
 }

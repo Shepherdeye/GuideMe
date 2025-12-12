@@ -1,12 +1,9 @@
 ﻿using GuideMe.Repositories;
-using GuideMe.ViewModels;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GuideMe.Areas.Main.Controllers
 {
@@ -124,6 +121,10 @@ namespace GuideMe.Areas.Main.Controllers
             return View(data);
         }
 
+
+
+        ///Start of  the review Crud
+
         [HttpPost]
         public async Task<IActionResult> CreateReview(CreateReviewVM reviewVM)
         {
@@ -203,5 +204,31 @@ namespace GuideMe.Areas.Main.Controllers
             return RedirectToAction(nameof(Details), new { id = TripId });
 
         }
+
+        ///End of  the review Crud
+
+
+        [HttpPost]        
+        public async Task<IActionResult> CreateOffer(OfferCreateVM offerCreateVM)
+        {
+            if (!ModelState.IsValid)
+            {
+
+                var errors = ModelState.Values.SelectMany(e => e.Errors);
+                TempData["error-notification"] = string.Join(",", errors.Select(e => e.ErrorMessage));
+                return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId });
+            }
+
+            var offer = offerCreateVM.Adapt<Offer>();
+
+            await _offerRepo.CreateAsync(offer);
+            await _offerRepo.CommitAsync();
+
+            TempData["success-notification"] = "Your Offer has been Added successfully!";
+            return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId });
+        }
+
+
+
     }
 }

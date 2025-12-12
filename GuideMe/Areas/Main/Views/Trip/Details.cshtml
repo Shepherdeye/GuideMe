@@ -38,14 +38,14 @@
                 <h3 class="text-primary fw-bolder display-5 m-0">@Model.Trip.Price.ToString("c")</h3>
                 <div class="d-flex gap-2 gap-md-3">
                     @* Adjusted gap for better mobile fit *@
-                    @if (Model.CurrentUser.Role != UserRole.Visitor)
+                    @if (Model.CurrentUser?.Role != UserRole.Visitor)
                     {
                         <button class="btn btn-primary btn-sm btn-lg px-3 px-md-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#offerModal">
                             <i class="fa-solid fa-handshake me-1 me-md-2"></i> Offer
                         </button>
                     }
 
-                    @if (Model.CurrentUser.Role != UserRole.Guide)
+                    @if (Model.CurrentUser?.Role != UserRole.Guide)
                     {
                         <button class="btn btn-outline-dark btn-sm btn-lg px-3 px-md-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#reviewModal">
                             <i class="fa-solid fa-star me-1 me-md-2"></i> Review
@@ -61,8 +61,8 @@
                 </p>
                 <div class="border-top pt-3 mt-4 text-end text-secondary" style="font-size:12px">
                     <span class="fw-semibold text-dark">Created by:</span>
-                    @Model.Trip.Visitor.ApplicationUser.FirstName
-                    @Model.Trip.Visitor.ApplicationUser.LastName
+                    @Model.Trip.Visitor?.ApplicationUser.FirstName
+                    @Model.Trip.Visitor?.ApplicationUser.LastName
                 </div>
 
 
@@ -95,7 +95,7 @@
 
                                         <small class="text-secondary">
                                             <i class="fa-solid fa-calendar-alt me-1"></i>
-                                            @item.OfferStartDate.ToLocalTime() → @item.OfferEndDate.ToLocalTime()
+                                            @item.OfferStartDate.ToShortDateString() → @item.OfferEndDate.ToShortDateString()
                                         </small>
                                     </div>
 
@@ -220,38 +220,39 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form>
+                    <form method="post" asp-action="CreateOffer" asp-controller="Trip" asp-area="Main">
                         <input type="hidden" name="TripId" value="@Model.Trip.Id" />
-                        @* <input type="hidden" name="GuideId" value="@U" /> *@
+                        <input type="hidden" name="GuideId" value="@Model.CurrentUser?.Guide?.Id" /> 
 
                         <p class="text-muted mb-4">Propose a new price and date range for this trip.</p>
                         <div class="mb-4">
                             <label class="form-label fw-bold">Offer Message</label>
-                            <textarea class="form-control" rows="3" placeholder="Explain why you are offering this price/date..."></textarea>
+                            <textarea name="Message" class="form-control" rows="3" placeholder="Explain why you are offering this price/date..."></textarea>
                         </div>
                         <div class="mb-4">
                             <label class="form-label fw-bold">Offered Price</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-dollar-sign"></i></span>
-                                <input type="number" class="form-control form-control-lg" placeholder="e.g., 900" />
+                                <input type="number"name="OfferedPrice" class="form-control form-control-lg" placeholder="e.g., 900" />
                             </div>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Start Date</label>
-                                <input type="date" class="form-control" />
+                                <input name="OfferStartDate" type="date" class="form-control" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">End Date</label>
-                                <input type="date" class="form-control" />
+                                <input name="OfferEndDate" type="date" class="form-control" />
                             </div>
                         </div>
+                        <div class="modal-footer border-0 p-4 d-flex justify-content-between">
+                            <button class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-success px-5 rounded-pill fw-bold">Submit Offer</button>
+                       </div>
                     </form>
                 </div>
-                <div class="modal-footer border-0 p-4 d-flex justify-content-between">
-                    <button class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-success px-5 rounded-pill fw-bold">Submit Offer</button>
-                </div>
+            
             </div>
         </div>
     </div>
