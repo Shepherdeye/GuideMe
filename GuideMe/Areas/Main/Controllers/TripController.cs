@@ -208,6 +208,9 @@ namespace GuideMe.Areas.Main.Controllers
         ///End of  the review Crud
 
 
+
+        //start the offer crud
+
         [HttpPost]        
         public async Task<IActionResult> CreateOffer(OfferCreateVM offerCreateVM)
         {
@@ -227,6 +230,9 @@ namespace GuideMe.Areas.Main.Controllers
             TempData["success-notification"] = "Your Offer has been Added successfully!";
             return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId });
         }
+
+
+        //End the offer crud
 
 
 

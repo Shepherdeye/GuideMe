@@ -211,6 +211,8 @@
         </div>
     </div>
 
+    @* Offers *@
+    @* start Creating Offer *@
 
     <div class="modal fade" id="offerModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -257,7 +259,16 @@
         </div>
     </div>
 
+    @* End Creating Offer *@
 
+
+
+
+
+@* Reviews *@
+
+
+@* start creating  Review modal *@
 
     <div class="modal fade" id="reviewModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -310,60 +321,8 @@
         </div>
     </div>
 
+@*  End  creating  Review modal *@
 
-    <div class="modal fade" id="bookingModal1" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-lg">
-                <div class="modal-header border-0 p-4 bg-info text-white rounded-top-4">
-                    <h4 class="modal-title fw-bold"><i class="bi bi-calendar2-check me-2"></i> Confirm Booking</h4>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body px-4 pb-4">
-                    <form class="needs-validation" novalidate>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Booking Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="text" class="form-control form-control-lg" value="900" disabled />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Booking Status</label>
-                                <select class="form-select form-select-lg" disabled>
-                                    <option>Accepted</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Start Date</label>
-                                <input type="date" class="form-control form-control-lg" value="2024-01-05" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">End Date</label>
-                                <input type="date" class="form-control form-control-lg" value="2024-01-20" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Visitor</label>
-                                <input class="form-control" value="Dummy Visitor (ID: 1)" disabled />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Guide</label>
-                                <input class="form-control" value="John Smith (ID: 3)" disabled />
-                            </div>
-                            <div class="col-12">
-                                <label class="fw-bold mb-1">Trip</label>
-                                <input class="form-control" value="Title (Trip ID: Id)" disabled />
-                            </div>
-                        </div>
-                        <button class="btn btn-success w-100 mt-5 py-3 fw-bold rounded-pill text-uppercase fs-5">
-                            Confirm Booking
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!--  Edit Review Modal-->
 
@@ -427,6 +386,61 @@
     <!--  End Edit Review Modal-->
 
 
+     @* Booking *@
+
+ <div class="modal fade" id="bookingModal1" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-lg">
+                <div class="modal-header border-0 p-4 bg-info text-white rounded-top-4">
+                    <h4 class="modal-title fw-bold"><i class="bi bi-calendar2-check me-2"></i> Confirm Booking</h4>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 pb-4">
+                    <form class="needs-validation" novalidate>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Booking Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control form-control-lg" value="900" disabled />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Booking Status</label>
+                                <select class="form-select form-select-lg" disabled>
+                                    <option>Accepted</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Start Date</label>
+                                <input type="date" class="form-control form-control-lg" value="2024-01-05" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">End Date</label>
+                                <input type="date" class="form-control form-control-lg" value="2024-01-20" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Visitor</label>
+                                <input class="form-control" value="Dummy Visitor (ID: 1)" disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="fw-bold mb-1">Guide</label>
+                                <input class="form-control" value="John Smith (ID: 3)" disabled />
+                            </div>
+                            <div class="col-12">
+                                <label class="fw-bold mb-1">Trip</label>
+                                <input class="form-control" value="Title (Trip ID: Id)" disabled />
+                            </div>
+                        </div>
+                        <button class="btn btn-success w-100 mt-5 py-3 fw-bold rounded-pill text-uppercase fs-5">
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @section Scripts {
