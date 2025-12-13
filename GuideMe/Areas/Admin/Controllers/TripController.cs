@@ -10,16 +10,19 @@ namespace GuideMe.Areas.Admin.Controllers
         private readonly IRepository<Trip> _tripRepo;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Visitor> _visitorRepo;
+        private readonly IWebHostEnvironment _env;
 
         public TripController(
             IRepository<Trip> tripRepo,
             UserManager<ApplicationUser> userManager
             , IRepository<Visitor> visitorRepo
+            ,IWebHostEnvironment env
             )
         {
             _tripRepo = tripRepo;
             _userManager = userManager;
             _visitorRepo = visitorRepo;
+            _env = env;
         }
         public async Task<IActionResult> Index(int page = 1)
         {
@@ -62,28 +65,66 @@ namespace GuideMe.Areas.Admin.Controllers
 
 
         [HttpPost]
+
+        //public async Task<IActionResult> Create(Trip trip, IFormFile Image)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        var errors = ModelState.Values.SelectMany(e => e.Errors);
+
+        //        TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
+        //        return View(trip);
+        //    }
+
+        //    var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+        //    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
+
+        //    using (var stream = System.IO.File.Create(filepath))
+        //    {
+        //        await Image.CopyToAsync(stream);
+        //    }
+        //    trip.Image = filename;
+
+
+        //    await _tripRepo.CreateAsync(trip);
+        //    await _tripRepo.CommitAsync();
+        //    TempData["success-notification"] = "Trip Created successfully";
+        //    return RedirectToAction(nameof(Index));
+        //}
+
         public async Task<IActionResult> Create(Trip trip, IFormFile Image)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(e => e.Errors);
-
                 TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
                 return View(trip);
             }
 
-            var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
-            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
-
-            using (var stream = System.IO.File.Create(filepath))
+            if (Image != null && Image.Length > 0)
             {
-                await Image.CopyToAsync(stream);
-            }
-            trip.Image = filename;
+                var fileName = Guid.NewGuid() + Path.GetExtension(Image.FileName);
 
+                var uploadsFolder = Path.Combine(
+                    _env.WebRootPath,
+                    "main",
+                    "img"
+                );
+
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await Image.CopyToAsync(stream);
+
+                trip.Image = fileName;
+            }
 
             await _tripRepo.CreateAsync(trip);
             await _tripRepo.CommitAsync();
+
             TempData["success-notification"] = "Trip Created successfully";
             return RedirectToAction(nameof(Index));
         }
@@ -100,50 +141,101 @@ namespace GuideMe.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        //public async Task<IActionResult> Edit(Trip trip, IFormFile? Image)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        var errors = ModelState.Values.SelectMany(e => e.Errors);
+
+        //        TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
+        //        return View(trip);
+        //    }
+        //    var tripDB = await _tripRepo.GetOneAsync(e => e.Id == trip.Id, tracked: false);
+
+        //    if (tripDB is null) return NotFound();
+
+        //    if (Image is not null && Image.Length > 0)
+        //    {
+        //        var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+        //        var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
+
+        //        using (var stream = System.IO.File.Create(filepath))
+        //        {
+        //            await Image.CopyToAsync(stream);
+        //        }
+
+        //        trip.Image = filename;
+
+        //        var oldFilepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", tripDB.Image);
+        //        if (System.IO.File.Exists(oldFilepath))
+        //        {
+        //            System.IO.File.Delete(oldFilepath);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        trip.Image = tripDB.Image;
+        //    }
+
+
+        //    _tripRepo.Update(trip);
+        //    await _tripRepo.CommitAsync();
+
+        //    TempData["success-notification"] = "Trip Updated successfully";
+
+        //    return RedirectToAction(nameof(Index));
+
+        //}
         public async Task<IActionResult> Edit(Trip trip, IFormFile? Image)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(e => e.Errors);
-
                 TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
                 return View(trip);
             }
-            var tripDB = await _tripRepo.GetOneAsync(e => e.Id == trip.Id, tracked: false);
 
+            var tripDB = await _tripRepo.GetOneAsync(e => e.Id == trip.Id, tracked: false);
             if (tripDB is null) return NotFound();
 
-            if (Image is not null && Image.Length > 0)
+            if (Image != null && Image.Length > 0)
             {
-                var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
-                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
+                var fileName = Guid.NewGuid() + Path.GetExtension(Image.FileName);
 
-                using (var stream = System.IO.File.Create(filepath))
+                var uploadsFolder = Path.Combine(
+                    _env.WebRootPath,
+                    "main",
+                    "img"
+                );
+
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await Image.CopyToAsync(stream);
+
+                // حذف الصورة القديمة
+                if (!string.IsNullOrEmpty(tripDB.Image))
                 {
-                    await Image.CopyToAsync(stream);
+                    var oldFilePath = Path.Combine(uploadsFolder, tripDB.Image);
+                    if (System.IO.File.Exists(oldFilePath))
+                        System.IO.File.Delete(oldFilePath);
                 }
 
-                trip.Image = filename;
-
-                var oldFilepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", tripDB.Image);
-                if (System.IO.File.Exists(oldFilepath))
-                {
-                    System.IO.File.Delete(oldFilepath);
-                }
+                trip.Image = fileName;
             }
             else
             {
                 trip.Image = tripDB.Image;
             }
 
-
             _tripRepo.Update(trip);
             await _tripRepo.CommitAsync();
 
             TempData["success-notification"] = "Trip Updated successfully";
-
             return RedirectToAction(nameof(Index));
-
         }
 
 
