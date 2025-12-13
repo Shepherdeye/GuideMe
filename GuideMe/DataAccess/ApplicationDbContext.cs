@@ -64,15 +64,31 @@ namespace GuideMe.DataAccess
                 .OnDelete(DeleteBehavior.Restrict);
 
             //  Review ↔ Trip
+            //modelBuilder.Entity<Review>()
+            //    .HasOne(r => r.Trip)
+            //    .WithMany(t => t.Reviews)
+            //    .HasForeignKey(r => r.TripId)
+            //    .OnDelete(DeleteBehavior.Restrict);
+
+            // Review ↔ Trip
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Trip)
                 .WithMany(t => t.Reviews)
                 .HasForeignKey(r => r.TripId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Offer ↔ Trip
+            modelBuilder.Entity<Offer>()
+                .HasOne(o => o.Trip)
+                .WithMany(t => t.Offers)
+                .HasForeignKey(o => o.TripId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
         }
 
 
- 
+
 
 
 
