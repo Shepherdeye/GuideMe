@@ -66,68 +66,32 @@ namespace GuideMe.Areas.Admin.Controllers
 
         [HttpPost]
 
-        //public async Task<IActionResult> Create(Trip trip, IFormFile Image)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var errors = ModelState.Values.SelectMany(e => e.Errors);
-
-        //        TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
-        //        return View(trip);
-        //    }
-
-        //    var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
-        //    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
-
-        //    using (var stream = System.IO.File.Create(filepath))
-        //    {
-        //        await Image.CopyToAsync(stream);
-        //    }
-        //    trip.Image = filename;
-
-
-        //    await _tripRepo.CreateAsync(trip);
-        //    await _tripRepo.CommitAsync();
-        //    TempData["success-notification"] = "Trip Created successfully";
-        //    return RedirectToAction(nameof(Index));
-        //}
-
         public async Task<IActionResult> Create(Trip trip, IFormFile Image)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(e => e.Errors);
+
                 TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
                 return View(trip);
             }
 
-            if (Image != null && Image.Length > 0)
+            var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+            var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
+
+            using (var stream = System.IO.File.Create(filepath))
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(Image.FileName);
-
-                var uploadsFolder = Path.Combine(
-                    _env.WebRootPath,
-                    "main",
-                    "img"
-                );
-
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
                 await Image.CopyToAsync(stream);
-
-                trip.Image = fileName;
             }
+            trip.Image = filename;
+
 
             await _tripRepo.CreateAsync(trip);
             await _tripRepo.CommitAsync();
-
             TempData["success-notification"] = "Trip Created successfully";
             return RedirectToAction(nameof(Index));
         }
+
 
 
         [HttpGet]
@@ -141,101 +105,50 @@ namespace GuideMe.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        //public async Task<IActionResult> Edit(Trip trip, IFormFile? Image)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var errors = ModelState.Values.SelectMany(e => e.Errors);
-
-        //        TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
-        //        return View(trip);
-        //    }
-        //    var tripDB = await _tripRepo.GetOneAsync(e => e.Id == trip.Id, tracked: false);
-
-        //    if (tripDB is null) return NotFound();
-
-        //    if (Image is not null && Image.Length > 0)
-        //    {
-        //        var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
-        //        var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
-
-        //        using (var stream = System.IO.File.Create(filepath))
-        //        {
-        //            await Image.CopyToAsync(stream);
-        //        }
-
-        //        trip.Image = filename;
-
-        //        var oldFilepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", tripDB.Image);
-        //        if (System.IO.File.Exists(oldFilepath))
-        //        {
-        //            System.IO.File.Delete(oldFilepath);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        trip.Image = tripDB.Image;
-        //    }
-
-
-        //    _tripRepo.Update(trip);
-        //    await _tripRepo.CommitAsync();
-
-        //    TempData["success-notification"] = "Trip Updated successfully";
-
-        //    return RedirectToAction(nameof(Index));
-
-        //}
         public async Task<IActionResult> Edit(Trip trip, IFormFile? Image)
         {
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(e => e.Errors);
+
                 TempData["error-notification"] = string.Join(", ", errors.Select(e => e.ErrorMessage));
                 return View(trip);
             }
-
             var tripDB = await _tripRepo.GetOneAsync(e => e.Id == trip.Id, tracked: false);
+
             if (tripDB is null) return NotFound();
 
-            if (Image != null && Image.Length > 0)
+            if (Image is not null && Image.Length > 0)
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(Image.FileName);
+                var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+                var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
 
-                var uploadsFolder = Path.Combine(
-                    _env.WebRootPath,
-                    "main",
-                    "img"
-                );
-
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await Image.CopyToAsync(stream);
-
-                // حذف الصورة القديمة
-                if (!string.IsNullOrEmpty(tripDB.Image))
+                using (var stream = System.IO.File.Create(filepath))
                 {
-                    var oldFilePath = Path.Combine(uploadsFolder, tripDB.Image);
-                    if (System.IO.File.Exists(oldFilePath))
-                        System.IO.File.Delete(oldFilePath);
+                    await Image.CopyToAsync(stream);
                 }
 
-                trip.Image = fileName;
+                trip.Image = filename;
+
+                var oldFilepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", tripDB.Image);
+                if (System.IO.File.Exists(oldFilepath))
+                {
+                    System.IO.File.Delete(oldFilepath);
+                }
             }
             else
             {
                 trip.Image = tripDB.Image;
             }
 
+
             _tripRepo.Update(trip);
             await _tripRepo.CommitAsync();
 
             TempData["success-notification"] = "Trip Updated successfully";
+
             return RedirectToAction(nameof(Index));
+
         }
 
 
