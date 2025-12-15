@@ -1,11 +1,11 @@
 ﻿using GuideMe.Repositories;
-using GuideMe.ViewModels;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GuideMe.Areas.Main.Controllers
 {
@@ -16,6 +16,7 @@ namespace GuideMe.Areas.Main.Controllers
         private readonly IRepository<Offer> _offerRepo;
         private readonly IRepository<Review> _reviewRepo;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRepository<Booking> _bookingRepo;
         private readonly ApplicationDbContext _context;
 
         public TripController(
@@ -23,6 +24,7 @@ namespace GuideMe.Areas.Main.Controllers
             , IRepository<Offer> offerRepo
             , IRepository<Review> ReviewRepo
             , UserManager<ApplicationUser> userManager
+            , IRepository<Booking> bookingRepo
             , ApplicationDbContext context
             )
         {
@@ -30,6 +32,7 @@ namespace GuideMe.Areas.Main.Controllers
             _offerRepo = offerRepo;
             _reviewRepo = ReviewRepo;
             _userManager = userManager;
+            _bookingRepo = bookingRepo;
             _context = context;
         }
         public async Task<IActionResult> Index(TripFilterVM filter, int page = 1)
@@ -122,7 +125,7 @@ namespace GuideMe.Areas.Main.Controllers
                 Reviews = reviews,
                 CurrentUser = currentUser,
                 ActiveReview = activeReview,
-                ActiveOffer=activeOffer
+                ActiveOffer = activeOffer
 
             };
 
@@ -237,7 +240,7 @@ namespace GuideMe.Areas.Main.Controllers
             await _offerRepo.CommitAsync();
 
             TempData["success-notification"] = "Your Offer has been Added successfully!";
-            return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId});
+            return RedirectToAction(nameof(Details), new { id = offerCreateVM.TripId });
         }
 
 
@@ -253,13 +256,13 @@ namespace GuideMe.Areas.Main.Controllers
 
             var offer = await _offerRepo.GetOneAsync(e => e.Id == editOfferVm.Id);
 
-            if (offer is null )
+            if (offer is null)
             {
                 TempData["error-notification"] = "Offer Not Founded";
 
                 return RedirectToAction(nameof(Details), new { id = editOfferVm.TripId });
             }
-            offer.Id=editOfferVm.Id;
+            offer.Id = editOfferVm.Id;
             offer.Message = editOfferVm.Message;
             offer.OfferedPrice = editOfferVm.OfferedPrice;
             offer.OfferStartDate = editOfferVm.OfferStartDate;
@@ -276,7 +279,7 @@ namespace GuideMe.Areas.Main.Controllers
         public async Task<IActionResult> DeleteOffer(int offerId)
         {
             var offer = await _offerRepo.GetOneAsync(e => e.Id == offerId);
-            if(offer is null)
+            if (offer is null)
             {
                 TempData["error-notification"] = "Offer Not Founded";
 
@@ -291,6 +294,66 @@ namespace GuideMe.Areas.Main.Controllers
         }
 
         //End the offer crud
+
+
+        // start  crud  of the booking
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBooking(CreateBookingVM createBookingVM)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(e => e.Errors);
+                TempData["error-notification"] = string.Join(",", errors.Select(e => e.ErrorMessage));
+                return RedirectToAction(nameof(Details), new { id = createBookingVM.TripId });
+            }
+
+            //1.create a new Booking
+
+            var booking = createBookingVM.Adapt<Booking>();
+
+            await _bookingRepo.CreateAsync(booking);
+            await _bookingRepo.CommitAsync();
+
+            //2. change the offer status  to be accepted
+
+            var takenOffer = await _offerRepo.GetOneAsync(e => e.Id == createBookingVM.OfferId);
+            if (takenOffer is null) return NotFound();
+            takenOffer.Status = OfferStatus.Accepted;
+
+            _offerRepo.Update(takenOffer);
+            await _offerRepo.CommitAsync();
+
+
+            //3.all other offer shoud be Rejected
+
+            var rejectedOffers = await _offerRepo.GetAsync(e => e.Id != createBookingVM.OfferId && e.TripId == createBookingVM.TripId);
+
+            foreach (var offer in rejectedOffers)
+            {
+                offer.Status = OfferStatus.Rejected;
+                _offerRepo.Update(offer);
+                await _offerRepo.CommitAsync();
+
+            }
+
+            //4.change the status of the trip to  be close
+
+            var trip = await _tripRepo.GetOneAsync(e => e.Id == createBookingVM.TripId);
+            if (trip is null) return NotFound();
+            trip.Status = TripStatus.Close;
+            _tripRepo.Update(trip);
+            await _tripRepo.CommitAsync();
+
+
+
+            TempData["success-notification"] = "Your Booking has been created Successfully wait for the Guide Approval";
+            return RedirectToAction(nameof(Details), new { id = createBookingVM.TripId });
+        }
+
+
+        // End  crud  of the booking
 
 
 

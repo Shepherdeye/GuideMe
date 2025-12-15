@@ -80,17 +80,17 @@
                     @foreach (var item in Model.Offers.ToList())
                     {
                     
-                    <div class="list-group-item offer-list-item p-3 p-md-4">
+                        <div class="list-group-item offer-list-item p-3 p-md-4">
 
-                    <!-- Top Row -->
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                    <img src="/identity/Profile/@item.Guide.ApplicationUser.ProfileImage"
-                    class="rounded-circle border border-primary p-1"
-                    style="width:55px;height:55px;object-fit:cover" />
+                        <!-- Top Row -->
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <img src="/identity/Profile/@item.Guide.ApplicationUser.ProfileImage"
+                                class="rounded-circle border border-primary p-1"
+                                style="width:55px;height:55px;object-fit:cover" />
 
-                    <div class="flex-grow-1">
-                    <div class="fw-bold text-dark">
-                    @item.Guide.ApplicationUser.FirstName @item.Guide.ApplicationUser.LastName
+                            <div class="flex-grow-1">
+                        <div class="fw-bold text-dark">
+                            @item.Guide.ApplicationUser.FirstName @item.Guide.ApplicationUser.LastName
                     </div>
                     <small class="text-muted">@item.Guide.ApplicationUser.Role</small>
                     </div>
@@ -129,16 +129,77 @@
                     <!-- Actions -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 
-                    @if (Model.CurrentUser?.Visitor?.Id == Model.Trip.VisitorId)
+                    @if (Model.CurrentUser?.Visitor?.Id == Model.Trip.VisitorId && item.Status==OfferStatus.Pending)
                     {
-                    <button class="btn btn-outline-success rounded-pill"
-                    data-bs-toggle="modal"
-                    data-bs-target="#bookingModal1">
-                    <i class="bi bi-calendar-check me-1"></i> Book Offer
-                    </button>
-                    }
+                        <button class="btn btn-primary btn-lg book-offer-btn w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#bookingModal-@item.Id">
+                            <i class="bi bi-calendar-check"></i>
+                            Book This Offer
+                        </button>
 
-                    @if (Model.CurrentUser.Guide?.Id == item.GuideId)
+                        <div class="modal fade"
+                             id="bookingModal-@item.Id"
+                             tabindex="-1"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-md">
+                                <div class="modal-content rounded-4 shadow">
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirm Your Booking</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+
+                                        <form   asp-action="CreateBooking"
+                                                asp-controller="Trip"
+                                                asp-area="Main"
+                                              method="post"
+                                              class="booking-form">
+
+                                            <input type="hidden" name="OfferId" value="@item.Id" />
+                                            <input type="hidden" name="TripId" value="@item.TripId" />
+                                            <input type="hidden" name="GuideId" value="@item.GuideId" />
+                                            <input type="hidden" name="VisitorId" value="@Model.CurrentUser.Visitor.Id" />
+
+                                            <input type="hidden" name="BookingPrice" value="@item.OfferedPrice" />
+                                            <input type="hidden" name="StartDate" value="@item.OfferStartDate.ToString("yyyy-MM-dd")" />
+                                            <input type="hidden" name="EndDate" value="@item.OfferEndDate.ToString("yyyy-MM-dd")" />
+
+                                            <div class="mb-3">
+                                                <strong>Price:</strong>
+                                                <span class="float-end">$@item.OfferedPrice</span>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <strong>Start Date:</strong>
+                                                <span class="float-end">@item.OfferStartDate.ToShortDateString()</span>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <strong>End Date:</strong>
+                                                <span class="float-end">@item.OfferEndDate.ToShortDateString()</span>
+                                            </div>
+
+                                            <hr />
+
+                                            <button type="button"
+                                                    class="btn btn-success w-100 confirm-booking">
+                                                Confirm Booking
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+
+                    }
+                    
+                    @if (Model.CurrentUser.Guide?.Id == item.GuideId && item.Status== OfferStatus.Pending)
                     {
                     <a href="/Main/Trip/Details/@item.TripId?activeOfferId=@item.Id"
                     class="btn btn-outline-warning rounded-pill">
@@ -146,15 +207,15 @@
                     </a>
 
                     <form method="post"
-                    asp-action="DeleteOffer"
-                    asp-controller="Trip"
-                    asp-area="Main"
-                    class="delete-offer-form">
-                    <input type="hidden" name="offerId" value="@item.Id" />
-                    <button type="submit"
-                    class="btn btn-outline-danger rounded-pill">
-                    <i class="bi bi-trash"></i>
-                    </button>
+                        asp-action="DeleteOffer"
+                        asp-controller="Trip"
+                        asp-area="Main"
+                        class="delete-offer-form">
+                            <input type="hidden" name="offerId" value="@item.Id" />
+                            <button type="submit"
+                            class="btn btn-outline-danger rounded-pill">
+                            <i class="bi bi-trash"></i>
+                            </button>
                     </form>
                     }
                     </div>
@@ -502,62 +563,6 @@
     <!--  End Edit Review Modal-->
 
 
-     @* Booking *@
-
- <div class="modal fade" id="bookingModal1" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-lg">
-                <div class="modal-header border-0 p-4 bg-info text-white rounded-top-4">
-                    <h4 class="modal-title fw-bold"><i class="bi bi-calendar2-check me-2"></i> Confirm Booking</h4>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body px-4 pb-4">
-                    <form class="needs-validation" novalidate>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Booking Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="text" class="form-control form-control-lg" value="900" disabled />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Booking Status</label>
-                                <select class="form-select form-select-lg" disabled>
-                                    <option>Accepted</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Start Date</label>
-                                <input type="date" class="form-control form-control-lg" value="2024-01-05" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">End Date</label>
-                                <input type="date" class="form-control form-control-lg" value="2024-01-20" required />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Visitor</label>
-                                <input class="form-control" value="Dummy Visitor (ID: 1)" disabled />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1">Guide</label>
-                                <input class="form-control" value="John Smith (ID: 3)" disabled />
-                            </div>
-                            <div class="col-12">
-                                <label class="fw-bold mb-1">Trip</label>
-                                <input class="form-control" value="Title (Trip ID: Id)" disabled />
-                            </div>
-                        </div>
-                        <button class="btn btn-success w-100 mt-5 py-3 fw-bold rounded-pill text-uppercase fs-5">
-                            Confirm Booking
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @section Scripts {
     <partial name="_NotifactionPartial" />
@@ -656,6 +661,30 @@
     });
 </script>
 
+
+
+<script>
+document.querySelectorAll(".confirm-booking").forEach(btn => {
+    btn.addEventListener("click", function () {
+
+        const form = this.closest("form");
+
+        Swal.fire({
+            title: 'Final Confirmation',
+            text: 'Are you sure you want to proceed with this booking?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Confirm',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#198754'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 
 
 }
