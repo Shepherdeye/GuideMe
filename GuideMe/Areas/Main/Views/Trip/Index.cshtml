@@ -101,39 +101,94 @@
 
             <div class="row g-4 justify-content-center">
                 @foreach (var trip in Model.Trips) { <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="package-item">
-                        <div class="overflow-hidden">
-                            <img class="img-fluid trip-image-card" src="~/main/img/@trip.Image"  alt="">
-                        </div>
-                        <div class="d-flex border-bottom">
-                            <small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-map-marker-alt text-primary me-2">
+                    <div class="package-item position-relative">
 
-                                </i>@trip.Destination</small> <small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-calendar-alt text-primary me-2"></i>@trip.NumberOfDays days</small>
-                            <small class="flex-fill text-center py-2"><i
-                                    class="fa fa-user text-primary me-2"></i>@trip.Members
-                                Person</small>
-                        </div>
-                        <div class="text-center p-4">
-                            <h3 class="mb-0">@trip.Price.ToString("c")</h3>
-                            <div class="mb-3"> <small class="fa fa-star text-primary"></small> <small
-                                    class="fa fa-star text-primary"></small> <small
-                                    class="fa fa-star text-primary"></small>
-                                <small class="fa fa-star text-primary"></small> <small
-                                    class="fa fa-star text-primary"></small>
+                           @if (Model.CurrentUser?.Visitor?.Id == trip.VisitorId)
+                            {
+                                <div style="
+                                  position: absolute;
+                                    top: 10px;
+                                    left: -20px;
+                                    width: 98px;
+                                    text-align: center;
+                                    background: linear-gradient(135deg, #FFD700, #C9A227);
+                                    color: #4a3b00;
+                                    font-size: 0.75rem;
+                                    font-weight: 700;
+                                    letter-spacing: 1px;
+                                    text-transform: uppercase;
+                                    padding: 6px 0;
+                                    transform: rotate(-45deg);
+                                    z-index: 20;
+                                    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
+                                    border-radius: 4px;
+
+                                " class="ribbon-gold">
+                                    ⭐ My Trip
+                                </div>
+                            }
+
+
+                            <div class="overflow-hidden">
+                                <img class="img-fluid trip-image-card" 
+                                     src="~/main/img/@trip.Image" alt="">
                             </div>
-                            <p>@trip.Description</p>
-                            <div class="d-flex justify-content-center mb-2"> 
-                                
-                                <a href="/Main/Trip/Details/@trip.Id"
-                                    class="btn btn-sm btn-primary px-3 border-end"
-                                    style="border-radius: 30px 0 0 30px;">Read More</a>
-                                    <button href=""
-                                    class="btn btn-sm @(trip.Status==TripStatus.Open?"btn-primary":"btn-danger") px-3" style="border-radius: 0 30px 30px 0;">@trip.Status</button>
+
+                            <!-- Trip Title -->
+                            <h3 class="trip-title text-center mt-3">
+                                      @(
+                                        trip.Title.Length >= 20
+                                        ? trip.Title.Substring(0, 20) + "..."
+                                        : trip.Title
+                                     )
+
+                                </h3>
+
+                            <div class="d-flex border-bottom">
+                                <small class="flex-fill text-center border-end py-2">
+                                    <i class="fa fa-map-marker-alt text-primary me-2"></i>
+                                    @trip.Destination
+                                </small>
+
+                                <small class="flex-fill text-center border-end py-2">
+                                    <i class="fa fa-calendar-alt text-primary me-2"></i>
+                                    @trip.NumberOfDays days
+                                </small>
+
+                                <small class="flex-fill text-center py-2">
+                                    <i class="fa fa-user text-primary me-2"></i>
+                                    @trip.Members Person
+                                </small>
+                            </div>
+
+                            <div class="text-center p-4">
+                                <h4 class="mb-0">@trip.Price.ToString("c")</h4>
+
+                                <div class="mb-3">
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                    <small class="fa fa-star text-primary"></small>
+                                </div>
+
+                                <p>@trip.Description</p>
+
+                                <div class="d-flex justify-content-center mb-2">
+                                    <a href="/Main/Trip/Details/@trip.Id"
+                                       class="btn btn-sm btn-primary px-3 border-end"
+                                       style="border-radius: 30px 0 0 30px;">
+                                       Read More
+                                    </a>
+
+                                    <button class="btn btn-sm @(trip.Status==TripStatus.Open ? "btn-primary" : "btn-danger") px-3"
+                                            style="border-radius: 0 30px 30px 0;">
+                                        @trip.Status
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
                 </div> 
                 
             }

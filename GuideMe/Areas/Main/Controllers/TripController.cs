@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GuideMe.Areas.Main.Controllers
 {
@@ -37,7 +35,7 @@ namespace GuideMe.Areas.Main.Controllers
         }
         public async Task<IActionResult> Index(TripFilterVM filter, int page = 1)
         {
-            var trips = await _tripRepo.GetAsync();
+            var trips = await _tripRepo.GetAsync(includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
 
             if (!string.IsNullOrEmpty(filter.Title))
             {
@@ -69,12 +67,29 @@ namespace GuideMe.Areas.Main.Controllers
             var totalpages = Math.Ceiling(totalcount / 6.00);
             trips = trips.Skip((page - 1) * 6).Take(6).ToList();
 
+
+            //get the current user
+            var userId = _userManager.GetUserId(User);
+
+            var currentUser = await _context.Users
+                .Include(u => u.Visitor)
+                .Include(u => u.Guide)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (currentUser == null)
+                return NotFound();
+
+
+
+
+
             TripsWithFilterVm Data = new TripsWithFilterVm()
             {
                 PagesNumber = totalpages,
                 CurrentPage = page,
                 Trips = trips,
-                Filter = filter
+                Filter = filter,
+                CurrentUser = currentUser
 
             };
 
