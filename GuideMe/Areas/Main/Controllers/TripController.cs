@@ -16,6 +16,7 @@ namespace GuideMe.Areas.Main.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Booking> _bookingRepo;
         private readonly ApplicationDbContext _context;
+        private readonly IRepository<ContactAccess> _contactAccessRepo;
 
         public TripController(
               IRepository<Trip> tripRepo
@@ -24,6 +25,7 @@ namespace GuideMe.Areas.Main.Controllers
             , UserManager<ApplicationUser> userManager
             , IRepository<Booking> bookingRepo
             , ApplicationDbContext context
+            , IRepository<ContactAccess> contactAccessRepo
             )
         {
             _tripRepo = tripRepo;
@@ -32,6 +34,7 @@ namespace GuideMe.Areas.Main.Controllers
             _userManager = userManager;
             _bookingRepo = bookingRepo;
             _context = context;
+            _contactAccessRepo = contactAccessRepo;
         }
         public async Task<IActionResult> Index(TripFilterVM filter, int page = 1)
         {
@@ -311,60 +314,85 @@ namespace GuideMe.Areas.Main.Controllers
         //End the offer crud
 
 
-        // start  crud  of the booking
+        // start crud of the booking
 
         [HttpPost]
         public async Task<IActionResult> CreateBooking(CreateBookingVM createBookingVM)
         {
-
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(e => e.Errors);
-                TempData["error-notification"] = string.Join(",", errors.Select(e => e.ErrorMessage));
+                TempData["error-notification"] =
+                    string.Join(",", errors.Select(e => e.ErrorMessage));
+
                 return RedirectToAction(nameof(Details), new { id = createBookingVM.TripId });
             }
 
-            //1.create a new Booking
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var booking = createBookingVM.Adapt<Booking>();
-
-            await _bookingRepo.CreateAsync(booking);
-            await _bookingRepo.CommitAsync();
-
-            //2. change the offer status  to be accepted
-
-            var takenOffer = await _offerRepo.GetOneAsync(e => e.Id == createBookingVM.OfferId);
-            if (takenOffer is null) return NotFound();
-            takenOffer.Status = OfferStatus.Accepted;
-
-            _offerRepo.Update(takenOffer);
-            await _offerRepo.CommitAsync();
-
-
-            //3.all other offer shoud be Rejected
-
-            var rejectedOffers = await _offerRepo.GetAsync(e => e.Id != createBookingVM.OfferId && e.TripId == createBookingVM.TripId);
-
-            foreach (var offer in rejectedOffers)
+            try
             {
-                offer.Status = OfferStatus.Rejected;
-                _offerRepo.Update(offer);
-                await _offerRepo.CommitAsync();
+                // 1. Create Booking
+                var booking = createBookingVM.Adapt<Booking>();
+                var newBooking = await _bookingRepo.CreateAsync(booking);
 
+                //i used commit  here to get a new id to  pass it to the contact access
+                await _bookingRepo.CommitAsync();
+
+
+
+
+                // 2. Accept selected offer
+                var takenOffer = await _offerRepo.GetOneAsync(e => e.Id == createBookingVM.OfferId);
+                if (takenOffer is null)
+                    return NotFound();
+
+                takenOffer.Status = OfferStatus.Accepted;
+                _offerRepo.Update(takenOffer);
+
+                // 3. Reject other offers
+                var rejectedOffers = await _offerRepo.GetAsync(
+                    e => e.Id != createBookingVM.OfferId &&
+                         e.TripId == createBookingVM.TripId);
+
+                foreach (var offer in rejectedOffers)
+                {
+                    offer.Status = OfferStatus.Rejected;
+                    _offerRepo.Update(offer);
+                }
+
+                // 4. Close trip
+                var trip = await _tripRepo.GetOneAsync(e => e.Id == createBookingVM.TripId);
+                if (trip is null)
+                    return NotFound();
+
+                trip.Status = TripStatus.Close;
+                _tripRepo.Update(trip);
+
+                // 5. Create ContactAccess
+                var contactAccess = new ContactAccess
+                {
+                    BookingId = newBooking.Id,
+                    CreatedAt = DateTime.Now
+                };
+
+                await _contactAccessRepo.CreateAsync(contactAccess);
+
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["success-notification"] =
+                    "Your Booking has been created Successfully, wait for the Guide Approval";
+
+                return RedirectToAction(nameof(Details), new { id = createBookingVM.TripId });
             }
-
-            //4.change the status of the trip to  be close
-
-            var trip = await _tripRepo.GetOneAsync(e => e.Id == createBookingVM.TripId);
-            if (trip is null) return NotFound();
-            trip.Status = TripStatus.Close;
-            _tripRepo.Update(trip);
-            await _tripRepo.CommitAsync();
-
-
-
-            TempData["success-notification"] = "Your Booking has been created Successfully wait for the Guide Approval";
-            return RedirectToAction(nameof(Details), new { id = createBookingVM.TripId });
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                TempData["error-notification"] = "Something went wrong, please try again.";
+                return RedirectToAction(nameof(Details), new { id = createBookingVM.TripId });
+            }
         }
 
 
