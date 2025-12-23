@@ -14,16 +14,16 @@ namespace GuideMe.Models
         [Key]
         public int Id { get; set; }
         [Required, MaxLength(50, ErrorMessage = "Maxmum length 50 letter")
-            , MinLength(10, ErrorMessage = "min length 10")]
+            , MinLength(3, ErrorMessage = "min length 10")]
         public string Title { get; set; } = string.Empty;
         [Required]
-        [MinLength(10, ErrorMessage = "min length 10")]
+        [MinLength(3, ErrorMessage = "min length 10")]
         public string Description { get; set; } = string.Empty;
         [Required]
-        [MinLength(10, ErrorMessage = "min length 10")]
+        [MinLength(3, ErrorMessage = "min length 10")]
         public string Destination { get; set; } = string.Empty;
         [Required]
-        [MinLength(10, ErrorMessage = "min length 10")]
+        [MinLength(3, ErrorMessage = "min length 10")]
         public string Region { get; set; } =  string.Empty;
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
