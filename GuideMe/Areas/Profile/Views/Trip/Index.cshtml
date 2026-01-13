@@ -1,0 +1,177 @@
+﻿@model AllTripData
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Trips</h4>
+        <a asp-action="Create" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Create New Trip
+        </a>
+    </div>
+@if (Model.Trips?.Any() == true)
+{
+        <div class="d-flex flex-column gap-3 container">
+
+            @foreach (var item in Model.Trips)
+            {
+                <div class="card trip-list-card shadow-sm border-0 rounded-4 p-3">
+
+                    <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+
+                        <!-- Image -->
+                        <img src="@(string.IsNullOrEmpty(item.Image) ? "/img/placeholder.jpg" : $"/main/img/{item.Image}")"
+                             class="trip-list-image rounded-3"
+                             alt="Trip Image">
+
+                        <!-- Info -->
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="fw-bold mb-1">@item.Title</h5>
+                                    <div class="text-muted small">
+                                        @item.Destination • @item.Region
+                                    </div>
+                                </div>
+
+                                <span class="badge @(item.Status == TripStatus.Open ? "bg-success" : "bg-warning text-dark")">
+                                    @item.Status
+                                </span>
+                            </div>
+
+                            <p class="text-secondary small mt-2 mb-2">
+                                @item.Description
+                            </p>
+
+                            <div class="d-flex flex-wrap gap-3 small text-muted">
+                                <span><i class="bi bi-cash"></i> @item.Price.ToString("C")</span>
+                                <span><i class="bi bi-calendar"></i> @item.NumberOfDays days</span>
+                                <span><i class="bi bi-people"></i> @item.Members members</span>
+                                <span><i class="bi bi-person"></i> @item.Visitor.ApplicationUser.FirstName</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex gap-2 ms-md-auto">
+                            <a asp-action="Edit" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="delete-form">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger rounded-pill delete-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="/profile/trip/index?page=@(Model.CurrentPage - 1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                }
+
+                @for (var i = 1; i <= Model.PagesNumber; i++)
+                {
+                    <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" href="/profile/trip/index?page=@i">@i</a>
+                    </li>
+                }
+
+                @if (Model.CurrentPage < Model.PagesNumber)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="/profile/trip/index?page=@(Model.CurrentPage + 1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </nav>
+}
+else
+{
+        <div class="text-center py-5">
+            <h5 class="text-muted">No Trips Found</h5>
+        </div>
+}
+
+
+<!-- Modal for showing full text -->
+<div class="modal fade" id="textModal" tabindex="-1" aria-labelledby="textModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="textModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="textModalBody"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.truncate-text').forEach(el => {
+            el.style.cursor = 'pointer';
+            el.addEventListener('click', function () {
+                const label = this.getAttribute('data-label');
+                const text = this.getAttribute('data-text');
+                document.getElementById('textModalLabel').textContent = label;
+                document.getElementById('textModalBody').textContent = text;
+                const modal = new bootstrap.Modal(document.getElementById('textModal'));
+                modal.show();
+            });
+        });
+
+        // Optional: SweetAlert delete confirmation
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                const form = btn.closest('form');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This trip will be deleted permanently!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .truncate-text {
+            display: inline-block;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+
+        td, th {
+            vertical-align: middle !important;
+        }
+    </style>
+}

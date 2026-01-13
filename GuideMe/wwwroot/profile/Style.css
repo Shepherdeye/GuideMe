@@ -87,3 +87,162 @@
 
     overflow-x:hidden !important;
 }
+
+.my-booking-link {
+    position: relative;
+    color: #0d6efd !important;
+    transition: all 0.3s ease;
+    padding: 8px 14px;
+    border-radius: 20px;
+}
+
+    .my-booking-link:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0a58ca !important;
+        transform: translateY(-1px);
+    }
+
+    .my-booking-link::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 2px;
+        width: 0%;
+        height: 2px;
+        background-color: #0d6efd;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .my-booking-link:hover::after {
+        width: 60%;
+    }
+
+
+/*adv*/
+<style >
+/* ===== Profile Page Design Layer ===== */
+.profile-container {
+    background: #f6f8fb;
+}
+
+.profile-container .card {
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.profile-container .col-lg-3 {
+    background: linear-gradient(180deg, #f8f9fa, #ffffff);
+    border-right: 1px solid #eee;
+}
+
+#profileImagePreview {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    #profileImagePreview:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+label[for="ProfileImageFile"] {
+    transition: all 0.2s ease;
+}
+
+    label[for="ProfileImageFile"]:hover {
+        transform: scale(1.1);
+        background-color: #0b5ed7 !important;
+    }
+
+.profile-form h4 {
+    letter-spacing: 0.3px;
+}
+
+.profile-container .form-control,
+.profile-container .form-select {
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-color: #e3e6ea;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .profile-container .form-control:focus,
+    .profile-container .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.15rem rgba(13,110,253,0.15);
+    }
+
+.accordion-item {
+    border: none;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+}
+
+.accordion-button {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+    .accordion-button:not(.collapsed) {
+        background: #eaf1ff;
+        color: #0d6efd;
+    }
+
+.accordion-body {
+    background: #ffffff;
+}
+
+    .accordion-body .border {
+        border-color: #e6e9ee !important;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+        .accordion-body .border:hover {
+            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+.role-badge {
+    font-size: 0.8rem;
+    letter-spacing: 0.4px;
+}
+
+.profile-container .col-lg-5,
+.profile-container .col-lg-4 {
+    background-color: #ffffff;
+}
+
+.trip-list-card {
+    transition: all 0.2s ease;
+}
+
+    .trip-list-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+.trip-list-image {
+    width: 110px;
+    height: 90px;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .trip-list-image {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+
+

@@ -64,3 +64,33 @@ body {
     font-weight: 700;
     color: #333;
 }
+
+.my-booking-link {
+    position: relative;
+    color: #0d6efd !important;
+    transition: all 0.3s ease;
+    padding: 8px 14px;
+    border-radius: 20px;
+}
+
+    .my-booking-link:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0a58ca !important;
+        transform: translateY(-1px);
+    }
+
+    .my-booking-link::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 2px;
+        width: 0%;
+        height: 2px;
+        background-color: #0d6efd;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .my-booking-link:hover::after {
+        width: 60%;
+    }
