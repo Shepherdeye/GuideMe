@@ -244,5 +244,9 @@ label[for="ProfileImageFile"] {
     }
 }
 
+.trip-header {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
 
 

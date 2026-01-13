@@ -1,13 +1,23 @@
 ﻿@model AllTripData
 
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold mb-0">Trips</h4>
-        <a asp-action="Create" class="btn btn-sm btn-primary">
-            <i class="bi bi-plus-lg"></i> Create New Trip
-        </a>
+<div class="container py-4">
+    <div class="trip-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+        <div>
+            <h3 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-map text-primary"></i> My Trips
+            </h3>
+            <small class="text-muted">Manage and organize all your trips</small>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 text-white">
+                <i class="bi bi-plus-lg me-1"></i> New Trip
+            </a>
+        </div>
+
     </div>
+
 @if (Model.Trips?.Any() == true)
 {
         <div class="d-flex flex-column gap-3 container">
