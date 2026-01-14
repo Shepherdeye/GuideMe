@@ -53,5 +53,142 @@ namespace GuideMe.Areas.Profile.Controllers
 
             return View(data);
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var trip = await _tripRepository.GetOneAsync(t => t.Id == id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+            if (trip == null) return NotFound();
+            return View(trip);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Trip trip, IFormFile? Image)
+        {
+            var userId = _userManager.GetUserId(User);
+            var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
+            
+            if (currentUser?.Visitor == null) return NotFound("Visitor profile not found.");
+
+            if (ModelState.IsValid)
+            {
+                if (Image != null && Image.Length > 0)
+                {
+                    var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+                    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
+
+                    using (var stream = System.IO.File.Create(filepath))
+                    {
+                        await Image.CopyToAsync(stream);
+                    }
+                    trip.Image = filename;
+                }
+
+                trip.VisitorId = currentUser.Visitor.Id;
+                trip.CreatedOn = DateTime.Now;
+                trip.LastUpdatedon = DateTime.Now;
+
+                await _tripRepository.CreateAsync(trip);
+                await _tripRepository.CommitAsync();
+                TempData["Success"] = "Trip created successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(trip);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var trip = await _tripRepository.GetOneAsync(t => t.Id == id);
+            if (trip == null) return NotFound();
+
+            var userId = _userManager.GetUserId(User);
+            var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
+            
+            if (trip.VisitorId != currentUser?.Visitor?.Id) return Forbid();
+
+            return View(trip);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Trip trip, IFormFile? Image)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = _userManager.GetUserId(User);
+                var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
+                
+                // Security check: ensure the trip belongs to the current visitor
+                var existingTrip = await _tripRepository.GetOneAsync(t => t.Id == trip.Id, tracked: false);
+                if (existingTrip == null || existingTrip.VisitorId != currentUser?.Visitor?.Id) return Forbid();
+
+                if (Image != null && Image.Length > 0)
+                {
+                    var filename = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+                    var filepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", filename);
+
+                    using (var stream = System.IO.File.Create(filepath))
+                    {
+                        await Image.CopyToAsync(stream);
+                    }
+
+                    // Delete old image if exists
+                    if (!string.IsNullOrEmpty(existingTrip.Image))
+                    {
+                        var oldFilepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", existingTrip.Image);
+                        if (System.IO.File.Exists(oldFilepath))
+                        {
+                            System.IO.File.Delete(oldFilepath);
+                        }
+                    }
+
+                    trip.Image = filename;
+                }
+                else
+                {
+                    trip.Image = existingTrip.Image;
+                }
+
+                trip.VisitorId = existingTrip.VisitorId;
+                trip.CreatedOn = existingTrip.CreatedOn;
+                trip.LastUpdatedon = DateTime.Now;
+
+                _tripRepository.Update(trip);
+                await _tripRepository.CommitAsync();
+                TempData["Success"] = "Trip updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(trip);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var trip = await _tripRepository.GetOneAsync(t => t.Id == id, includes: [e => e.Bookings]);
+            if (trip == null) return NotFound();
+
+            var userId = _userManager.GetUserId(User);
+            var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
+            
+            if (trip.VisitorId != currentUser?.Visitor?.Id) return Forbid();
+
+            // Logic: Prevent deletion if there are accepted bookings
+            if (trip.Bookings != null && trip.Bookings.Any(b => b.BookingStatus == BookingStatus.Accepted))
+            {
+                TempData["Error"] = "This trip has accepted bookings and cannot be deleted. Please cancel the bookings first.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _tripRepository.Delete(trip);
+            await _tripRepository.CommitAsync();
+            TempData["Success"] = "Trip deleted successfully.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

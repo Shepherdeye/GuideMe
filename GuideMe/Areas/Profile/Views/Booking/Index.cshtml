@@ -1,0 +1,145 @@
+@model IEnumerable<Booking>
+
+@{
+    ViewData["Title"] = "My Bookings";
+    string userType = ViewBag.UserType ?? "User";
+}
+
+<div class="container py-5 animate-fade-in">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div>
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="bi bi-calendar-check text-primary me-2"></i>@(userType == "Guide" ? "Received Bookings" : "My Bookings")
+            </h1>
+            <p class="text-secondary mb-0">Manage your travel experiences and reservations.</p>
+        </div>
+        <a href="/Main/Trip/Index" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm transition-all hover-lift">
+            <i class="bi bi-plus-lg me-2"></i>Find New Trip
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-xl-6">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 transition-hover">
+                        <div class="row g-0 h-100">
+                            <div class="col-sm-4 bg-light">
+                                <img src="@(string.IsNullOrEmpty(item.Trip?.Image) ? "/img/placeholder.jpg" : $"/main/img/{item.Trip.Image}")" 
+                                     class="w-100 h-100 object-fit-cover" alt="Trip Image" style="min-height: 200px;">
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="card-body p-4 d-flex flex-column h-100">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge @(item.BookingStatus switch {
+                                            BookingStatus.Accepted => "bg-soft-success text-success",
+                                            BookingStatus.Paid => "bg-soft-primary text-primary",
+                                            BookingStatus.Pending => "bg-soft-info text-info",
+                                            BookingStatus.Rejected => "bg-soft-danger text-danger",
+                                            BookingStatus.Canceled => "bg-soft-secondary text-secondary",
+                                            _ => "bg-light text-dark"
+                                        }) rounded-pill px-3 py-2">
+                                            @item.BookingStatus
+                                        </span>
+                                        <h5 class="fw-bold text-primary mb-0">@item.BookingPrice.ToString("C")</h5>
+                                    </div>
+
+                                    <h4 class="fw-bold text-dark mb-3">@item.Trip?.Title</h4>
+                                    
+                                    <div class="d-flex flex-column gap-2 mb-4">
+                                        <div class="d-flex align-items-center gap-2 text-secondary small">
+                                            <i class="bi bi-calendar3 text-primary"></i>
+                                            <span>@item.StartDate.ToShortDateString() - @item.EndDate.ToShortDateString()</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2 text-secondary small">
+                                            <i class="bi bi-person-badge text-primary"></i>
+                                            <span>
+                                                @(userType == "Guide" 
+                                                    ? $"Visitor: {item.Visitor?.ApplicationUser?.FirstName} {item.Visitor?.ApplicationUser?.LastName}"
+                                                    : $"Guide: {item.Guide?.ApplicationUser?.FirstName} {item.Guide?.ApplicationUser?.LastName}")
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto d-flex gap-2">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm rounded-pill px-3 transition-all">
+                                            View Details
+                                        </a>
+
+                                        @if (userType == "Visitor" && item.BookingStatus == BookingStatus.Accepted)
+                                        {
+                                            <form asp-action="Pay" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 transition-all shadow-sm">
+                                                    <i class="bi bi-wallet2 me-2"></i>Pay Now
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (userType == "Visitor" && item.BookingStatus == BookingStatus.Pending)
+                                        {
+                                            <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 transition-all" 
+                                                        onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (userType == "Guide" && item.BookingStatus == BookingStatus.Pending)
+                                        {
+                                            <form asp-action="UpdateStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <input type="hidden" name="status" value="@BookingStatus.Accepted" />
+                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 transition-all">
+                                                    Accept
+                                                </button>
+                                            </form>
+                                            <form asp-action="UpdateStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                                <input type="hidden" name="status" value="@BookingStatus.Rejected" />
+                                                <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 transition-all">
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+            <div class="mb-4">
+                <i class="bi bi-journal-x text-muted display-1"></i>
+            </div>
+            <h3 class="fw-bold text-dark">No Bookings Found</h3>
+            <p class="text-secondary mb-4">You haven't made or received any bookings yet.</p>
+            <a href="/Main/Trip/Index" class="btn btn-primary rounded-pill px-5 py-3">Explore Trips</a>
+        </div>
+    }
+</div>
+
+<style>
+    body { background-color: #f8fafc; }
+    .bg-soft-primary { background-color: #e0e7ff !important; }
+    .bg-soft-success { background-color: #ecfdf5 !important; }
+    .bg-soft-info { background-color: #eff6ff !important; }
+    .bg-soft-danger { background-color: #fef2f2 !important; }
+    .bg-soft-secondary { background-color: #f1f5f9 !important; }
+    
+    .transition-hover:hover { 
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+    }
+    .hover-lift:hover { transform: translateY(-2px); }
+    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .object-fit-cover { object-fit: cover; }
+    .transition-all { transition: all 0.3s ease; }
+</style>

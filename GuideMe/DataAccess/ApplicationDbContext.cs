@@ -40,7 +40,7 @@ namespace GuideMe.DataAccess
                 .HasOne(b => b.Trip)
                 .WithMany(t => t.Bookings)
                 .HasForeignKey(b => b.TripId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // علاقة Booking ↔ Visitor
             modelBuilder.Entity<Booking>()

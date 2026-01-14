@@ -7,7 +7,8 @@ namespace GuideMe.Models
     {
         Visitor,
         Guide,
-        Admin
+        Admin,
+        SuperAdmin
     }
 
     public enum GenderType
@@ -30,7 +31,7 @@ namespace GuideMe.Models
         [Required(ErrorMessage = "Phone number is required")]
         [RegularExpression(@"^01[0-2,5]{1}[0-9]{8}$",
         ErrorMessage = "Please enter a valid Egyptian phone number (e.g. 01012345678)")]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public new string? PhoneNumber { get; set; } = string.Empty;
 
         [Required]
         public UserRole Role { get; set; }

@@ -120,7 +120,6 @@
 
 
 /*adv*/
-<style >
 /* ===== Profile Page Design Layer ===== */
 .profile-container {
     background: #f6f8fb;
@@ -250,3 +249,24 @@ label[for="ProfileImageFile"] {
 }
 
 
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-soft-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+    .btn-soft-danger:hover {
+        background-color: #dc3545;
+        color: #fff;
+        transform: scale(1.05);
+    }

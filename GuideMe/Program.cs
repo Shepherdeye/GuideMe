@@ -3,6 +3,7 @@ using GuideMe.Utility.DBInitializer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using GuideMe.Utility;
 
 namespace GuideMe
 {
@@ -54,11 +55,14 @@ namespace GuideMe
             builder.Services.AddScoped<IRepository<Guide>, Repository<Guide>>();
             builder.Services.AddScoped<IRepository<UserOTP>, Repository<UserOTP>>();
             builder.Services.AddScoped<IRepository<Trip>, Repository<Trip>>();
-            builder.Services.AddScoped<IRepository<Review>, Repository<Review>>();
+            builder.Services.AddScoped<IRepository<GuideMe.Models.Review>, Repository<GuideMe.Models.Review>>();
             builder.Services.AddScoped<IRepository<Booking>, Repository<Booking>>();
             builder.Services.AddScoped<IRepository<Payment>, Repository<Payment>>();
             builder.Services.AddScoped<IRepository<Offer>, Repository<Offer>>();
             builder.Services.AddScoped<IRepository<ContactAccess>, Repository<ContactAccess>>();
+
+            //Stripe configuration
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 
 
 
@@ -102,6 +106,9 @@ namespace GuideMe
                 .WithStaticAssets();
 
             app.Run();
+
+            // Set Stripe Secret Key
+            Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
         }
     }
 }

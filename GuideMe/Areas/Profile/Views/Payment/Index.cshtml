@@ -1,0 +1,119 @@
+@model IEnumerable<Payment>
+
+@{
+    ViewData["Title"] = "Payment History";
+    string userType = ViewBag.UserType ?? "User";
+}
+
+<div class="container py-5 animate-fade-in">
+    <div class="mb-5">
+        <h1 class="display-5 fw-bold text-dark mb-2">
+            <i class="bi bi-wallet2 text-success me-2"></i>Financial Overview
+        </h1>
+        <p class="text-secondary">Track your @(userType == "Guide" ? "earnings and payouts" : "spending and transactions").</p>
+    </div>
+
+    @if (userType == "Guide")
+    {
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white">
+                    <small class="opacity-75 text-uppercase fw-bold">Total Earnings</small>
+                    <h2 class="fw-bold mb-0">@Model.Sum(p => p.GuideEarning).ToString("C")</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-success text-white">
+                    <small class="opacity-75 text-uppercase fw-bold">Recent Payout</small>
+                    <h2 class="fw-bold mb-0">@Model.OrderByDescending(p => p.PaymentDate).FirstOrDefault()?.GuideEarning.ToString("C")</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-dark text-white">
+                    <small class="opacity-75 text-uppercase fw-bold">Service Fees Paid</small>
+                    <h2 class="fw-bold mb-0">@Model.Sum(p => p.ServiceFeeGuide).ToString("C")</h2>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase small fw-bold text-secondary">Date</th>
+                        <th class="py-3 text-uppercase small fw-bold text-secondary">Reference</th>
+                        <th class="py-3 text-uppercase small fw-bold text-secondary">Trip / Event</th>
+                        <th class="py-3 text-uppercase small fw-bold text-secondary text-end">Amount</th>
+                        @if (userType == "Guide")
+                        {
+                            <th class="py-3 text-uppercase small fw-bold text-secondary text-end pe-4">Net Earning</th>
+                        }
+                        else
+                        {
+                            <th class="py-3 text-uppercase small fw-bold text-secondary text-end pe-4">Status</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model.OrderByDescending(p => p.PaymentDate))
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">@item.PaymentDate.ToString("MMM dd, yyyy")</div>
+                                    <small class="text-muted small">@item.PaymentDate.ToString("t")</small>
+                                </td>
+                                <td>
+                                    <code class="text-primary small">#@item.StripePaymentIntentId.Substring(Math.Max(0, item.StripePaymentIntentId.Length - 8))</code>
+                                </td>
+                                <td>
+                                    <div class="text-dark fw-semibold">@item.Booking?.Trip?.Title</div>
+                                    <small class="text-muted">
+                                        @(userType == "Guide" 
+                                            ? $"Visitor: {item.Booking?.Visitor?.ApplicationUser?.FirstName}" 
+                                            : $"Guide: {item.Booking?.Guide?.ApplicationUser?.FirstName}")
+                                    </small>
+                                </td>
+                                <td class="text-end fw-bold text-dark">
+                                    @item.Amount.ToString("C")
+                                </td>
+                                @if (userType == "Guide")
+                                {
+                                    <td class="text-end pe-4">
+                                        <span class="text-success fw-bold">+@item.GuideEarning.ToString("C")</span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="text-end pe-4">
+                                        <span class="badge bg-soft-success text-success rounded-pill px-3">Completed</span>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-receipt-cutoff display-4 d-block mb-3 opacity-25"></i>
+                                No transaction records found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #f8fafc; }
+    .bg-soft-success { background-color: #ecfdf5 !important; }
+    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    table thead th { border-top: none; }
+</style>

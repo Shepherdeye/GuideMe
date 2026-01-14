@@ -1,0 +1,85 @@
+@model IEnumerable<Review>
+
+@{
+    ViewData["Title"] = "My Reviews";
+}
+
+<div class="container py-5 animate-fade-in">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div>
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="bi bi-star-fill text-warning me-2"></i>My Feedback
+            </h1>
+            <p class="text-secondary mb-0">Manage the reviews you've shared with the community.</p>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="text-warning">
+                                    @for (int i = 0; i < (int)item.RatingReview + 1; i++)
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    @for (int i = (int)item.RatingReview + 1; i < 5; i++)
+                                    {
+                                        <i class="bi bi-star text-muted opacity-25"></i>
+                                    }
+                                </div>
+                                <small class="text-muted">@item.ReviewDate.ToString("MMM dd, yyyy")</small>
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1">
+                                <i class="bi bi-map text-primary me-2"></i>@item.Trip?.Title
+                            </h5>
+                            <p class="text-secondary small mb-3">
+                                Guide: <span class="fw-semibold text-dark">@item.Guide?.ApplicationUser?.FirstName</span>
+                            </p>
+
+                            <div class="bg-light p-3 rounded-3 mb-4">
+                                <p class="text-dark font-italic mb-0 small" style="display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;">
+                                    "@item.Comment"
+                                </p>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm rounded-pill px-3 flex-grow-1">
+                                    <i class="bi bi-pencil-square me-1"></i>Edit
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="flex-grow-1">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 w-100" 
+                                            onclick="return confirm('Permanently delete this review?')">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+            <i class="bi bi-chat-left-dots text-muted display-1 mb-4"></i>
+            <h3 class="fw-bold text-dark">No Reviews Found</h3>
+            <p class="text-secondary mb-4">You haven't shared your thoughts on any trips yet.</p>
+            <a href="/Profile/Booking/Index" class="btn btn-primary rounded-pill px-5 py-3">View My Bookings</a>
+        </div>
+    }
+</div>
+
+<style>
+    body { background-color: #f8fafc; }
+    .transition-hover:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important; }
+    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>

@@ -1,0 +1,35 @@
+@model int
+
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 p-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+                <h2 class="fw-bold text-dark mb-3">Payment Successful!</h2>
+                <p class="text-secondary mb-4">
+                    Thank you for your payment. Your booking <strong>#@Model</strong> has been confirmed. 
+                    You can now access the guide's contact information in the booking details.
+                </p>
+                <div class="d-grid gap-3">
+                    <a asp-action="Details" asp-route-id="@Model" class="btn btn-primary btn-lg rounded-pill py-3">
+                        View Booking Details
+                    </a>
+                    <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none">
+                        Back to All Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #f8fafc; }
+    .card { animation: slideUp 0.6s ease-out; }
+    @@keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

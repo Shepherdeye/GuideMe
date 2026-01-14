@@ -8,8 +8,8 @@ namespace GuideMe.Models
     Pending,
     Accepted,
     Rejected,
-    Canceled
-    
+    Canceled,
+    Paid
     }
 
 

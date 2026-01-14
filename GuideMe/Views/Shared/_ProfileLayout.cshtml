@@ -56,32 +56,44 @@
                     <!-- Main links -->
                     <ul class="navbar-nav mx-lg-auto mt-3 mt-lg-0 gap-lg-2">
 
-                        @if (user.Role!=UserRole.Guide)
+                        @if (user.Role == UserRole.Visitor)
                         {
                             <li class="nav-item">
-                                <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/Profile/trip/index">
-                                    <i class="fa fa-route me-2"></i> My Trips
+                                <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/Profile/Trip/Index">
+                                    <i class="fa fa-route me-2 text-primary"></i> My Trips
                                 </a>
                             </li>
-
                         }
+                        
                         <li class="nav-item">
-                            <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/main/home/index">
-                                <i class="fa fa-calendar-check me-2"></i> My Bookings
+                            <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/Profile/Booking/Index">
+                                <i class="fa fa-calendar-check me-2 text-success"></i> My Bookings
                             </a>
                         </li>
 
+                        @if (user.Role == UserRole.Guide || user.Role == UserRole.Visitor)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/Profile/Offer/Index">
+                                    <i class="fa fa-tag me-2 text-warning"></i> My Offers
+                                </a>
+                            </li>
+                        }
+
                         <li class="nav-item">
-                            <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/main/payments/index">
-                                <i class="fa fa-credit-card me-2"></i> My Payments
+                            <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/Profile/Payment/Index">
+                                <i class="fa fa-credit-card me-2 text-info"></i> Financials
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/main/contact/index">
-                                <i class="fa fa-headset me-2"></i> Contact Access
-                            </a>
-                        </li>
+                        @if (user.Role == UserRole.Visitor)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link my-booking-link d-lg-inline d-block text-start" href="/Profile/Review/Index">
+                                    <i class="fa fa-star me-2 text-warning"></i> My Reviews
+                                </a>
+                            </li>
+                        }
 
                     </ul>
 
@@ -115,6 +127,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

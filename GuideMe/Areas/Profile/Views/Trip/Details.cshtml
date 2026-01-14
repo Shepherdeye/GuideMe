@@ -1,0 +1,169 @@
+@model Trip
+
+@{
+    ViewData["Title"] = "Trip Details";
+}
+
+<div class="container py-5 animate-fade-in">
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none p-0 transition-hover">
+            <i class="bi bi-arrow-left me-2"></i>Back to my trips
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="trip-hero-image" style="height: 450px; background: url('@(string.IsNullOrEmpty(Model.Image) ? "/img/placeholder.jpg" : $"/main/img/{Model.Image}")') center/cover no-repeat;">
+                    <div class="h-100 w-100 d-flex align-items-end p-4 p-md-5 bg-gradient-overlay">
+                        <div class="text-white">
+                            <span class="badge @(Model.Status == TripStatus.Open ? "bg-success" : "bg-warning text-dark") mb-3 px-3 py-2 rounded-pill shadow-sm">
+                                <i class="bi @(Model.Status == TripStatus.Open ? "bi-check-circle" : "bi-lock") me-1"></i> @Model.Status
+                            </span>
+                            <h1 class="display-4 fw-bold mb-0">@Model.Title</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-2 text-primary fw-bold mb-4">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>@Model.Destination, @Model.Region</span>
+                    </div>
+
+                    <h4 class="fw-bold text-dark mb-3">About this experience</h4>
+                    <p class="text-secondary lead mb-5" style="white-space: pre-line;">
+                        @Model.Description
+                    </p>
+
+                    <hr class="my-5 opacity-10">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-dark mb-4">What's included</h5>
+                            <ul class="list-unstyled d-flex flex-column gap-3">
+                                <li class="d-flex align-items-center gap-3">
+                                    <div class="icon-box bg-soft-success text-success rounded-circle">
+                                        <i class="bi bi-person-check-fill"></i>
+                                    </div>
+                                    <span class="text-secondary">Professional local guide</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-3">
+                                    <div class="icon-box bg-soft-primary text-primary rounded-circle">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </div>
+                                    <span class="text-secondary">Photography locations</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-3">
+                                    <div class="icon-box bg-soft-warning text-warning rounded-circle">
+                                        <i class="bi bi-shield-check"></i>
+                                    </div>
+                                    <span class="text-secondary">Full safety equipment</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Sidebar Stats -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 2rem; z-index: 100;">
+                <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5">
+                    <div class="price-tag mb-4">
+                        <span class="display-5 fw-bold text-dark">@Model.Price.ToString("C")</span>
+                        <span class="text-muted">/ person</span>
+                    </div>
+
+                    <div class="d-flex flex-column gap-4 mb-5">
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box-small bg-white text-primary rounded-3 shadow-sm text-center">
+                                    <i class="bi bi-calendar3"></i>
+                                </div>
+                                <span class="text-secondary fw-semibold">Duration</span>
+                            </div>
+                            <span class="fw-bold text-dark">@Model.NumberOfDays Days</span>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box-small bg-white text-primary rounded-3 shadow-sm text-center">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <span class="text-secondary fw-semibold">Capacity</span>
+                            </div>
+                            <span class="fw-bold text-dark">@Model.Members People</span>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box-small bg-white text-primary rounded-3 shadow-sm text-center">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                                <span class="text-secondary fw-semibold">Creator</span>
+                            </div>
+                            <span class="fw-bold text-dark">@Model.Visitor?.ApplicationUser?.FirstName</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <a href="/Main/Trip/Details/@Model.Id" class="btn btn-outline-primary btn-lg rounded-pill py-3 transition-all">
+                            <i class="bi bi-eye me-2"></i>View Public Page
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg rounded-pill py-3 shadow-sm transition-hover">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Trip Details
+                        </a>
+                        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="delete-form">
+                            <button type="button" class="btn btn-outline-danger btn-lg rounded-pill py-3 w-100 delete-btn">
+                                <i class="bi bi-trash3 me-2"></i>Delete Trip
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                const form = btn.closest('form');
+                Swal.fire({
+                    title: "Delete this Trip?",
+                    text: "This action cannot be undone and will remove all associated bookings.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#ef4444",
+                    cancelButtonColor: "#64748b",
+                    confirmButtonText: "Yes, delete it",
+                    customClass: { popup: 'rounded-4' }
+                }).then((result) => {
+                    if (result.isConfirmed) { form.submit(); }
+                });
+            });
+        });
+    </script>
+    <style>
+        body { background-color: #f8fafc; }
+        .bg-gradient-overlay { background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%); }
+        .bg-soft-success { background-color: #ecfdf5; }
+        .bg-soft-primary { background-color: #eff6ff; }
+        .bg-soft-warning { background-color: #fffbeb; }
+        
+        .icon-box { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .icon-box-small { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+
+        .transition-hover:hover { transform: translateX(5px); }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out; }
+        @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+}

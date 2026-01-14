@@ -1,0 +1,152 @@
+@model Booking
+
+@{
+    ViewData["Title"] = "Booking Details";
+    var userType = User.IsInRole("Guide") ? "Guide" : "Visitor";
+}
+
+<div class="container py-5 animate-fade-in">
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none p-0 transition-all hover-translate-x-n">
+            <i class="bi bi-arrow-left me-2"></i>Back to bookings
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="p-4 p-md-5 bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <span class="badge @(Model.BookingStatus switch {
+                            BookingStatus.Accepted => "bg-success",
+                            BookingStatus.Paid => "bg-primary",
+                            BookingStatus.Pending => "bg-info",
+                            BookingStatus.Rejected => "bg-danger",
+                            BookingStatus.Canceled => "bg-secondary",
+                            _ => "bg-light text-dark"
+                        }) px-3 py-2 rounded-pill">
+                            @Model.BookingStatus
+                        </span>
+                        <div class="text-end">
+                            <small class="text-white-50 d-block">Booking ID</small>
+                            <span class="fw-bold">#@Model.Id</span>
+                        </div>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-2">@Model.Trip?.Title</h1>
+                    <div class="d-flex align-items-center gap-3 text-white-50">
+                        <span><i class="bi bi-geo-alt me-1"></i>@Model.Trip?.Destination</span>
+                        <span><i class="bi bi-calendar-event me-1"></i>@Model.StartDate.ToLongDateString()</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-5">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-dark mb-4 border-bottom pb-2">Traveler Info</h5>
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <img src="@(string.IsNullOrEmpty(Model.Visitor?.ApplicationUser?.ProfileImage) ? "/img/user-default.png" : $"/identity/Profile/{Model.Visitor.ApplicationUser.ProfileImage}")" 
+                                     class="rounded-circle" width="60" height="60" style="object-fit: cover;">
+                                <div>
+                                    <h6 class="fw-bold mb-0">@Model.Visitor?.ApplicationUser?.FirstName @Model.Visitor?.ApplicationUser?.LastName</h6>
+                                    <small class="text-muted">Visitor</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="fw-bold text-dark mb-4 border-bottom pb-2">Guide Info</h5>
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <img src="@(string.IsNullOrEmpty(Model.Guide?.ApplicationUser?.ProfileImage) ? "/img/user-default.png" : $"/identity/Profile/{Model.Guide.ApplicationUser.ProfileImage}")" 
+                                     class="rounded-circle" width="60" height="60" style="object-fit: cover;">
+                                <div>
+                                    <h6 class="fw-bold mb-0">@Model.Guide?.ApplicationUser?.FirstName @Model.Guide?.ApplicationUser?.LastName</h6>
+                                    <small class="text-muted">Professional Guide</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 p-4 bg-light rounded-4">
+                        <h5 class="fw-bold text-dark mb-4">Reservation Details</h5>
+                        <div class="row g-4">
+                            <div class="col-sm-6 col-lg-3">
+                                <small class="text-muted d-block text-uppercase small mb-1">Check-in</small>
+                                <span class="fw-bold text-dark">@Model.StartDate.ToShortDateString()</span>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <small class="text-muted d-block text-uppercase small mb-1">Check-out</small>
+                                <span class="fw-bold text-dark">@Model.EndDate.ToShortDateString()</span>
+                            </div>
+                            <div class="col-sm-6 col-lg-3">
+                                <small class="text-muted d-block text-uppercase small mb-1">Price per person</small>
+                                <span class="fw-bold text-dark">@Model.Trip?.Price.ToString("C")</span>
+                            </div>
+                            <div class="col-sm-6 col-lg-3 text-lg-end">
+                                <small class="text-muted d-block text-uppercase small mb-1">Total Paid</small>
+                                <span class="fw-bold text-primary fs-4">@Model.BookingPrice.ToString("C")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 2rem;">
+                <h5 class="fw-bold text-dark mb-4">Actions</h5>
+                
+                <div class="d-grid gap-3">
+                    <a href="/Main/Trip/Details/@Model.TripId" class="btn btn-outline-primary rounded-pill py-3 transition-all">
+                        <i class="bi bi-eye me-2"></i>View Public Trip
+                    </a>
+
+                    @if (userType == "Visitor" && Model.BookingStatus == BookingStatus.Pending)
+                    {
+                        <form asp-action="Cancel" asp-route-id="@Model.Id" method="post">
+                            <button type="submit" class="btn btn-outline-danger rounded-pill py-3 w-100 transition-all">
+                                <i class="bi bi-x-circle me-2"></i>Cancel Booking
+                            </button>
+                        </form>
+                    }
+
+                    @if (userType == "Guide" && Model.BookingStatus == BookingStatus.Pending)
+                    {
+                        <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+                            <input type="hidden" name="status" value="@BookingStatus.Accepted" />
+                            <button type="submit" class="btn btn-success rounded-pill py-3 w-100 mb-2 transition-all">
+                                <i class="bi bi-check-circle me-2"></i>Accept Reservation
+                            </button>
+                        </form>
+                        <form asp-action="UpdateStatus" asp-route-id="@Model.Id" method="post">
+                            <input type="hidden" name="status" value="@BookingStatus.Rejected" />
+                            <button type="submit" class="btn btn-outline-danger rounded-pill py-3 w-100 transition-all">
+                                <i class="bi bi-slash-circle me-2"></i>Reject Reservation
+                            </button>
+                        </form>
+                    }
+
+                    @if (Model.BookingStatus == BookingStatus.Accepted)
+                    {
+                        <div class="alert alert-success border-0 rounded-4 mb-0">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-patch-check-fill fs-3"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Booking Confirmed</h6>
+                                    <small>Contact information is now shared between both parties.</small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #f8fafc; }
+    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .hover-translate-x-n:hover { transform: translateX(-5px); }
+    .transition-all { transition: all 0.3s ease; }
+</style>
