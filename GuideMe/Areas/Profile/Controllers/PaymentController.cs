@@ -37,7 +37,26 @@ namespace GuideMe.Areas.Profile.Controllers
 
             IEnumerable<Payment> payments;
 
-            if (user.Role == UserRole.Guide && user.Guide != null)
+            if (user.Role == UserRole.SuperAdmin || user.Role == UserRole.Admin)
+            {
+                // Ensure profiles exist
+                bool changed = false;
+                if (user.Guide == null) { user.Guide = new Guide { ApplicationUserId = userId }; await _context.Guides.AddAsync(user.Guide); changed = true; }
+                if (user.Visitor == null) { user.Visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available }; await _context.Visitors.AddAsync(user.Visitor); changed = true; }
+                if (changed) await _context.SaveChangesAsync();
+
+                var guidePayments = await _paymentRepo.GetAsync(
+                    p => p.Booking.GuideId == user.Guide.Id,
+                    includes: [p => p.Booking, p => p.Booking.Trip, p => p.Booking.Visitor, p => p.Booking.Visitor.ApplicationUser]);
+                
+                var visitorPayments = await _paymentRepo.GetAsync(
+                    p => p.Booking.VisitorId == user.Visitor.Id,
+                    includes: [p => p.Booking, p => p.Booking.Trip, p => p.Booking.Guide, p => p.Booking.Guide.ApplicationUser]);
+
+                payments = guidePayments.Concat(visitorPayments).DistinctBy(p => p.Id);
+                ViewBag.UserRole = "SuperAdmin";
+            }
+            else if (user.Role == UserRole.Guide && user.Guide != null)
             {
                 payments = await _paymentRepo.GetAsync(
                     p => p.Booking.GuideId == user.Guide.Id,
@@ -63,7 +82,21 @@ namespace GuideMe.Areas.Profile.Controllers
             
             if (user.Role == UserRole.Visitor) {
                 totalFees = payments.Sum(p => p.ServiceFeeVisitor);
-                netEarnings = totalRevenue - totalFees;
+                netEarnings = totalRevenue - totalFees; // Cost for visitor, technically
+            } else if (user.Role == UserRole.SuperAdmin || user.Role == UserRole.Admin) {
+                 // For SuperAdmin, show pure earnings where they are Guide, and costs where they are Visitor?
+                 // Or just total volume. Let's show Net Earnings as (GuideEarnings - VisitorCosts)
+                 // Or simpler: Show Guide Earning sum.
+                 
+                 // Split correctly:
+                 var asGuide = payments.Where(p => p.Booking.GuideId == user.Guide?.Id);
+                 var asVisitor = payments.Where(p => p.Booking.VisitorId == user.Visitor?.Id);
+                 
+                 var guideEarnings = asGuide.Sum(p => p.GuideEarning);
+                 var visitorCosts = asVisitor.Sum(p => p.Amount); // Total spent
+                 
+                 netEarnings = guideEarnings; // Just show earnings for positivity
+                 totalFees = asGuide.Sum(p => p.ServiceFeeGuide) + asVisitor.Sum(p => p.ServiceFeeVisitor);
             }
 
             var now = DateTime.Now;

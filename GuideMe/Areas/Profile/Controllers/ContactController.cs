@@ -37,7 +37,26 @@ namespace GuideMe.Areas.Profile.Controllers
 
             IEnumerable<ContactAccess> contacts;
 
-            if (user.Role == UserRole.Guide && user.Guide != null)
+            if (user.Role == UserRole.SuperAdmin || user.Role == UserRole.Admin)
+            {
+                 // Ensure profiles exist (robustness)
+                bool changed = false;
+                if (user.Guide == null) { user.Guide = new Guide { ApplicationUserId = userId }; await _context.Guides.AddAsync(user.Guide); changed = true; }
+                if (user.Visitor == null) { user.Visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available }; await _context.Visitors.AddAsync(user.Visitor); changed = true; }
+                if (changed) await _context.SaveChangesAsync();
+
+                var guideContacts = await _contactAccessRepo.GetAsync(
+                    c => c.Booking.GuideId == user.Guide.Id,
+                     includes: [c => c.Booking, c => c.Booking.Visitor, c => c.Booking.Visitor.ApplicationUser, c => c.Booking.Trip]);
+
+                var visitorContacts = await _contactAccessRepo.GetAsync(
+                    c => c.Booking.VisitorId == user.Visitor.Id,
+                    includes: [c => c.Booking, c => c.Booking.Guide, c => c.Booking.Guide.ApplicationUser, c => c.Booking.Trip]);
+
+                contacts = guideContacts.Concat(visitorContacts).DistinctBy(c => c.Id);
+                ViewBag.CurrentUserRole = "SuperAdmin";
+            }
+            else if (user.Role == UserRole.Guide && user.Guide != null)
             {
                 contacts = await _contactAccessRepo.GetAsync(
                     c => c.Booking.GuideId == user.Guide.Id,

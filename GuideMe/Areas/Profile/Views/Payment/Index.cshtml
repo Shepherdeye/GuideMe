@@ -1,5 +1,7 @@
 @model PaginatedList<Payment>
 
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 @{
     ViewData["Title"] = "Financial Records";
     var totalRevenue = ViewBag.TotalRevenue ?? 0m;
@@ -7,6 +9,7 @@
     var netEarnings = ViewBag.NetEarnings ?? 0m;
     var growth = (double)(ViewBag.Growth ?? 0);
     string userRole = ViewBag.UserRole ?? "User";
+    var currentUserId = UserManager.GetUserId(User);
 }
 
 <div class="container py-5">
@@ -20,7 +23,7 @@
                 </ol>
             </nav>
             <h1 class="display-4 fw-bold text-dark mb-0">Financial Analytics</h1>
-            <p class="text-secondary fs-5 mt-2">Track your @(userRole == "Guide" ? "earnings" : "spending") and growth with precision.</p>
+            <p class="text-secondary fs-5 mt-2">Track your @(userRole == "Guide" ? "earnings" : userRole == "SuperAdmin" ? "finances" : "spending") and growth with precision.</p>
         </div>
     </div>
 
@@ -50,7 +53,7 @@
                         <i class="bi bi-bank fs-4 text-success"></i>
                     </div>
                 </div>
-                <h6 class="text-secondary tiny fw-bold text-uppercase ls-1 mb-1">Net @(userRole == "Guide" ? "Earnings" : "Spend")</h6>
+                <h6 class="text-secondary tiny fw-bold text-uppercase ls-1 mb-1">Net @(userRole == "Guide" ? "Earnings" : userRole == "SuperAdmin" ? "Income" : "Spend")</h6>
                 <h2 class="fw-bold text-dark mb-0">@netEarnings.ToString("C")</h2>
             </div>
         </div>
@@ -120,6 +123,8 @@
                     {
                         @foreach (var payment in Model)
                         {
+                            bool isGuide = userRole == "Guide" || (userRole == "SuperAdmin" && payment.Booking?.Guide?.ApplicationUserId == currentUserId);
+
                             <tr>
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center gap-2">
@@ -131,7 +136,7 @@
                                 </td>
                                 <td>
                                     <p class="mb-0 fw-bold text-dark">@payment.Booking?.Trip?.Title</p>
-                                    <p class="mb-0 text-muted tiny">@(userRole == "Guide" ? "Visitor" : "Guide"): @(userRole == "Guide" ? payment.Booking?.Visitor?.ApplicationUser?.FirstName : payment.Booking?.Guide?.ApplicationUser?.FirstName)</p>
+                                    <p class="mb-0 text-muted tiny">@(isGuide ? "Visitor" : "Guide"): @(isGuide ? payment.Booking?.Visitor?.ApplicationUser?.FirstName : payment.Booking?.Guide?.ApplicationUser?.FirstName)</p>
                                 </td>
                                 <td>
                                     <div class="small">
@@ -143,11 +148,11 @@
                                     <span class="fw-bold text-dark">@payment.Amount.ToString("C")</span>
                                 </td>
                                 <td>
-                                    <span class="text-danger small fw-semibold">- @((userRole == "Guide" ? payment.PlatformEarning : payment.ServiceFeeVisitor).ToString("C"))</span>
+                                    <span class="text-danger small fw-semibold">- @((isGuide ? payment.PlatformEarning : payment.ServiceFeeVisitor).ToString("C"))</span>
                                 </td>
                                 <td class="pe-4">
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="fw-bold text-success">@((userRole == "Guide" ? payment.GuideEarning : (payment.Amount - payment.ServiceFeeVisitor)).ToString("C"))</span>
+                                        <span class="fw-bold text-success">@((isGuide ? payment.GuideEarning : (payment.Amount - payment.ServiceFeeVisitor)).ToString("C"))</span>
                                         <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-0 tiny">Settled</span>
                                     </div>
                                 </td>

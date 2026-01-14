@@ -38,7 +38,37 @@ namespace GuideMe.Areas.Profile.Controllers
 
             IEnumerable<Booking> bookings;
 
-            if (user.Role == UserRole.Guide && user.Guide != null)
+            if (user.Role == UserRole.SuperAdmin || user.Role == UserRole.Admin)
+            {
+                 // Ensure both records exist
+                bool changed = false;
+                if (user.Guide == null)
+                {
+                    user.Guide = new Guide { ApplicationUserId = userId };
+                    await _context.Guides.AddAsync(user.Guide);
+                    changed = true;
+                }
+                if (user.Visitor == null)
+                {
+                    user.Visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available };
+                    await _context.Visitors.AddAsync(user.Visitor);
+                    changed = true;
+                }
+                if (changed) await _context.SaveChangesAsync();
+
+                var guideBookings = await _bookingRepo.GetAsync(
+                    b => b.GuideId == user.Guide.Id,
+                     includes: [b => b.Trip, b => b.Visitor, b => b.Visitor.ApplicationUser]);
+
+                var visitorBookings = await _bookingRepo.GetAsync(
+                    b => b.VisitorId == user.Visitor.Id,
+                    includes: [b => b.Trip, b => b.Guide, b => b.Guide.ApplicationUser]);
+
+                bookings = guideBookings.Concat(visitorBookings).DistinctBy(b => b.Id);
+                ViewBag.UserType = "SuperAdmin";
+                ViewBag.CurrentUserId = userId; // To help the view distinguish roles
+            }
+            else if (user.Role == UserRole.Guide && user.Guide != null)
             {
                 bookings = await _bookingRepo.GetAsync(
                     b => b.GuideId == user.Guide.Id,
@@ -78,7 +108,8 @@ namespace GuideMe.Areas.Profile.Controllers
             if (booking == null) return NotFound();
 
             // Security check
-            if (booking.VisitorId != user?.Visitor?.Id && booking.GuideId != user?.Guide?.Id)
+            bool isAuthorized = (booking.VisitorId == user?.Visitor?.Id) || (booking.GuideId == user?.Guide?.Id);
+            if (!isAuthorized)
             {
                 return Forbid();
             }
@@ -96,7 +127,12 @@ namespace GuideMe.Areas.Profile.Controllers
             var booking = await _bookingRepo.GetOneAsync(b => b.Id == id);
             if (booking == null) return NotFound();
 
-            if (booking.VisitorId != visitor?.Id) return Forbid();
+            if (booking.VisitorId != visitor?.Id)
+            {
+                // Allow SuperAdmin/Admin if they are the visitor for this booking
+                 var currentUser = await _context.Users.Include(u => u.Visitor).FirstOrDefaultAsync(u => u.Id == userId);
+                 if (currentUser?.Visitor?.Id != booking.VisitorId) return Forbid();
+            }
 
             if (booking.BookingStatus == BookingStatus.Pending)
             {
@@ -123,7 +159,12 @@ namespace GuideMe.Areas.Profile.Controllers
             var booking = await _bookingRepo.GetOneAsync(b => b.Id == id);
             if (booking == null) return NotFound();
 
-            if (booking.GuideId != guide?.Id) return Forbid();
+            if (booking.GuideId != guide?.Id) 
+            {
+                 // Allow SuperAdmin
+                 var currentUser = await _context.Users.Include(u => u.Guide).FirstOrDefaultAsync(u => u.Id == userId);
+                 if (currentUser?.Guide?.Id != booking.GuideId) return Forbid();
+            }
 
             booking.BookingStatus = status;
             _bookingRepo.Update(booking);

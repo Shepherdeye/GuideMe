@@ -1,7 +1,10 @@
 ﻿@model PaginatedList<Trip>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "My Trips";
+    var currentUserId = UserManager.GetUserId(User);
 }
 
 <div class="container py-5">
@@ -11,6 +14,14 @@
             <h1 class="display-4 fw-bold text-dark mb-0">Manage Trips</h1>
         </div>
         <div class="col-md-6 text-md-end">
+             <div class="d-flex gap-2 justify-content-md-end mb-3">
+                <div class="badge-glass px-3 py-2">
+                    <i class="bi bi-map text-primary me-2"></i>Created
+                </div>
+                <div class="badge-glass px-3 py-2">
+                    <i class="bi bi-compass text-success me-2"></i>Guiding
+                </div>
+            </div>
             <a asp-action="Create" class="btn-premium d-inline-block">
                 <i class="bi bi-plus-lg me-2"></i>Create New Trip
             </a>
@@ -23,11 +34,31 @@
             @for (int i = 0; i < Model.Count; i++)
             {
                 var trip = Model[i];
+                // Determine if the current user is the Creator (Visitor) or the Guide
+                bool isCreator = trip.Visitor?.ApplicationUserId == currentUserId;
+
                 <div class="col-lg-4 col-md-6 reveal-@(i % 3 + 1)">
                     <div class="glass-card h-100 p-0 overflow-hidden border-0">
                         <div class="position-relative">
                             <img src="@(string.IsNullOrEmpty(trip.Image) ? "/img/placeholder.jpg" : $"/main/img/{trip.Image}")" 
                                  class="w-100 object-fit-cover" style="height: 200px;" alt="">
+                            
+                            <!-- Context Badge -->
+                            <div class="position-absolute top-0 start-0 m-3">
+                                @if (isCreator)
+                                {
+                                     <span class="badge bg-primary bg-opacity-90 shadow-sm border border-light">
+                                        <i class="bi bi-map me-1"></i>Created
+                                    </span>
+                                }
+                                else
+                                {
+                                     <span class="badge bg-success bg-opacity-90 shadow-sm border border-light">
+                                        <i class="bi bi-compass me-1"></i>Guiding
+                                    </span>
+                                }
+                            </div>
+
                             <div class="position-absolute top-0 end-0 m-3">
                                 <span class="badge-glass shadow-sm">
                                     <i class="bi @(trip.Status == TripStatus.Open ? "bi-eye-fill text-success" : "bi-eye-slash-fill text-danger") me-1"></i>
@@ -37,7 +68,7 @@
                         </div>
                         
                         <div class="p-4">
-                            <h4 class="fw-bold text-dark mb-3">@trip.Title</h4>
+                            <h4 class="fw-bold text-dark mb-3 text-truncate">@trip.Title</h4>
                             <div class="d-flex justify-content-between mb-3 text-muted small">
                                 <span><i class="bi bi-geo-alt-fill text-primary me-1"></i>@trip.Destination</span>
                                 <span><i class="bi bi-calendar-check text-primary me-1"></i>@trip.CreatedOn.ToShortDateString()</span>
@@ -47,16 +78,26 @@
                                 <a asp-action="Details" asp-route-id="@trip.Id" class="btn btn-outline-dark btn-sm rounded-pill">
                                     <i class="bi bi-info-circle me-1"></i>Details
                                 </a>
-                                <div class="d-flex gap-2">
-                                    <a asp-action="Edit" asp-route-id="@trip.Id" class="btn btn-soft-primary btn-sm rounded-pill flex-grow-1">
-                                        <i class="bi bi-pencil me-1"></i>Edit
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@trip.Id" method="post" class="flex-grow-1">
-                                        <button type="submit" class="btn btn-soft-danger btn-sm rounded-pill w-100" onclick="return confirm('Delete this trip?')">
-                                            <i class="bi bi-trash me-1"></i>Delete
-                                        </button>
-                                    </form>
-                                </div>
+
+                                @if (isCreator)
+                                {
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Edit" asp-route-id="@trip.Id" class="btn btn-soft-primary btn-sm rounded-pill flex-grow-1">
+                                            <i class="bi bi-pencil me-1"></i>Edit
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@trip.Id" method="post" class="flex-grow-1">
+                                            <button type="submit" class="btn btn-soft-danger btn-sm rounded-pill w-100" onclick="return confirm('Delete this trip?')">
+                                                <i class="bi bi-trash me-1"></i>Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-soft-secondary btn-sm rounded-pill w-100" disabled>
+                                        <i class="bi bi-lock me-1"></i>Creator Only
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -96,8 +137,8 @@
     {
         <div class="text-center py-5 glass-card mt-4 reveal-1">
             <i class="bi bi-map text-muted display-1 opacity-25 mb-4"></i>
-            <h2 class="fw-bold text-dark">No trips created yet</h2>
-            <p class="text-secondary mb-5 fs-5">Start your journey as a guide by creating your first trip offer.</p>
+            <h2 class="fw-bold text-dark">No trips found</h2>
+            <p class="text-secondary mb-5 fs-5">You haven't created any trips or been assigned as a guide yet.</p>
             <a asp-action="Create" class="btn-premium">Create New Trip</a>
         </div>
     }
@@ -108,6 +149,7 @@
     .ls-2 { letter-spacing: 2px; }
     .btn-soft-primary { background: rgba(79, 70, 229, 0.1); color: #4f46e5; border: none; }
     .btn-soft-primary:hover { background: #4f46e5; color: white; }
+    .btn-soft-secondary { background: rgba(100, 116, 139, 0.1); color: #64748b; border: none; }
     .btn-soft-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; }
     .btn-soft-danger:hover { background: #ef4444; color: white; }
     .shadow-primary { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
@@ -117,4 +159,5 @@
         transition: all 0.3s ease;
     }
     .pagination .page-link { text-decoration: none; }
+    .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

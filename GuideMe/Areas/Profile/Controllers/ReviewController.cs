@@ -28,13 +28,71 @@ namespace GuideMe.Areas.Profile.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
             var userId = _userManager.GetUserId(User);
-            var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
-            
-            if (visitor == null) return Forbid("Only visitors can manage reviews.");
+            var currentUser = await _context.Users.Include(u => u.Visitor).FirstOrDefaultAsync(u => u.Id == userId);
 
-            var reviews = await _reviewRepo.GetAsync(
-                r => r.VisitorId == visitor.Id,
-                includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser]);
+            if (currentUser == null) return NotFound();
+
+            IEnumerable<GuideMe.Models.Review> reviews;
+
+            // Handle SuperAdmin/Admin
+            if (currentUser.Role == UserRole.SuperAdmin || currentUser.Role == UserRole.Admin)
+            {
+                if (currentUser.Guide == null)
+                {
+                   currentUser.Guide = new Guide { ApplicationUserId = userId };
+                   await _context.Guides.AddAsync(currentUser.Guide);
+                }
+                if (currentUser.Visitor == null)
+                {
+                    currentUser.Visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available };
+                    await _context.Visitors.AddAsync(currentUser.Visitor);
+                }
+                await _context.SaveChangesAsync();
+
+                var writtenReviews = await _reviewRepo.GetAsync(
+                    r => r.VisitorId == currentUser.Visitor.Id,
+                    includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser, r => r.Guide, r => r.Guide.ApplicationUser]);
+                
+                var receivedReviews = await _reviewRepo.GetAsync(
+                    r => r.GuideId == currentUser.Guide.Id,
+                    includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser, r => r.Guide, r => r.Guide.ApplicationUser]);
+
+                reviews = writtenReviews.Concat(receivedReviews).DistinctBy(r => r.Id);
+                ViewBag.UserType = "SuperAdmin";
+            }
+            else if (currentUser.Role == UserRole.Guide && currentUser.Guide != null)
+            {
+                 // Guide might also have a Visitor profile if they book trips, so check both if possible, 
+                 // but typically Guide primarily cares about received reviews. 
+                 // However, "like both" implies if I am a Guide and I acted as a Visitor, I want both.
+                 // Let's safe-guard:
+                 
+                 var receivedReviews = await _reviewRepo.GetAsync(
+                    r => r.GuideId == currentUser.Guide.Id,
+                     includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser, r => r.Guide, r => r.Guide.ApplicationUser]);
+                 
+                 var writtenReviews = Enumerable.Empty<GuideMe.Models.Review>();
+                 if (currentUser.Visitor != null)
+                 {
+                     writtenReviews = await _reviewRepo.GetAsync(
+                        r => r.VisitorId == currentUser.Visitor.Id,
+                        includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser, r => r.Guide, r => r.Guide.ApplicationUser]);
+                 }
+
+                 reviews = receivedReviews.Concat(writtenReviews).DistinctBy(r => r.Id);
+                 ViewBag.UserType = "Guide";
+            }
+            else if (currentUser.Visitor != null)
+            {
+                 reviews = await _reviewRepo.GetAsync(
+                    r => r.VisitorId == currentUser.Visitor.Id,
+                    includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser, r => r.Guide, r => r.Guide.ApplicationUser]);
+                 ViewBag.UserType = "Visitor";
+            }
+            else
+            {
+                return Forbid();
+            }
 
             var sortedReviews = reviews.OrderByDescending(r => r.Id);
             var paginatedReviews = PaginatedList<GuideMe.Models.Review>.Create(sortedReviews, page, 8);
@@ -46,12 +104,14 @@ namespace GuideMe.Areas.Profile.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var userId = _userManager.GetUserId(User);
-            var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
+            var currentUser = await _context.Users.Include(u => u.Visitor).FirstOrDefaultAsync(u => u.Id == userId);
+            
+            var visitorId = currentUser?.Visitor?.Id;
 
             var review = await _reviewRepo.GetOneAsync(r => r.Id == id, includes: [r => r.Trip]);
             if (review == null) return NotFound();
 
-            if (review.VisitorId != visitor?.Id) return Forbid();
+            if (review.VisitorId != visitorId) return Forbid();
 
             return View(review);
         }
@@ -73,8 +133,8 @@ namespace GuideMe.Areas.Profile.Controllers
 
                 // Check ownership again for security
                 var userId = _userManager.GetUserId(User);
-                var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
-                if (existingReview.VisitorId != visitor?.Id) return Forbid();
+                var currentUser = await _context.Users.Include(u => u.Visitor).FirstOrDefaultAsync(u => u.Id == userId);
+                if (existingReview.VisitorId != currentUser?.Visitor?.Id) return Forbid();
 
                 // Update only editable fields to be safe
                 existingReview.Comment = review.Comment;
@@ -97,12 +157,12 @@ namespace GuideMe.Areas.Profile.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var userId = _userManager.GetUserId(User);
-            var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
+            var currentUser = await _context.Users.Include(u => u.Visitor).FirstOrDefaultAsync(u => u.Id == userId);
 
             var review = await _reviewRepo.GetOneAsync(r => r.Id == id);
             if (review == null) return NotFound();
 
-            if (review.VisitorId != visitor?.Id) return Forbid();
+            if (review.VisitorId != currentUser?.Visitor?.Id) return Forbid();
 
             _reviewRepo.Delete(review);
             await _reviewRepo.CommitAsync();
@@ -112,3 +172,4 @@ namespace GuideMe.Areas.Profile.Controllers
         }
     }
 }
+

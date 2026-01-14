@@ -1,8 +1,11 @@
 @model PaginatedList<ContactAccess>
 
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 @{
     ViewData["Title"] = "Contact Directory";
     string currentUserRole = ViewBag.CurrentUserRole ?? "User";
+    var currentUserId = UserManager.GetUserId(User);
 }
 
 <div class="container py-5">
@@ -44,11 +47,13 @@
                     {
                         @foreach (var contact in Model)
                         {
-                            var targetUser = currentUserRole == "Guide" 
-                                ? contact.Booking.Visitor?.ApplicationUser 
-                                : contact.Booking.Guide?.ApplicationUser;
+                            bool isGuide = currentUserRole == "Guide" || (currentUserRole == "SuperAdmin" && contact.Booking?.Guide?.ApplicationUserId == currentUserId);
                             
-                            var targetRole = currentUserRole == "Guide" ? "Visitor" : "Guide";
+                            var targetUser = isGuide 
+                                ? contact.Booking?.Visitor?.ApplicationUser 
+                                : contact.Booking?.Guide?.ApplicationUser;
+                            
+                            var targetRole = isGuide ? "Visitor" : "Guide";
 
                             <tr>
                                 <td class="ps-4">

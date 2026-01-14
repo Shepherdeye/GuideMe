@@ -1,0 +1,74 @@
+@model Offer
+
+@{
+    ViewData["Title"] = "Recall Proposal";
+}
+
+<div class="container py-5 animate-fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-primary p-4 text-white">
+                    <h3 class="fw-bold mb-0">Edit Proposal</h3>
+                    <p class="mb-0 opacity-75">Update your offer details.</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="TripId" />
+                        <input type="hidden" asp-for="GuideId" />
+                        <!-- Status is not editable here, but handled in controller logic -->
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Trip</label>
+                             <div class="p-3 bg-light rounded-3 border text-secondary">
+                                <i class="bi bi-geo-alt-fill text-primary me-2"></i>@(Model.Trip?.Title ?? "Trip Details")
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="OfferStartDate" class="form-label fw-bold text-dark">Start Date</label>
+                                <input asp-for="OfferStartDate" type="date" class="form-control py-3 rounded-3" />
+                                <span asp-validation-for="OfferStartDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="OfferEndDate" class="form-label fw-bold text-dark">End Date</label>
+                                <input asp-for="OfferEndDate" type="date" class="form-control py-3 rounded-3" />
+                                <span asp-validation-for="OfferEndDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="OfferedPrice" class="form-label fw-bold text-dark">Required Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-3">$</span>
+                                <input asp-for="OfferedPrice" type="number" step="0.01" class="form-control py-3 border-start-0 rounded-end-3" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="OfferedPrice" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Message" class="form-label fw-bold text-dark">Your Pitch</label>
+                            <textarea asp-for="Message" class="form-control rounded-3" rows="4" placeholder="Update your message..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3 fw-bold">
+                                <i class="bi bi-check-lg me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

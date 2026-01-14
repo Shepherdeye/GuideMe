@@ -41,7 +41,33 @@ namespace GuideMe.Areas.Profile.Controllers
 
             IEnumerable<Offer> offers;
 
-            if (user.Role == UserRole.Guide && user.Guide != null)
+            if (user.Role == UserRole.SuperAdmin || user.Role == UserRole.Admin)
+            {
+                // Ensure both records exist for SuperAdmin
+                if (user.Guide == null)
+                {
+                    user.Guide = new Guide { ApplicationUserId = userId };
+                    await _context.Guides.AddAsync(user.Guide);
+                }
+                if (user.Visitor == null)
+                {
+                    user.Visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available };
+                    await _context.Visitors.AddAsync(user.Visitor);
+                }
+                await _context.SaveChangesAsync();
+
+                var guideOffers = await _offerRepo.GetAsync(
+                    o => o.GuideId == user.Guide.Id,
+                    includes: [o => o.Trip, o => o.Trip.Visitor, o => o.Trip.Visitor.ApplicationUser]);
+                
+                var visitorOffers = await _offerRepo.GetAsync(
+                    o => o.Trip.VisitorId == user.Visitor.Id,
+                    includes: [o => o.Trip, o => o.Guide, o => o.Guide.ApplicationUser]);
+
+                offers = guideOffers.Concat(visitorOffers).DistinctBy(o => o.Id);
+                ViewBag.UserType = "SuperAdmin";
+            }
+            else if (user.Role == UserRole.Guide && user.Guide != null)
             {
                 offers = await _offerRepo.GetAsync(
                     o => o.GuideId == user.Guide.Id,
@@ -71,8 +97,22 @@ namespace GuideMe.Areas.Profile.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var user = await _context.Users.Include(u => u.Guide).FirstOrDefaultAsync(u => u.Id == userId);
-            
-            if (user?.Role != UserRole.Guide) return Forbid("Only guides can create offers.");
+
+            if (user == null) return NotFound();
+
+            if (user.Role == UserRole.SuperAdmin || user.Role == UserRole.Admin)
+            {
+                if (user.Guide == null)
+                {
+                    user.Guide = new Guide { ApplicationUserId = userId };
+                    await _context.Guides.AddAsync(user.Guide);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else if (user.Role != UserRole.Guide) 
+            {
+                return Forbid("Only guides can create offers.");
+            }
 
             if (tripId.HasValue)
             {
@@ -122,6 +162,50 @@ namespace GuideMe.Areas.Profile.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var guide = await _context.Guides.FirstOrDefaultAsync(g => g.ApplicationUserId == userId);
+
+            var offer = await _offerRepo.GetOneAsync(o => o.Id == id, includes: [o => o.Trip]);
+            if (offer == null) return NotFound();
+
+            if (offer.GuideId != guide?.Id) return Forbid();
+            
+            if (offer.Status != OfferStatus.Pending) return Forbid();
+
+            return View(offer);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Offer offer)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingOffer = await _offerRepo.GetOneAsync(o => o.Id == offer.Id, tracked: false);
+                if (existingOffer == null) return NotFound();
+
+                var userId = _userManager.GetUserId(User);
+                var guide = await _context.Guides.FirstOrDefaultAsync(g => g.ApplicationUserId == userId);
+                
+                if (existingOffer.GuideId != guide?.Id) return Forbid();
+                if (existingOffer.Status != OfferStatus.Pending) return Forbid();
+
+                existingOffer.OfferedPrice = offer.OfferedPrice;
+                existingOffer.Message = offer.Message;
+                existingOffer.OfferStartDate = offer.OfferStartDate;
+                existingOffer.OfferEndDate = offer.OfferEndDate;
+
+                _offerRepo.Update(existingOffer);
+                await _offerRepo.CommitAsync();
+                TempData["Success"] = "Offer updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(offer);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -133,6 +217,12 @@ namespace GuideMe.Areas.Profile.Controllers
             if (offer == null) return NotFound();
 
             if (offer.GuideId != guide?.Id) return Forbid();
+
+            // Allow delete if Pending OR Rejected
+            if (offer.Status != OfferStatus.Pending && offer.Status != OfferStatus.Rejected) 
+            {
+                return Forbid();
+            }
 
             _offerRepo.Delete(offer);
             await _offerRepo.CommitAsync();

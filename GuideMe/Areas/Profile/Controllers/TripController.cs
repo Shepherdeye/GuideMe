@@ -34,11 +34,78 @@ namespace GuideMe.Areas.Profile.Controllers
             var currentUser = await _context.Users.Include(e => e.Visitor).Include(e => e.Guide)
                 .FirstOrDefaultAsync(e => e.Id == userId);
 
-            if (currentUser?.Visitor == null) return NotFound();
+            if (currentUser == null) return NotFound();
 
-            var trips = await _tripRepository.GetAsync(
-                e => e.VisitorId == currentUser.Visitor.Id, 
-                includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+            // Handle SuperAdmin/Admin who might not have a Visitor record yet
+            if (currentUser.Visitor == null && (currentUser.Role == UserRole.SuperAdmin || currentUser.Role == UserRole.Admin))
+            {
+                var visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available };
+                await _context.Visitors.AddAsync(visitor);
+                await _context.SaveChangesAsync();
+                currentUser.Visitor = visitor;
+            }
+
+            if (currentUser.Visitor == null) return NotFound("Visitor profile not found.");
+
+            if (currentUser.Visitor == null) return NotFound("Visitor profile not found.");
+
+            IEnumerable<Trip> trips;
+
+            if (currentUser.Role == UserRole.SuperAdmin || currentUser.Role == UserRole.Admin)
+            {
+               // Get trips created by this user (as Visitor)
+               var createdTrips = await _tripRepository.GetAsync(
+                   e => e.VisitorId == currentUser.Visitor.Id, 
+                   includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+               
+               // Get trips where this user is the confirmed Guide (via Bookings)
+               // Note: We need to load Bookings to filter effectively if repository doesn't support complex cross-linking easily.
+               // However, simple way is: if we have a Booking repository, we query that. 
+               // Since we are in TripController and usually only inject TripRepo, let's see if we can query Trips with a predicate involving Bookings.
+               // Default Generic Repo might not support deep nested filtering if not set up, but let's try.
+               // Alternatively, filtering in memory if dataset is small, or injecting BookingRepo.
+               // Let's assume we want to show trips where the guide has an Accepted booking.
+               
+               // For now, to avoid major dependency injection changes if not present, let's keep it simple.
+               // But wait, TripController only has TripRepo.
+               // Actually, `GetAsync` takes a predicate.
+               // `e => e.Bookings.Any(b => b.GuideId == currentUser.Guide.Id)` might work if EF Core is handling it.
+               
+               var guidedTrips = await _tripRepository.GetAsync(
+                   e => e.Bookings.Any(b => b.GuideId == currentUser.Guide.Id && (b.BookingStatus == BookingStatus.Accepted || b.BookingStatus == BookingStatus.Paid)),
+                   includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]
+               );
+
+               trips = createdTrips.Concat(guidedTrips).DistinctBy(t => t.Id);
+               ViewBag.UserType = "SuperAdmin";
+            }
+            else if (currentUser.Role == UserRole.Guide)
+            {
+                 // Guide might have created trips as a Visitor too?
+                 var guidedTrips = await _tripRepository.GetAsync(
+                   e => e.Bookings.Any(b => b.GuideId == currentUser.Guide.Id && (b.BookingStatus == BookingStatus.Accepted || b.BookingStatus == BookingStatus.Paid)),
+                   includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]
+                 );
+                 
+                 var createdTrips = Enumerable.Empty<Trip>();
+                 if (currentUser.Visitor != null)
+                 {
+                    createdTrips = await _tripRepository.GetAsync(
+                       e => e.VisitorId == currentUser.Visitor.Id, 
+                       includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+                 }
+                 
+                 trips = guidedTrips.Concat(createdTrips).DistinctBy(t => t.Id);
+                 ViewBag.UserType = "Guide";
+            }
+            else
+            {
+                // Regular Visitor
+                trips = await _tripRepository.GetAsync(
+                    e => e.VisitorId == currentUser.Visitor.Id, 
+                    includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+                ViewBag.UserType = "Visitor";
+            }
 
             var sortedTrips = trips.OrderByDescending(t => t.Id);
             var paginatedTrips = PaginatedList<Trip>.Create(sortedTrips, page, 6);
@@ -65,7 +132,18 @@ namespace GuideMe.Areas.Profile.Controllers
             var userId = _userManager.GetUserId(User);
             var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
             
-            if (currentUser?.Visitor == null) return NotFound("Visitor profile not found.");
+            if (currentUser == null) return NotFound();
+
+            // Handle SuperAdmin/Admin
+            if (currentUser.Visitor == null && (currentUser.Role == UserRole.SuperAdmin || currentUser.Role == UserRole.Admin))
+            {
+                var visitor = new Visitor { ApplicationUserId = userId, visitorStatus = VisitorStatus.Available };
+                await _context.Visitors.AddAsync(visitor);
+                await _context.SaveChangesAsync();
+                currentUser.Visitor = visitor;
+            }
+
+            if (currentUser.Visitor == null) return NotFound("Visitor profile not found.");
 
             if (ModelState.IsValid)
             {
