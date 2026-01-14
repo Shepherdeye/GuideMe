@@ -75,25 +75,14 @@
                     <a href="/main/Trip/index" class="nav-item nav-link">Trips</a>
                     <a href="/Main/Home/Index#Services" class="nav-item nav-link">Services</a>
                     <a href="/Main/Home/Index#About" class="nav-item nav-link">About</a>
-                    @* <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                        <div class="dropdown-menu m-0">
-                            <a href="destination.html" class="dropdown-item">Destination</a>
-                            <a href="booking.html" class="dropdown-item">Booking</a>
-                            <a href="team.html" class="dropdown-item">Travel Guides</a>
-                            <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                            <a href="/main/home/notFoundPage" class="dropdown-item">404 Page</a>
-                        </div>
-                    </div> *@
-                    @* <a href="contact.html" class="nav-item nav-link">Contact</a> *@
+                 
                 </div>
         
               
                 @if (User is not null && User.Identity.IsAuthenticated)
                 {
                    
-                    @* <a class="nav-item nav-link fw-bolder" href="/Profile/Profile/Index">@User.Identity.Name <i class="bi-person-fill me-1 text-lg"></i></a>
-                    <a href="/identity/Account/Logout" class="btn btn-danger rounded-pill py-2 px-4">Logout</a> *@
+
                         <div class="nav-item dropdown ms-3 position-relative" id="userDropdown">
                             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center px-2" aria-expanded="false">
                             @if (user.ProfileImage is not null && user.ProfileImage.Length>0 && user.ProfileImage != "")
@@ -122,10 +111,13 @@
                                 <a href="/Profile/Profile/Index" class="dropdown-item d-flex align-items-center py-2">
                                     <i class="bi bi-person-circle me-2 text-primary"></i> My Profile
                                 </a>
+                            @if (user.Role==UserRole.Admin|| user.Role==UserRole.SuperAdmin)
+                            {
                                 <a href="/admin" class="dropdown-item d-flex align-items-center py-2">
                                     <i class="bi bi-speedometer2 me-2 text-secondary"></i> Dashboard
                                 </a>
-                                <a href="/Profile/Profile/Index" class="dropdown-item d-flex align-items-center py-2">
+                            }
+                            <a href="/Profile/Profile/Index" class="dropdown-item d-flex align-items-center py-2">
                                     <i class="bi bi-gear-fill me-2 text-info"></i> Settings
                                 </a>
                                 <hr class="dropdown-divider">

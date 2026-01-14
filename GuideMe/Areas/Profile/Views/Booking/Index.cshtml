@@ -1,79 +1,93 @@
-@model IEnumerable<Booking>
+@model PaginatedList<Booking>
 
 @{
     ViewData["Title"] = "My Bookings";
     string userType = ViewBag.UserType ?? "User";
 }
 
-<div class="container py-5 animate-fade-in">
+<div class="container py-5">
     <!-- Header Section -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5 reveal-1">
         <div>
-            <h1 class="display-5 fw-bold text-dark mb-2">
-                <i class="bi bi-calendar-check text-primary me-2"></i>@(userType == "Guide" ? "Received Bookings" : "My Bookings")
+            <h1 class="display-4 fw-bold text-dark mb-2">
+                <i class="bi bi-calendar2-check-fill text-primary me-3"></i>@(userType == "Guide" ? "Incoming Bookings" : "My Journeys")
             </h1>
-            <p class="text-secondary mb-0">Manage your travel experiences and reservations.</p>
+            <p class="fs-5 text-secondary mb-0">Manage your travel experiences with elegance and ease.</p>
         </div>
-        <a href="/Main/Trip/Index" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm transition-all hover-lift">
-            <i class="bi bi-plus-lg me-2"></i>Find New Trip
-        </a>
+        <div class="d-flex align-items-center gap-3">
+             <span class="badge-glass px-4 py-2 d-none d-md-inline-block">
+                <i class="bi bi-journal-check me-2"></i>Total: @Model.Count Bookings
+            </span>
+            <a href="/Main/Trip/Index" class="btn-premium">
+                <i class="bi bi-search me-2"></i>Explore New Trips
+            </a>
+        </div>
     </div>
 
     @if (Model != null && Model.Any())
     {
-        <div class="row g-4">
-            @foreach (var item in Model)
+        <div class="row g-5 mb-5">
+            @for (int i = 0; i < Model.Count; i++)
             {
-                <div class="col-xl-6">
-                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 transition-hover">
+                var item = Model[i];
+                <div class="col-xl-6 reveal-@(i % 3 + 1)">
+                    <div class="glass-card overflow-hidden">
                         <div class="row g-0 h-100">
-                            <div class="col-sm-4 bg-light">
+                            <div class="col-sm-5 position-relative">
                                 <img src="@(string.IsNullOrEmpty(item.Trip?.Image) ? "/img/placeholder.jpg" : $"/main/img/{item.Trip.Image}")" 
-                                     class="w-100 h-100 object-fit-cover" alt="Trip Image" style="min-height: 200px;">
+                                     class="w-100 h-100 object-fit-cover" alt="Trip" style="min-height: 250px;">
+                                <div class="position-absolute top-0 start-0 m-3">
+                                    <span class="badge-glass shadow-sm">
+                                        <i class="bi bi-tag-fill me-1"></i>@item.BookingPrice.ToString("C")
+                                    </span>
+                                </div>
                             </div>
-                            <div class="col-sm-8">
-                                <div class="card-body p-4 d-flex flex-column h-100">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="col-sm-7">
+                                <div class="p-4 d-flex flex-column h-100">
+                                    <div class="mb-2">
                                         <span class="badge @(item.BookingStatus switch {
-                                            BookingStatus.Accepted => "bg-soft-success text-success",
-                                            BookingStatus.Paid => "bg-soft-primary text-primary",
-                                            BookingStatus.Pending => "bg-soft-info text-info",
-                                            BookingStatus.Rejected => "bg-soft-danger text-danger",
-                                            BookingStatus.Canceled => "bg-soft-secondary text-secondary",
+                                            BookingStatus.Accepted => "bg-success",
+                                            BookingStatus.Paid => "bg-primary",
+                                            BookingStatus.Pending => "bg-warning text-dark",
+                                            BookingStatus.Rejected => "bg-danger",
+                                            BookingStatus.Canceled => "bg-secondary",
                                             _ => "bg-light text-dark"
-                                        }) rounded-pill px-3 py-2">
+                                        }) rounded-pill px-3 py-1 small fw-bold">
                                             @item.BookingStatus
                                         </span>
-                                        <h5 class="fw-bold text-primary mb-0">@item.BookingPrice.ToString("C")</h5>
                                     </div>
 
-                                    <h4 class="fw-bold text-dark mb-3">@item.Trip?.Title</h4>
+                                    <h3 class="fw-bold text-dark mb-3">@item.Trip?.Title</h3>
                                     
-                                    <div class="d-flex flex-column gap-2 mb-4">
-                                        <div class="d-flex align-items-center gap-2 text-secondary small">
-                                            <i class="bi bi-calendar3 text-primary"></i>
-                                            <span>@item.StartDate.ToShortDateString() - @item.EndDate.ToShortDateString()</span>
+                                    <div class="space-y-2 mb-4">
+                                        <div class="d-flex align-items-center gap-3 text-muted">
+                                            <div class="rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                <i class="bi bi-calendar-event text-primary"></i>
+                                            </div>
+                                            <span class="small fw-semibold">@item.StartDate.ToShortDateString()</span>
                                         </div>
-                                        <div class="d-flex align-items-center gap-2 text-secondary small">
-                                            <i class="bi bi-person-badge text-primary"></i>
-                                            <span>
+                                        <div class="d-flex align-items-center gap-3 text-muted mt-2">
+                                            <div class="rounded-circle bg-light p-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                <i class="bi bi-person-circle text-primary"></i>
+                                            </div>
+                                            <span class="small fw-semibold text-truncate" style="max-width: 150px;">
                                                 @(userType == "Guide" 
-                                                    ? $"Visitor: {item.Visitor?.ApplicationUser?.FirstName} {item.Visitor?.ApplicationUser?.LastName}"
-                                                    : $"Guide: {item.Guide?.ApplicationUser?.FirstName} {item.Guide?.ApplicationUser?.LastName}")
+                                                    ? $"Traveler: {item.Visitor?.ApplicationUser?.FirstName}"
+                                                    : $"Guide: {item.Guide?.ApplicationUser?.FirstName}")
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div class="mt-auto d-flex gap-2">
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm rounded-pill px-3 transition-all">
-                                            View Details
+                                    <div class="mt-auto pt-3 border-top d-flex flex-wrap gap-2">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm rounded-pill px-4 transition-all">
+                                            Details
                                         </a>
 
                                         @if (userType == "Visitor" && item.BookingStatus == BookingStatus.Accepted)
                                         {
                                             <form asp-action="Pay" asp-route-id="@item.Id" method="post" class="d-inline">
                                                 <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 transition-all shadow-sm">
-                                                    <i class="bi bi-wallet2 me-2"></i>Pay Now
+                                                    <i class="bi bi-credit-card-2-back me-2"></i>Pay
                                                 </button>
                                             </form>
                                         }
@@ -81,9 +95,9 @@
                                         @if (userType == "Visitor" && item.BookingStatus == BookingStatus.Pending)
                                         {
                                             <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline">
-                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 transition-all" 
-                                                        onclick="return confirm('Are you sure you want to cancel this booking?')">
-                                                    Cancel
+                                                <button type="submit" class="btn btn-soft-danger btn-sm rounded-pill px-4" 
+                                                        onclick="return confirm('Withdraw this reservation request?')">
+                                                    Withdraw
                                                 </button>
                                             </form>
                                         }
@@ -92,14 +106,14 @@
                                         {
                                             <form asp-action="UpdateStatus" asp-route-id="@item.Id" method="post" class="d-inline">
                                                 <input type="hidden" name="status" value="@BookingStatus.Accepted" />
-                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 transition-all">
+                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 transition-all">
                                                     Accept
                                                 </button>
                                             </form>
                                             <form asp-action="UpdateStatus" asp-route-id="@item.Id" method="post" class="d-inline">
                                                 <input type="hidden" name="status" value="@BookingStatus.Rejected" />
-                                                <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 transition-all">
-                                                    Reject
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-4 transition-all">
+                                                    Decline
                                                 </button>
                                             </form>
                                         }
@@ -111,35 +125,56 @@
                 </div>
             }
         </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex justify-content-center mt-5 reveal-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-md gap-2">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link glass-card border-0 rounded-4 px-3 py-2" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link glass-card border-0 rounded-4 px-3 py-2 @(i == Model.PageIndex ? "bg-primary text-white shadow-primary text-decoration-none" : "text-dark text-decoration-none")" 
+                                   asp-action="Index" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link glass-card border-0 rounded-4 px-3 py-2" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     }
     else
     {
-        <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+        <div class="text-center py-5 glass-card mt-4 reveal-1">
             <div class="mb-4">
-                <i class="bi bi-journal-x text-muted display-1"></i>
+                <i class="bi bi-patch-question text-muted display-1 opacity-25"></i>
             </div>
-            <h3 class="fw-bold text-dark">No Bookings Found</h3>
-            <p class="text-secondary mb-4">You haven't made or received any bookings yet.</p>
-            <a href="/Main/Trip/Index" class="btn btn-primary rounded-pill px-5 py-3">Explore Trips</a>
+            <h2 class="fw-bold text-dark">No bookings found</h2>
+            <p class="text-secondary mb-5 fs-5">Your travel history starts here. Find your next destination today.</p>
+            <a href="/Main/Trip/Index" class="btn-premium">Browse All Trips</a>
         </div>
     }
 </div>
 
 <style>
-    body { background-color: #f8fafc; }
-    .bg-soft-primary { background-color: #e0e7ff !important; }
-    .bg-soft-success { background-color: #ecfdf5 !important; }
-    .bg-soft-info { background-color: #eff6ff !important; }
-    .bg-soft-danger { background-color: #fef2f2 !important; }
-    .bg-soft-secondary { background-color: #f1f5f9 !important; }
-    
-    .transition-hover:hover { 
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
-    }
-    .hover-lift:hover { transform: translateY(-2px); }
-    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    body { background: #fdfdfd; }
     .object-fit-cover { object-fit: cover; }
-    .transition-all { transition: all 0.3s ease; }
+    .space-y-2 > * + * { margin-top: 0.5rem; }
+    .shadow-primary { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+    .pagination .page-link:hover:not(.bg-primary) {
+        background: rgba(255, 255, 255, 0.8) !important;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
 </style>

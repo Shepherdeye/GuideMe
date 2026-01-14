@@ -2,10 +2,13 @@ using GuideMe.Models;
 using GuideMe.Repositories;
 using GuideMe.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using GuideMe.Utility;
 
 namespace GuideMe.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
+    [Authorize(Roles = SD.AdminRole + "," + SD.SuperAdminRole)]
     public class ReviewController : Controller
     {
         private readonly IRepository<GuideMe.Models.Review> _reviewRepo;

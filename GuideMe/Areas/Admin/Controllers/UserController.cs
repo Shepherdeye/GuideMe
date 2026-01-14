@@ -1,12 +1,16 @@
+using GuideMe.Models;
 using GuideMe.Repositories;
 using GuideMe.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using GuideMe.Utility;
 
 namespace GuideMe.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
+    [Authorize(Roles = SD.AdminRole + "," + SD.SuperAdminRole)]
     public class UserController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

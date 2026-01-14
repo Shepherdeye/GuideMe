@@ -48,7 +48,14 @@
                                      class="rounded-circle" width="60" height="60" style="object-fit: cover;">
                                 <div>
                                     <h6 class="fw-bold mb-0">@Model.Visitor?.ApplicationUser?.FirstName @Model.Visitor?.ApplicationUser?.LastName</h6>
-                                    <small class="text-muted">Visitor</small>
+                                    <small class="text-muted d-block">Visitor</small>
+                                    @if (Model.BookingStatus == BookingStatus.Paid)
+                                    {
+                                        <div class="mt-2 small">
+                                            <div class="text-primary"><i class="bi bi-telephone me-1"></i>@Model.Visitor?.ApplicationUser?.PhoneNumber</div>
+                                            <div class="text-primary"><i class="bi bi-envelope me-1"></i>@Model.Visitor?.ApplicationUser?.Email</div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -60,7 +67,14 @@
                                      class="rounded-circle" width="60" height="60" style="object-fit: cover;">
                                 <div>
                                     <h6 class="fw-bold mb-0">@Model.Guide?.ApplicationUser?.FirstName @Model.Guide?.ApplicationUser?.LastName</h6>
-                                    <small class="text-muted">Professional Guide</small>
+                                    <small class="text-muted d-block">Professional Guide</small>
+                                    @if (Model.BookingStatus == BookingStatus.Paid)
+                                    {
+                                        <div class="mt-2 small">
+                                            <div class="text-primary"><i class="bi bi-telephone me-1"></i>@Model.Guide?.ApplicationUser?.PhoneNumber</div>
+                                            <div class="text-primary"><i class="bi bi-envelope me-1"></i>@Model.Guide?.ApplicationUser?.Email</div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>

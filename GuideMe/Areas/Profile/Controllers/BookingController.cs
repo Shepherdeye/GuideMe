@@ -26,7 +26,7 @@ namespace GuideMe.Areas.Profile.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = _userManager.GetUserId(User);
             var user = await _context.Users
@@ -40,7 +40,6 @@ namespace GuideMe.Areas.Profile.Controllers
 
             if (user.Role == UserRole.Guide && user.Guide != null)
             {
-                // As a Guide, see bookings where I am the guide
                 bookings = await _bookingRepo.GetAsync(
                     b => b.GuideId == user.Guide.Id,
                     includes: [b => b.Trip, b => b.Visitor, b => b.Visitor.ApplicationUser]);
@@ -48,7 +47,6 @@ namespace GuideMe.Areas.Profile.Controllers
             }
             else if (user.Visitor != null)
             {
-                // As a Visitor, see bookings I made
                 bookings = await _bookingRepo.GetAsync(
                     b => b.VisitorId == user.Visitor.Id,
                     includes: [b => b.Trip, b => b.Guide, b => b.Guide.ApplicationUser]);
@@ -59,7 +57,10 @@ namespace GuideMe.Areas.Profile.Controllers
                 return Forbid();
             }
 
-            return View(bookings);
+            var sortedBookings = bookings.OrderByDescending(b => b.Id);
+            var paginatedBookings = PaginatedList<Booking>.Create(sortedBookings, page, 6);
+
+            return View(paginatedBookings);
         }
 
         public async Task<IActionResult> Details(int id)
@@ -196,35 +197,63 @@ namespace GuideMe.Areas.Profile.Controllers
             var service = new SessionService();
             Session session = service.Get(booking.StripeSessionId);
 
-            if (session.PaymentStatus.ToLower() == "paid" && booking.BookingStatus != BookingStatus.Paid)
+            if (session.PaymentStatus.ToLower() == "paid")
             {
-                booking.BookingStatus = BookingStatus.Paid;
-                _bookingRepo.Update(booking);
-
-                // Create Payment Record
-                var paymentRepo = HttpContext.RequestServices.GetRequiredService<IRepository<Payment>>();
+                bool isNewPayment = false;
                 
-                // Simple logic: 90% to Guide, 10% to Platform
-                decimal totalAmount = booking.BookingPrice;
-                decimal platformEarning = totalAmount * 0.10m;
-                decimal guideEarning = totalAmount - platformEarning;
-
-                Payment payment = new Payment
+                // Idempotency check: Create Payment Record only if it doesn't exist
+                var paymentRepo = HttpContext.RequestServices.GetRequiredService<IRepository<Payment>>();
+                var existingPayment = await paymentRepo.GetOneAsync(p => p.BookingId == id);
+                
+                if (existingPayment == null)
                 {
-                    BookingId = booking.Id,
-                    Amount = totalAmount,
-                    StripePaymentIntentId = session.PaymentIntentId,
-                    PaymentDate = DateTime.Now,
-                    PlatformEarning = platformEarning,
-                    GuideEarning = guideEarning,
-                    ServiceFeeGuide = platformEarning / 2, // Example split
-                    ServiceFeeVisitor = platformEarning / 2 // Example split
-                };
+                    decimal totalAmount = booking.BookingPrice;
+                    decimal platformEarning = totalAmount * 0.10m;
+                    decimal guideEarning = totalAmount - platformEarning;
 
-                await paymentRepo.CreateAsync(payment);
+                    Payment payment = new Payment
+                    {
+                        BookingId = booking.Id,
+                        Amount = totalAmount,
+                        StripePaymentIntentId = session.PaymentIntentId,
+                        PaymentDate = DateTime.Now,
+                        PlatformEarning = platformEarning,
+                        GuideEarning = guideEarning,
+                        ServiceFeeGuide = platformEarning / 2,
+                        ServiceFeeVisitor = platformEarning / 2
+                    };
+
+                    await paymentRepo.CreateAsync(payment);
+                    isNewPayment = true;
+                }
+
+                // Idempotency check: Create ContactAccess Record only if it doesn't exist (prevents IX_ContactAccess_BookingId error)
+                var contactRepo = HttpContext.RequestServices.GetRequiredService<IRepository<ContactAccess>>();
+                var existingContact = await contactRepo.GetOneAsync(c => c.BookingId == id);
+                
+                if (existingContact == null)
+                {
+                    ContactAccess contactAccess = new ContactAccess
+                    {
+                        BookingId = booking.Id,
+                        CreatedAt = DateTime.Now
+                    };
+                    await contactRepo.CreateAsync(contactAccess);
+                }
+
+                // Update booking status if not already set
+                if (booking.BookingStatus != BookingStatus.Paid)
+                {
+                    booking.BookingStatus = BookingStatus.Paid;
+                    _bookingRepo.Update(booking);
+                }
+
                 await _bookingRepo.CommitAsync();
 
-                TempData["Success"] = "Payment successful! Your trip is confirmed.";
+                if (isNewPayment)
+                {
+                    TempData["Success"] = "Payment successful! Your trip is confirmed and contact information is unlocked.";
+                }
             }
 
             return View(id);

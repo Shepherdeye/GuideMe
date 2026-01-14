@@ -1,29 +1,96 @@
-﻿
+﻿@model AdminDashboardVM
+
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-light text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Worldwide Sales</h6>
-                    <a href="">Show All</a>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm border-start border-primary border-4">
+                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2 text-muted small text-uppercase fw-bold">Total Bookings</p>
+                    <h4 class="mb-0 fw-bold">@Model.TotalBookings</h4>
                 </div>
-                <canvas id="worldwide-sales"></canvas>
             </div>
         </div>
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-light text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Salse & Revenue</h6>
-                    <a href="">Show All</a>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm border-start border-success border-4">
+                <i class="fa fa-wallet fa-3x text-success"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2 text-muted small text-uppercase fw-bold">Total Revenue</p>
+                    <h4 class="mb-0 fw-bold">@Model.TotalRevenue.ToString("C")</h4>
                 </div>
-                <canvas id="salse-revenue"></canvas>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm border-start border-info border-4">
+                <i class="fa fa-users fa-3x text-info"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2 text-muted small text-uppercase fw-bold">Active Guides</p>
+                    <h4 class="mb-0 fw-bold">@Model.TotalGuides</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm border-start border-warning border-4">
+                <i class="fa fa-walking fa-3x text-warning"></i>
+                <div class="ms-3 text-end">
+                    <p class="mb-2 text-muted small text-uppercase fw-bold">Registered Visitors</p>
+                    <h4 class="mb-0 fw-bold">@Model.TotalVisitors</h4>
+                </div>
             </div>
         </div>
     </div>
-</div> 
-<!-- Sales Chart End -->
+</div>
+
+
 
 @section Scripts {
-   
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const labels = @Html.Raw(Json.Serialize(Model.MonthlyLabels));
+            const bookingData = @Html.Raw(Json.Serialize(Model.MonthlyBookingCounts));
+            const revenueData = @Html.Raw(Json.Serialize(Model.MonthlyRevenue));
+
+            // Bookings Chart
+            new Chart(document.getElementById('bookings-chart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Bookings',
+                        data: bookingData,
+                        backgroundColor: 'rgba(0, 156, 255, .7)',
+                        borderRadius: 5
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Revenue Chart
+            new Chart(document.getElementById('revenue-chart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Monthly Revenue',
+                        data: revenueData,
+                        backgroundColor: 'rgba(0, 156, 255, .1)',
+                        borderColor: 'rgba(0, 156, 255, 1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgba(0, 156, 255, 1)'
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+    </script>
     <partial name="_NotifactionPartial" />
 }

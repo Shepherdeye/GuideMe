@@ -34,7 +34,7 @@ namespace GuideMe.Models
         public int VisitorId { get; set; }
 
         [ForeignKey(nameof(VisitorId))]
-        public Visitor Visitor { get; set; }
+        public Visitor? Visitor { get; set; }
 
 
         public int? BookingId { get; set; }

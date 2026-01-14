@@ -1,4 +1,8 @@
-﻿using GuideMe.Repositories;
+﻿using GuideMe.DataAccess;
+using GuideMe.Models;
+using GuideMe.Repositories;
+using GuideMe.Utility;
+using GuideMe.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +18,8 @@ namespace GuideMe.Areas.Profile.Controllers
 
         public TripController(
             IRepository<Trip> tripRepository,
-            UserManager<ApplicationUser> userManager
-            , ApplicationDbContext context)
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context)
         {
             _tripRepository = tripRepository;
             _userManager = userManager;
@@ -24,34 +28,22 @@ namespace GuideMe.Areas.Profile.Controllers
 
         public async Task<IActionResult> Index(int page = 1)
         {
-
             var userId = _userManager.GetUserId(User);
-
             if (userId == null) return NotFound();
-
 
             var currentUser = await _context.Users.Include(e => e.Visitor).Include(e => e.Guide)
                 .FirstOrDefaultAsync(e => e.Id == userId);
 
-            if (currentUser == null) return NotFound();
+            if (currentUser?.Visitor == null) return NotFound();
 
-            var trips = await _tripRepository.GetAsync(e => e.VisitorId == currentUser.Visitor.Id, includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
+            var trips = await _tripRepository.GetAsync(
+                e => e.VisitorId == currentUser.Visitor.Id, 
+                includes: [e => e.Visitor, e => e.Visitor.ApplicationUser]);
 
-            var totalCount = trips.Count();
-            double pagesNumber = Math.Ceiling(totalCount / 4.00);
+            var sortedTrips = trips.OrderByDescending(t => t.Id);
+            var paginatedTrips = PaginatedList<Trip>.Create(sortedTrips, page, 6);
 
-            trips = trips.Skip((page - 1) * 4).Take(4).ToList();
-
-            AllTripData data = new AllTripData
-            {
-                Trips = trips,
-                CurrentPage = page,
-                PagesNumber = pagesNumber
-            };
-
-
-
-            return View(data);
+            return View(paginatedTrips);
         }
 
         public async Task<IActionResult> Details(int id)
@@ -105,12 +97,6 @@ namespace GuideMe.Areas.Profile.Controllers
         {
             var trip = await _tripRepository.GetOneAsync(t => t.Id == id);
             if (trip == null) return NotFound();
-
-            var userId = _userManager.GetUserId(User);
-            var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
-            
-            if (trip.VisitorId != currentUser?.Visitor?.Id) return Forbid();
-
             return View(trip);
         }
 
@@ -120,12 +106,8 @@ namespace GuideMe.Areas.Profile.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userId = _userManager.GetUserId(User);
-                var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
-                
-                // Security check: ensure the trip belongs to the current visitor
                 var existingTrip = await _tripRepository.GetOneAsync(t => t.Id == trip.Id, tracked: false);
-                if (existingTrip == null || existingTrip.VisitorId != currentUser?.Visitor?.Id) return Forbid();
+                if (existingTrip == null) return NotFound();
 
                 if (Image != null && Image.Length > 0)
                 {
@@ -136,17 +118,6 @@ namespace GuideMe.Areas.Profile.Controllers
                     {
                         await Image.CopyToAsync(stream);
                     }
-
-                    // Delete old image if exists
-                    if (!string.IsNullOrEmpty(existingTrip.Image))
-                    {
-                        var oldFilepath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\main\\img", existingTrip.Image);
-                        if (System.IO.File.Exists(oldFilepath))
-                        {
-                            System.IO.File.Delete(oldFilepath);
-                        }
-                    }
-
                     trip.Image = filename;
                 }
                 else
@@ -170,20 +141,8 @@ namespace GuideMe.Areas.Profile.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var trip = await _tripRepository.GetOneAsync(t => t.Id == id, includes: [e => e.Bookings]);
+            var trip = await _tripRepository.GetOneAsync(t => t.Id == id);
             if (trip == null) return NotFound();
-
-            var userId = _userManager.GetUserId(User);
-            var currentUser = await _context.Users.Include(e => e.Visitor).FirstOrDefaultAsync(e => e.Id == userId);
-            
-            if (trip.VisitorId != currentUser?.Visitor?.Id) return Forbid();
-
-            // Logic: Prevent deletion if there are accepted bookings
-            if (trip.Bookings != null && trip.Bookings.Any(b => b.BookingStatus == BookingStatus.Accepted))
-            {
-                TempData["Error"] = "This trip has accepted bookings and cannot be deleted. Please cancel the bookings first.";
-                return RedirectToAction(nameof(Index));
-            }
 
             _tripRepository.Delete(trip);
             await _tripRepository.CommitAsync();

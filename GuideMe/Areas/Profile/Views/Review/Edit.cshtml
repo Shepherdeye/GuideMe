@@ -1,45 +1,60 @@
 @model Review
 
-@{
-    ViewData["Title"] = "Edit Review";
-}
-
-<div class="container py-5 animate-fade-in">
-    <div class="row justify-content-center">
+<div class="container py-5">
+    <div class="row justify-content-center reveal-1">
         <div class="col-lg-6">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="bg-warning p-4 text-dark">
-                    <h3 class="fw-bold mb-0">Edit Your Review</h3>
-                    <p class="mb-0 opacity-75">Update your feedback for the community.</p>
+            <div class="glass-card overflow-hidden border-0 shadow-lg">
+                <div class="p-4 p-md-5 text-center bg-primary bg-opacity-10 border-bottom border-white border-opacity-20">
+                    <div class="display-4 text-primary mb-3">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-1">Refine Your Story</h2>
+                    <p class="text-secondary small text-uppercase fw-bold ls-1">Update your feedback for @(Model.Trip?.Title ?? "your journey")</p>
                 </div>
+
                 <div class="card-body p-4 p-md-5">
-                    <form asp-action="Edit" method="post">
+                    <form asp-action="Edit" method="post" id="editReviewForm">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="VisitorId" />
+                        <input type="hidden" asp-for="TripId" />
+                        <input type="hidden" asp-for="GuideId" />
+                        <input type="hidden" asp-for="BookingId" />
                         
-                        <div class="mb-4 text-center">
-                            <label class="form-label fw-bold d-block text-dark mb-3">Overall Rating</label>
-                            <div class="star-rating fs-2 text-warning">
+                        <div class="mb-5 text-center">
+                            <label class="form-label fw-bold d-block text-dark mb-4 text-uppercase tiny ls-2">Your Rating</label>
+                            <div class="star-rating fs-1 d-flex justify-content-center flex-row-reverse gap-2">
                                 @for (int i = 5; i >= 1; i--)
                                 {
-                                    <input type="radio" asp-for="RatingReview" value="@(i-1)" id="star@(i)" />
-                                    <label for="star@(i)"><i class="bi bi-star-fill"></i></label>
+                                    <input type="radio" asp-for="RatingReview" value="@(i-1)" id="star@(i)" class="d-none" />
+                                    <label for="star@(i)" class="star-label transition-all cursor-pointer">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
                                 }
                             </div>
-                            <span asp-validation-for="RatingReview" class="text-danger small"></span>
+                            <span asp-validation-for="RatingReview" class="text-danger tiny fw-bold mt-2 d-block"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="Comment" class="form-label fw-bold text-dark">Your Experience</label>
-                            <textarea asp-for="Comment" class="form-control rounded-3" rows="5" placeholder="Share your experience..."></textarea>
-                            <span asp-validation-for="Comment" class="text-danger small"></span>
+                        <div class="mb-5">
+                            <label asp-for="Comment" class="form-label fw-bold text-dark text-uppercase tiny ls-2 ms-2 mb-3">Your Experience</label>
+                            <div class="position-relative">
+                                <textarea asp-for="Comment" 
+                                          class="form-control glass-input rounded-4 p-4" 
+                                          rows="6" 
+                                          placeholder="Describe your journey, the guide's expertise, and the small details that made it special..."></textarea>
+                                <div class="position-absolute bottom-0 end-0 p-3 text-muted tiny opacity-50">
+                                    <span id="charCount">0</span>/200
+                                </div>
+                            </div>
+                            <span asp-validation-for="Comment" class="text-danger tiny fw-bold mt-2 d-block"></span>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-warning btn-lg rounded-pill py-3 fw-bold shadow-sm">
-                                <i class="bi bi-check-lg me-2"></i>Update Review
+                        <div class="d-grid gap-3 pt-3">
+                            <button type="submit" class="btn-premium py-3 text-uppercase fw-bold ls-1">
+                                <i class="bi bi-stars me-2"></i>Update Feedback
                             </button>
-                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none">
-                                Cancel and return
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none tiny fw-bold text-uppercase ls-1 hover-primary transition-all">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel and return
                             </a>
                         </div>
                     </form>
@@ -50,30 +65,54 @@
 </div>
 
 <style>
-    body { background-color: #f8fafc; }
-    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .ls-1 { letter-spacing: 1px; }
+    .ls-2 { letter-spacing: 2px; }
+    .tiny { font-size: 0.7rem; }
+    .cursor-pointer { cursor: pointer; }
+    
+    .glass-input {
+        background: rgba(255, 255, 255, 0.5);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+    
+    .glass-input:focus {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: #4f46e5;
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
 
-    /* Star Rating System */
-    .star-rating {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: center;
+    /* Star Rating */
+    .star-label {
+        color: #e2e8f0;
+        font-size: 2.5rem;
     }
-    .star-rating input { display: none; }
-    .star-rating label {
-        color: #dee2e6;
-        cursor: pointer;
-        padding: 0 0.2rem;
-        transition: color 0.2s;
+    
+    .star-rating input:checked ~ .star-label,
+    .star-label:hover,
+    .star-label:hover ~ .star-label {
+        color: #fbbf24;
+        transform: scale(1.1);
     }
-    .star-rating input:checked ~ label,
-    .star-rating label:hover,
-    .star-rating label:hover ~ label {
-        color: #ffc107;
-    }
+    
+    .hover-primary:hover { color: #4f46e5 !important; }
 </style>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('textarea');
+            const countSpan = document.getElementById('charCount');
+            
+            const updateCount = () => {
+                countSpan.textContent = textarea.value.length;
+            };
+            
+            textarea.addEventListener('input', updateCount);
+            updateCount();
+        });
+    </script>
 }

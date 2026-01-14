@@ -1,11 +1,16 @@
-﻿using GuideMe.Repositories;
+﻿using GuideMe.Models;
+using GuideMe.Repositories;
+using GuideMe.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+using GuideMe.Utility;
 
 namespace GuideMe.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
+    [Authorize(Roles = SD.AdminRole + "," + SD.SuperAdminRole)]
     public class OfferController : Controller
     {
         private readonly IRepository<Offer> _offerRepository;

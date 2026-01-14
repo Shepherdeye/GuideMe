@@ -1,97 +1,61 @@
-﻿@model AllTripData
+﻿@model PaginatedList<Trip>
+
+@{
+    ViewData["Title"] = "My Trips";
+}
 
 <div class="container py-5">
-    <!-- Page Header -->
-    <div class="row align-items-center mb-5 animate-fade-in">
+    <div class="row mb-5 align-items-end reveal-1">
         <div class="col-md-6">
-            <h1 class="display-5 fw-bold text-dark mb-2">My Trips</h1>
-            <p class="text-secondary lead mb-0">Discover and manage your unique travel experiences</p>
+            <h6 class="text-primary text-uppercase fw-bold ls-2 mb-2">My Expeditions</h6>
+            <h1 class="display-4 fw-bold text-dark mb-0">Manage Trips</h1>
         </div>
-        <div class="col-md-6 text-md-end mt-4 mt-md-0">
-            <a asp-action="Create" class="btn btn-primary btn-lg rounded-pill shadow-sm px-5 py-3 transition-hover">
+        <div class="col-md-6 text-md-end">
+            <a asp-action="Create" class="btn-premium d-inline-block">
                 <i class="bi bi-plus-lg me-2"></i>Create New Trip
             </a>
         </div>
     </div>
 
-    <!-- Alert Messages (Toast style) -->
-    @if (TempData["Success"] != null)
+    @if (Model != null && Model.Any())
     {
-        <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 p-3 animate-slide-down" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 p-3 animate-slide-down" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-    }
-
-    <!-- Content Grid -->
-    @if (Model.Trips?.Any() == true)
-    {
-        <div class="row g-4 overflow-hidden">
-            @for (int i = 0; i < Model.Trips.Count; i++)
+        <div class="row g-4 mb-5">
+            @for (int i = 0; i < Model.Count; i++)
             {
-                var item = Model.Trips.ElementAt(i);
-                <div class="col-md-6 col-lg-4 col-xl-3 animate-fade-up" style="animation-delay: @(i * 0.1)s">
-                    <div class="card trip-premium-card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative transition-all">
-                        <!-- Card Header Label -->
-                        <div class="position-absolute top-0 end-0 m-3 z-index-10">
-                            <span class="badge @(item.Status == TripStatus.Open ? "bg-success" : "bg-warning text-dark") px-3 py-2 rounded-pill shadow-sm">
-                                <i class="bi @(item.Status == TripStatus.Open ? "bi-check-circle" : "bi-lock") me-1"></i> @item.Status
-                            </span>
-                        </div>
-
-                        <!-- Image Section -->
-                        <div class="trip-image-container position-relative overflow-hidden" style="height: 220px;">
-                            <img src="@(string.IsNullOrEmpty(item.Image) ? "/img/placeholder.jpg" : $"/main/img/{item.Image}")"
-                                 class="card-img-top w-100 h-100 object-fit-cover transition-transform duration-500"
-                                 alt="@item.Title">
-                            <div class="trip-image-overlay position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-dark">
-                                <span class="text-white fw-bold fs-5">@item.Price.ToString("C")</span>
-                                <small class="text-white-50 ms-2">/ per person</small>
+                var trip = Model[i];
+                <div class="col-lg-4 col-md-6 reveal-@(i % 3 + 1)">
+                    <div class="glass-card h-100 p-0 overflow-hidden border-0">
+                        <div class="position-relative">
+                            <img src="@(string.IsNullOrEmpty(trip.Image) ? "/img/placeholder.jpg" : $"/main/img/{trip.Image}")" 
+                                 class="w-100 object-fit-cover" style="height: 200px;" alt="">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge-glass shadow-sm">
+                                    <i class="bi @(trip.Status == TripStatus.Open ? "bi-eye-fill text-success" : "bi-eye-slash-fill text-danger") me-1"></i>
+                                    @trip.Status
+                                </span>
                             </div>
                         </div>
-
-                        <!-- Card Body -->
-                        <div class="card-body p-4">
-                            <h5 class="card-title fw-bold text-dark mb-2 text-truncate" title="@item.Title">@item.Title</h5>
-                            <p class="text-muted small mb-3"><i class="bi bi-geo-alt-fill text-primary me-1"></i> @item.Destination, @item.Region</p>
+                        
+                        <div class="p-4">
+                            <h4 class="fw-bold text-dark mb-3">@trip.Title</h4>
+                            <div class="d-flex justify-content-between mb-3 text-muted small">
+                                <span><i class="bi bi-geo-alt-fill text-primary me-1"></i>@trip.Destination</span>
+                                <span><i class="bi bi-calendar-check text-primary me-1"></i>@trip.CreatedOn.ToShortDateString()</span>
+                            </div>
                             
-                            <p class="card-text text-secondary small mb-4 line-clamp-2" style="height: 3.2em;">
-                                @item.Description
-                            </p>
-
-                            <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
-                                <div class="trip-stats d-flex gap-3">
-                                    <div class="text-center">
-                                        <div class="small fw-bold text-dark">@item.NumberOfDays</div>
-                                        <div class="text-muted" style="font-size: 0.7rem">Days</div>
-                                    </div>
-                                    <div class="text-center border-start ps-3">
-                                        <div class="small fw-bold text-dark">@item.Members</div>
-                                        <div class="text-muted" style="font-size: 0.7rem">Slots</div>
-                                    </div>
-                                </div>
-                                <div class="trip-actions d-flex gap-2">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-icon btn-light rounded-circle shadow-sm" title="View Details">
-                                        <i class="bi bi-eye"></i>
+                            <div class="d-grid gap-2 mt-4">
+                                <a asp-action="Details" asp-route-id="@trip.Id" class="btn btn-outline-dark btn-sm rounded-pill">
+                                    <i class="bi bi-info-circle me-1"></i>Details
+                                </a>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Edit" asp-route-id="@trip.Id" class="btn btn-soft-primary btn-sm rounded-pill flex-grow-1">
+                                        <i class="bi bi-pencil me-1"></i>Edit
                                     </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-icon btn-soft-primary rounded-circle shadow-sm" title="Edit">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline delete-form">
-    <button type="button"
-            class="btn btn-icon btn-soft-danger rounded-circle shadow-sm delete-btn"
-            title="Delete">
-        <i class="bi bi-trash"></i>
-    </button>
-</form>
-
+                                    <form asp-action="Delete" asp-route-id="@trip.Id" method="post" class="flex-grow-1">
+                                        <button type="submit" class="btn btn-soft-danger btn-sm rounded-pill w-100" onclick="return confirm('Delete this trip?')">
+                                            <i class="bi bi-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -101,208 +65,56 @@
         </div>
 
         <!-- Pagination -->
-        <nav class="mt-5 pt-3">
-            <ul class="pagination pagination-professional justify-content-center">
-                @if (Model.CurrentPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link rounded-circle mx-1" href="/profile/trip/index?page=@(Model.CurrentPage - 1)">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                }
-
-                @for (var i = 1; i <= Model.PagesNumber; i++)
-                {
-                    <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
-                        <a class="page-link rounded-circle mx-1" href="/profile/trip/index?page=@i">@i</a>
-                    </li>
-                }
-
-                @if (Model.CurrentPage < Model.PagesNumber)
-                {
-                    <li class="page-item">
-                        <a class="page-link rounded-circle mx-1" href="/profile/trip/index?page=@(Model.CurrentPage + 1)">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex justify-content-center mt-5 reveal-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-md gap-2">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link glass-card border-0 rounded-4 px-3 py-2" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link glass-card border-0 rounded-4 px-3 py-2 @(i == Model.PageIndex ? "bg-primary text-white shadow-primary" : "text-dark")" 
+                                   asp-action="Index" asp-route-page="@i">@i</a>
+                        </li>
+                        }
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link glass-card border-0 rounded-4 px-3 py-2" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     }
     else
     {
-        <div class="text-center py-5 mt-5 animate-fade-in">
-            <div class="empty-state-icon mb-4">
-                <i class="bi bi-map text-light" style="font-size: 5rem;"></i>
-            </div>
-            <h3 class="fw-bold text-dark">Your map is empty</h3>
-            <p class="text-muted mb-4 lead">You haven't created any trips yet. Start your journey today!</p>
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-5 py-3">
-                Create Your First Trip
-            </a>
+        <div class="text-center py-5 glass-card mt-4 reveal-1">
+            <i class="bi bi-map text-muted display-1 opacity-25 mb-4"></i>
+            <h2 class="fw-bold text-dark">No trips created yet</h2>
+            <p class="text-secondary mb-5 fs-5">Start your journey as a guide by creating your first trip offer.</p>
+            <a asp-action="Create" class="btn-premium">Create New Trip</a>
         </div>
     }
 </div>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // Modal logic (if still used)
-        document.querySelectorAll('.truncate-text').forEach(el => {
-            el.addEventListener('click', function () {
-                const label = this.getAttribute('data-label');
-                const text = this.getAttribute('data-text');
-                Swal.fire({
-                    title: label,
-                    text: text,
-                    confirmButtonColor: '#3b82f6'
-                });
-            });
-        });
-
-        // SweetAlert delete confirmation
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', e => {
-                e.preventDefault();
-                const form = btn.closest('form');
-                Swal.fire({
-                    title: "Delete this Trip?",
-                    text: "This action cannot be undone. All related data will be removed.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#ef4444",
-                    cancelButtonColor: "#64748b",
-                    confirmButtonText: "Yes, delete it",
-                    cancelButtonText: "Cancel",
-                    customClass: {
-                        popup: 'rounded-4 border-0 shadow-lg'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    </script>
-
-    <style>
-        :root {
-            --primary-color: #3b82f6;
-            --primary-soft: #eff6ff;
-            --danger-soft: #fef2f2;
-            --dark-color: #1e293b;
-            --gray-color: #64748b;
-        }
-
-        body {
-            background-color: #f8fafc;
-        }
-
-        .object-fit-cover { object-fit: cover; }
-        .transition-all { transition: all 0.3s ease; }
-        .transition-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .duration-500 { transition-duration: 0.5s; }
-
-        .bg-gradient-dark {
-            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-        }
-
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Premium Card Styling */
-        .trip-premium-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        }
-
-        .trip-premium-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .trip-premium-card:hover img {
-            transform: scale(1.1);
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: all 0.2s;
-        }
-
-        .btn-soft-primary {
-            background-color: var(--primary-soft);
-            color: var(--primary-color);
-            border: none;
-        }
-        .btn-soft-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-soft-danger {
-            background-color: var(--danger-soft);
-            color: #ef4444;
-            border: none;
-        }
-        .btn-soft-danger:hover {
-            background-color: #ef4444;
-            color: white;
-        }
-
-        /* Animations */
-        @@keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @@keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @@keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-fade-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
-        .animate-fade-in { animation: fadeIn 0.8s ease-in forwards; }
-        .animate-slide-down { animation: slideDown 0.4s ease-out forwards; }
-
-        /* Pagination Styling */
-        .pagination-professional .page-link {
-            border: none;
-            color: var(--gray-color);
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        .pagination-professional .page-item.active .page-link {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
-        }
-
-        .pagination-professional .page-link:hover {
-            background-color: var(--primary-soft);
-            color: var(--primary-color);
-        }
-    </style>
-}
+<style>
+    .ls-1 { letter-spacing: 1px; }
+    .ls-2 { letter-spacing: 2px; }
+    .btn-soft-primary { background: rgba(79, 70, 229, 0.1); color: #4f46e5; border: none; }
+    .btn-soft-primary:hover { background: #4f46e5; color: white; }
+    .btn-soft-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; }
+    .btn-soft-danger:hover { background: #ef4444; color: white; }
+    .shadow-primary { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+    .pagination .page-link:hover:not(.bg-primary) {
+        background: rgba(255, 255, 255, 0.8) !important;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
+    .pagination .page-link { text-decoration: none; }
+</style>

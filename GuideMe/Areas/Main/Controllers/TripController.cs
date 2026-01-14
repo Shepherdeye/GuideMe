@@ -369,16 +369,6 @@ namespace GuideMe.Areas.Main.Controllers
                 trip.Status = TripStatus.Close;
                 _tripRepo.Update(trip);
 
-                // 5. Create ContactAccess
-                var contactAccess = new ContactAccess
-                {
-                    BookingId = newBooking.Id,
-                    CreatedAt = DateTime.Now
-                };
-
-                await _contactAccessRepo.CreateAsync(contactAccess);
-
-
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 

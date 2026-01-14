@@ -25,7 +25,7 @@ namespace GuideMe.Areas.Profile.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = _userManager.GetUserId(User);
             var user = await _context.Users
@@ -39,26 +39,59 @@ namespace GuideMe.Areas.Profile.Controllers
 
             if (user.Role == UserRole.Guide && user.Guide != null)
             {
-                // As a Guide, see payments where I am the guide in the associated booking
                 payments = await _paymentRepo.GetAsync(
                     p => p.Booking.GuideId == user.Guide.Id,
                     includes: [p => p.Booking, p => p.Booking.Trip, p => p.Booking.Visitor, p => p.Booking.Visitor.ApplicationUser]);
-                ViewBag.UserType = "Guide";
+                ViewBag.UserRole = "Guide";
             }
             else if (user.Visitor != null)
             {
-                // As a Visitor, see payments I made
                 payments = await _paymentRepo.GetAsync(
                     p => p.Booking.VisitorId == user.Visitor.Id,
                     includes: [p => p.Booking, p => p.Booking.Trip, p => p.Booking.Guide, p => p.Booking.Guide.ApplicationUser]);
-                ViewBag.UserType = "Visitor";
+                ViewBag.UserRole = "Visitor";
             }
             else
             {
                 return Forbid();
             }
 
-            return View(payments);
+            // Financial Analytics
+            var totalRevenue = payments.Sum(p => p.Amount);
+            var totalFees = payments.Sum(p => p.PlatformEarning); // Total platform fee
+            var netEarnings = payments.Sum(p => p.GuideEarning);
+            
+            if (user.Role == UserRole.Visitor) {
+                totalFees = payments.Sum(p => p.ServiceFeeVisitor);
+                netEarnings = totalRevenue - totalFees;
+            }
+
+            var now = DateTime.Now;
+            var thirtyDaysAgo = now.AddDays(-30);
+            var sixtyDaysAgo = now.AddDays(-60);
+
+            var currentPeriodEarnings = payments.Where(p => p.PaymentDate >= thirtyDaysAgo).Sum(p => p.Amount);
+            var previousPeriodEarnings = payments.Where(p => p.PaymentDate >= sixtyDaysAgo && p.PaymentDate < thirtyDaysAgo).Sum(p => p.Amount);
+
+            double growth = 0;
+            if (previousPeriodEarnings > 0)
+            {
+                growth = (double)((currentPeriodEarnings - previousPeriodEarnings) / previousPeriodEarnings) * 100;
+            }
+            else if (currentPeriodEarnings > 0)
+            {
+                growth = 100;
+            }
+
+            ViewBag.TotalRevenue = totalRevenue;
+            ViewBag.TotalFees = totalFees;
+            ViewBag.NetEarnings = netEarnings;
+            ViewBag.Growth = growth;
+
+            var sortedPayments = payments.OrderByDescending(p => p.Id);
+            var paginatedPayments = PaginatedList<Payment>.Create(sortedPayments, page, 8);
+
+            return View(paginatedPayments);
         }
     }
 }

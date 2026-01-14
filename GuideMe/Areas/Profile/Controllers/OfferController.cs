@@ -29,7 +29,7 @@ namespace GuideMe.Areas.Profile.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = _userManager.GetUserId(User);
             var user = await _context.Users
@@ -43,7 +43,6 @@ namespace GuideMe.Areas.Profile.Controllers
 
             if (user.Role == UserRole.Guide && user.Guide != null)
             {
-                // As a Guide, see offers I have SENT
                 offers = await _offerRepo.GetAsync(
                     o => o.GuideId == user.Guide.Id,
                     includes: [o => o.Trip, o => o.Trip.Visitor, o => o.Trip.Visitor.ApplicationUser]);
@@ -51,7 +50,6 @@ namespace GuideMe.Areas.Profile.Controllers
             }
             else if (user.Visitor != null)
             {
-                // As a Visitor, see offers RECEIVED on my trips
                 offers = await _offerRepo.GetAsync(
                     o => o.Trip.VisitorId == user.Visitor.Id,
                     includes: [o => o.Trip, o => o.Guide, o => o.Guide.ApplicationUser]);
@@ -62,7 +60,10 @@ namespace GuideMe.Areas.Profile.Controllers
                 return Forbid();
             }
 
-            return View(offers);
+            var sortedOffers = offers.OrderByDescending(o => o.Id);
+            var paginatedOffers = PaginatedList<Offer>.Create(sortedOffers, page, 6);
+
+            return View(paginatedOffers);
         }
 
         [HttpGet]
@@ -111,7 +112,6 @@ namespace GuideMe.Areas.Profile.Controllers
             var offer = await _offerRepo.GetOneAsync(o => o.Id == id, includes: [o => o.Trip]);
             if (offer == null) return NotFound();
 
-            // Only Trip Owner (Visitor) can Accept/Reject
             if (offer.Trip.VisitorId != visitor?.Id) return Forbid();
 
             offer.Status = status;

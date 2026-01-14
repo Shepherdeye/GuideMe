@@ -1,92 +1,103 @@
-@model IEnumerable<Offer>
+@model PaginatedList<Offer>
 
 @{
     ViewData["Title"] = "Trip Offers";
     string userType = ViewBag.UserType ?? "User";
 }
 
-<div class="container py-5 animate-fade-in">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+<div class="container py-5">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 reveal-1">
         <div>
-            <h1 class="display-5 fw-bold text-dark mb-2">
-                <i class="bi bi-tag text-primary me-2"></i>@(userType == "Guide" ? "My Sent Offers" : "Received Offers")
+            <h1 class="display-4 fw-bold text-dark mb-2">
+                <i class="bi bi-tags-fill text-primary me-3"></i>@(userType == "Guide" ? "Sent Proposals" : "Guide Proposals")
             </h1>
-            <p class="text-secondary mb-0">Track and manage guide proposals for your experiences.</p>
+            <p class="fs-5 text-secondary mb-0">Elevate your trips with expert local guide offers.</p>
         </div>
-        @if (userType == "Guide")
-        {
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm transition-all hover-lift">
-                <i class="bi bi-send me-2"></i>New Offer
-            </a>
-        }
+        <div class="d-flex align-items-center gap-3">
+             <span class="badge-glass px-4 py-2 d-none d-md-inline-block">
+                <i class="bi bi-send-check me-2"></i>Total: @Model.Count Proposals
+            </span>
+            @if (userType == "Guide")
+            {
+                <a asp-action="Create" class="btn-premium">
+                    <i class="bi bi-send-fill me-2"></i>Create New Offer
+                </a>
+            }
+        </div>
     </div>
 
     @if (Model != null && Model.Any())
     {
-        <div class="row g-4">
-            @foreach (var item in Model)
+        <div class="row g-5 mb-5">
+            @for (int i = 0; i < Model.Count; i++)
             {
-                <div class="col-md-6 col-xl-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 transition-hover">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <span class="badge @(item.Status switch {
-                                    OfferStatus.Accepted => "bg-soft-success text-success",
-                                    OfferStatus.Pending => "bg-soft-warning text-warning",
-                                    OfferStatus.Rejected => "bg-soft-danger text-danger",
-                                    OfferStatus.Canceled => "bg-soft-secondary text-secondary",
-                                    _ => "bg-light text-dark"
-                                }) rounded-pill px-3 py-2">
-                                    @item.Status
-                                </span>
-                                <h4 class="fw-bold text-primary mb-0">@item.OfferedPrice.ToString("C")</h4>
-                            </div>
-
-                            <h5 class="fw-bold text-dark mb-2">@item.Trip?.Title</h5>
-                            <div class="d-flex align-items-center gap-2 text-secondary mb-3 small">
-                                <i class="bi bi-person-badge"></i>
-                                <span>
-                                    @(userType == "Guide" 
-                                        ? $"To: {item.Trip?.Visitor?.ApplicationUser?.FirstName}" 
-                                        : $"From: {item.Guide?.ApplicationUser?.FirstName}")
-                                </span>
-                            </div>
-
-                            <p class="text-secondary small mb-4" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                                "@item.Message"
-                            </p>
-
-                            <div class="border-top pt-3 mt-auto">
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <div class="text-muted small">Starts</div>
-                                        <div class="fw-bold small">@item.OfferStartDate.ToShortDateString()</div>
-                                    </div>
-                                    <div class="col-6 text-end">
-                                        <div class="text-muted small">Ends</div>
-                                        <div class="fw-bold small">@item.OfferEndDate.ToShortDateString()</div>
-                                    </div>
-                                </div>
+                var item = Model[i];
+                <div class="col-md-6 col-xl-4 reveal-@(i % 3 + 1)">
+                    <div class="glass-card p-4 transition-all h-100 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <span class="badge @(item.Status switch {
+                                OfferStatus.Accepted => "bg-success",
+                                OfferStatus.Pending => "bg-warning text-dark",
+                                OfferStatus.Rejected => "bg-danger",
+                                OfferStatus.Canceled => "bg-secondary",
+                                _ => "bg-light text-dark"
+                            }) rounded-pill px-3 py-1 small fw-bold">
+                                @item.Status
+                            </span>
+                            <div class="text-end">
+                                <span class="d-block text-muted small text-uppercase fw-bold">Price</span>
+                                <h3 class="fw-bold text-primary mb-0">@item.OfferedPrice.ToString("C")</h3>
                             </div>
                         </div>
-                        <div class="card-footer bg-light border-0 p-3 rounded-bottom-4">
+
+                        <h4 class="fw-bold text-dark mb-2">@item.Trip?.Title</h4>
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <div class="rounded-circle bg-light p-1" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-fill text-primary"></i>
+                            </div>
+                            <span class="text-secondary small fw-semibold text-truncate" style="max-width: 150px;">
+                                @(userType == "Guide" 
+                                    ? $"To: {item.Trip?.Visitor?.ApplicationUser?.FirstName}" 
+                                    : $"From: {item.Guide?.ApplicationUser?.FirstName}")
+                            </span>
+                        </div>
+
+                        <div class="bg-light bg-opacity-50 rounded-4 p-3 mb-4 flex-grow-1">
+                            <p class="text-dark small mb-0 italic" style="display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6;">
+                                <i class="bi bi-quote text-primary opacity-50 me-1"></i>@item.Message"
+                            </p>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="row g-3 mb-4 border-bottom pb-3 text-nowrap">
+                                <div class="col-6">
+                                    <span class="d-block text-muted tiny text-uppercase fw-bold">In</span>
+                                    <span class="fw-bold small">@item.OfferStartDate.ToString("MMM dd")</span>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <span class="d-block text-muted tiny text-uppercase fw-bold">Out</span>
+                                    <span class="fw-bold small">@item.OfferEndDate.ToString("MMM dd")</span>
+                                </div>
+                            </div>
+
                             <div class="d-flex gap-2">
                                 @if (userType == "Visitor" && item.Status == OfferStatus.Pending)
                                 {
                                     <form asp-action="UpdateStatus" asp-route-id="@item.Id" method="post" class="flex-grow-1">
                                         <input type="hidden" name="status" value="@OfferStatus.Accepted" />
-                                        <button type="submit" class="btn btn-success btn-sm w-100 rounded-pill py-2">Accept</button>
+                                        <button type="submit" class="btn btn-success btn-sm w-100 rounded-pill py-2 fw-bold shadow-sm transition-all">Accept</button>
                                     </form>
                                     <form asp-action="UpdateStatus" asp-route-id="@item.Id" method="post" class="flex-grow-1">
                                         <input type="hidden" name="status" value="@OfferStatus.Rejected" />
-                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill py-2">Reject</button>
+                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill py-2 fw-bold transition-all">Decline</button>
                                     </form>
                                 }
                                 @if (userType == "Guide" && item.Status == OfferStatus.Pending)
                                 {
                                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="w-100">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill py-2" 
-                                                onclick="return confirm('Withdraw this offer?')">Withdraw</button>
+                                        <button type="submit" class="btn btn-soft-danger btn-sm w-100 rounded-pill py-2 fw-bold" 
+                                                onclick="return confirm('Withdraw this proposal?')">Withdraw Offer</button>
                                     </form>
                                 }
                             </div>
@@ -95,24 +106,54 @@
                 </div>
             }
         </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="d-flex justify-content-center mt-5 reveal-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-md gap-2">
+                        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                            <a class="page-link glass-card border-0 rounded-4 px-3 py-2" asp-action="Index" asp-route-page="@(Model.PageIndex - 1)">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link glass-card border-0 rounded-4 px-3 py-2 @(i == Model.PageIndex ? "bg-primary text-white shadow-primary text-decoration-none" : "text-dark text-decoration-none")" 
+                                   asp-action="Index" asp-route-page="@i">@i</a>
+                        </li>
+                        }
+                        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                            <a class="page-link glass-card border-0 rounded-4 px-3 py-2" asp-action="Index" asp-route-page="@(Model.PageIndex + 1)">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     }
     else
     {
-        <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
-            <i class="bi bi-tag-fill text-muted display-1 mb-4"></i>
-            <h3 class="fw-bold text-dark">No Offers Yet</h3>
-            <p class="text-secondary mb-4">@(userType == "Guide" ? "You haven't sent any offers to trip owners." : "You haven't received any guide offers on your trips yet.")</p>
+        <div class="text-center py-5 glass-card mt-4 reveal-1">
+            <i class="bi bi-envelope-x text-muted display-1 opacity-25 mb-4"></i>
+            <h2 class="fw-bold text-dark">No offers available</h2>
+            <p class="text-secondary mb-0 fs-5">@(userType == "Guide" ? "You haven't sent any proposals to trip owners yet." : "You haven't received any guide proposals for your trips yet.")</p>
         </div>
     }
 </div>
 
 <style>
-    body { background-color: #f8fafc; }
-    .bg-soft-success { background-color: #ecfdf5 !important; }
-    .bg-soft-warning { background-color: #fffbeb !important; }
-    .bg-soft-danger { background-color: #fef2f2 !important; }
-    .bg-soft-secondary { background-color: #f1f5f9 !important; }
-    .transition-hover:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important; }
-    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-    @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    body { background: #fdfdfd; }
+    .tiny { font-size: 0.65rem; letter-spacing: 0.5px; }
+    .italic { font-style: italic; }
+    .shadow-primary { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+    .pagination .page-link:hover:not(.bg-primary) {
+        background: rgba(255, 255, 255, 0.8) !important;
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
+    .pagination .page-link { text-decoration: none; }
 </style>

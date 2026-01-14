@@ -25,18 +25,21 @@ namespace GuideMe.Areas.Profile.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var userId = _userManager.GetUserId(User);
             var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
             
-            if (visitor == null) return Forbid("Only visitors can write reviews.");
+            if (visitor == null) return Forbid("Only visitors can manage reviews.");
 
             var reviews = await _reviewRepo.GetAsync(
                 r => r.VisitorId == visitor.Id,
-                includes: [r => r.Trip, r => r.Guide, r => r.Guide.ApplicationUser]);
+                includes: [r => r.Trip, r => r.Visitor, r => r.Visitor.ApplicationUser]);
 
-            return View(reviews);
+            var sortedReviews = reviews.OrderByDescending(r => r.Id);
+            var paginatedReviews = PaginatedList<GuideMe.Models.Review>.Create(sortedReviews, page, 8);
+
+            return View(paginatedReviews);
         }
 
         [HttpGet]
@@ -45,7 +48,7 @@ namespace GuideMe.Areas.Profile.Controllers
             var userId = _userManager.GetUserId(User);
             var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
 
-            var review = await _reviewRepo.GetOneAsync(r => r.Id == id);
+            var review = await _reviewRepo.GetOneAsync(r => r.Id == id, includes: [r => r.Trip]);
             if (review == null) return NotFound();
 
             if (review.VisitorId != visitor?.Id) return Forbid();
@@ -57,22 +60,35 @@ namespace GuideMe.Areas.Profile.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(GuideMe.Models.Review review)
         {
+            // Remove navigation properties from validation if they are causing issues
+            ModelState.Remove("Visitor");
+            ModelState.Remove("Trip");
+            ModelState.Remove("Guide");
+            ModelState.Remove("Booking");
+
             if (ModelState.IsValid)
             {
-                var existingReview = await _reviewRepo.GetOneAsync(r => r.Id == review.Id, tracked: false);
+                var existingReview = await _reviewRepo.GetOneAsync(r => r.Id == review.Id);
                 if (existingReview == null) return NotFound();
 
-                review.VisitorId = existingReview.VisitorId;
-                review.TripId = existingReview.TripId;
-                review.GuideId = existingReview.GuideId;
-                review.BookingId = existingReview.BookingId;
-                review.ReviewDate = DateTime.Now;
+                // Check ownership again for security
+                var userId = _userManager.GetUserId(User);
+                var visitor = await _context.Visitors.FirstOrDefaultAsync(v => v.ApplicationUserId == userId);
+                if (existingReview.VisitorId != visitor?.Id) return Forbid();
 
-                _reviewRepo.Update(review);
+                // Update only editable fields to be safe
+                existingReview.Comment = review.Comment;
+                existingReview.RatingReview = review.RatingReview;
+                existingReview.ReviewDate = DateTime.Now;
+
+                _reviewRepo.Update(existingReview);
                 await _reviewRepo.CommitAsync();
+                
                 TempData["Success"] = "Review updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
+            
+            // If we got here, there's a validation error
             return View(review);
         }
 

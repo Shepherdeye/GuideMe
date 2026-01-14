@@ -105,10 +105,10 @@ namespace GuideMe
                 pattern: "{area=Main}/{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
-            app.Run();
-
             // Set Stripe Secret Key
             Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
+
+            app.Run();
         }
     }
 }
